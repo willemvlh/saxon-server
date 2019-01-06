@@ -34,13 +34,13 @@ public class Server {
                 req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
                 Part xmlPart = req.raw().getPart(INPUT_KEY);
                 if(xmlPart == null){
-                    return handleException(res, 400, new RuntimeException("No XML input found")).body();
+                    return handleException(res, 400, new InvalidRequest("No XML input found")).body();
                 }
                 try(InputStream input = xmlPart.getInputStream())
                 {
                     Part xslPart = req.raw().getPart(XSL_KEY);
                     if(xslPart == null){
-                        return handleException(res, 400, new RuntimeException("No XSL input found")).body();
+                        return handleException(res, 400, new InvalidRequest("No XSL input found")).body();
                     }
                     SaxonTransformer transformer = new SaxonTransformer();
                     try(InputStream stylesheet = xslPart.getInputStream()){

@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0a61355b-d7b0-4822-86e2-a60db938f8c5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/SaxonTransformerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/XsltTransformer/Error.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/XsltTransformer/Error.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/XsltTransformer/SaxonTransformer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/XsltTransformer/SaxonTransformer.java" afterDir="false" />
+    <list default="true" id="0a61355b-d7b0-4822-86e2-a60db938f8c5" name="Default Changelist" comment="add test">
       <change beforePath="$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/SaxonTransformerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/SaxonTransformerTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -22,7 +18,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/SaxonTransformer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
+            <state relative-caret-position="214">
               <caret line="20" selection-start-line="20" selection-end-line="20" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -34,10 +30,31 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/XsltTransformer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="162">
+              <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="jar://$MAVEN_REPOSITORY$/net/sf/saxon/Saxon-HE/9.9.0-2/Saxon-HE-9.9.0-2.jar!/net/sf/saxon/s9api/XsltCompiler.class">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="129">
               <caret line="314" selection-start-line="314" selection-end-line="314" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/SerializationProperties.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="10" selection-start-line="10" selection-end-line="10" />
             </state>
           </provider>
         </entry>
@@ -54,8 +71,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-630">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="162">
+              <caret line="36" column="72" selection-start-line="36" selection-start-column="72" selection-end-line="36" selection-end-column="72" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -66,7 +83,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/Error.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
+            <state relative-caret-position="234">
               <caret line="13" selection-start-line="13" selection-end-line="13" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -87,8 +104,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/SaxonTransformerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="25" column="96" selection-start-line="25" selection-start-column="96" selection-end-line="25" selection-end-column="96" />
+            <state relative-caret-position="338">
+              <caret line="29" column="151" selection-start-line="29" selection-start-column="151" selection-end-line="29" selection-end-column="151" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -156,8 +173,8 @@
         <option value="$PROJECT_DIR$/src/main/java/XsltTransformer/InvalidRequest.java" />
         <option value="$PROJECT_DIR$/src/main/java/XsltTransformer/Error.java" />
         <option value="$PROJECT_DIR$/src/main/java/XsltTransformer/SaxonTransformer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java" />
         <option value="$PROJECT_DIR$/src/test/java/SaxonTransformerTest.java" />
       </list>
     </option>
@@ -226,6 +243,27 @@
               <item name="saxon" type="b2602c69:ProjectViewProjectNode" />
               <item name="saxon" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="saxon" type="b2602c69:ProjectViewProjectNode" />
+              <item name="saxon" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="saxon" type="b2602c69:ProjectViewProjectNode" />
+              <item name="saxon" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="XsltTransformer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="saxon" type="b2602c69:ProjectViewProjectNode" />
+              <item name="saxon" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -262,7 +300,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.SaxonTransformerTest">
+  <component name="RunManager" selected="JUnit.SaxonTransformerTest.malformedXslTest">
     <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="XsltTransformer.Server" />
       <module name="saxon" />
@@ -274,6 +312,16 @@
       <module name="saxon" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="SaxonTransformerTest" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SaxonTransformerTest.malformedXslTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="saxon" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="SaxonTransformerTest" />
+      <option name="METHOD_NAME" value="malformedXslTest" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -374,9 +422,11 @@
       <item itemvalue="Maven.saxon [package]" />
       <item itemvalue="JUnit.SaxonTransformerTest.transformTest" />
       <item itemvalue="JUnit.SaxonTransformerTest" />
+      <item itemvalue="JUnit.SaxonTransformerTest.malformedXslTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.SaxonTransformerTest.malformedXslTest" />
         <item itemvalue="JUnit.SaxonTransformerTest" />
         <item itemvalue="JUnit.SaxonTransformerTest.transformTest" />
         <item itemvalue="Application.Server" />
@@ -397,6 +447,15 @@
   <component name="TestHistory">
     <history-entry file="SaxonTransformerTest_transformTest - 2019.01.06 at 17h 03m 30s.xml">
       <configuration name="SaxonTransformerTest.transformTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SaxonTransformerTest - 2019.01.06 at 17h 05m 24s.xml">
+      <configuration name="SaxonTransformerTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SaxonTransformerTest_malformedXslTest - 2019.01.06 at 17h 19m 21s.xml">
+      <configuration name="SaxonTransformerTest.malformedXslTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SaxonTransformerTest_malformedXslTest - 2019.01.06 at 17h 19m 49s.xml">
+      <configuration name="SaxonTransformerTest.malformedXslTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TodoView">
@@ -679,23 +738,6 @@
     <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_java-se-jetty-gradle-v3.zip/src/main/java/org/example/Application.java">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/XsltTransformer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/SerializationProperties.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/com/sparkjava/spark-core/2.7.2/spark-core-2.7.2.jar!/spark/Route.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
@@ -761,44 +803,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/SaxonTransformer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#413#414#0" expanded="true" />
-            <element signature="e#444#445#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/sun/security/provider/SHA2.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="237">
           <caret line="148" selection-start-line="148" selection-end-line="148" />
           <folding>
             <element signature="e#4046#4047#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-630">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/Error.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -817,10 +827,59 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/SaxonTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#413#414#0" expanded="true" />
+            <element signature="e#444#445#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/SerializationProperties.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/Error.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="36" column="72" selection-start-line="36" selection-start-column="72" selection-end-line="36" selection-end-column="72" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/XsltTransformer/XsltTransformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/SaxonTransformerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="25" column="96" selection-start-line="25" selection-start-column="96" selection-end-line="25" selection-end-column="96" />
+        <state relative-caret-position="338">
+          <caret line="29" column="151" selection-start-line="29" selection-start-column="151" selection-end-line="29" selection-end-column="151" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
