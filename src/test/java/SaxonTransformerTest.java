@@ -10,7 +10,7 @@ public class SaxonTransformerTest {
     SaxonTransformer tf = new SaxonTransformer();
 
     @Test
-    public void transformTest() throws UnsupportedEncodingException, SaxonApiException {
+    public void transformTest() throws UnsupportedEncodingException, TransformationException {
         String xml = "<test/>";
         String xsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
@@ -27,10 +27,10 @@ public class SaxonTransformerTest {
     @Test
     public void malformedXslTest(){
 
-        Assertions.assertThrows(SaxonApiException.class, () -> transformWithStrings("bad xml", "bad xsl"), "Malformed input should trigger an exception");
+        Assertions.assertThrows(TransformationException.class, () -> transformWithStrings("bad xml", "bad xsl"), "Malformed input should trigger an exception");
     }
 
-    private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws UnsupportedEncodingException, SaxonApiException {
+    private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws UnsupportedEncodingException, TransformationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(xml.getBytes("utf-8"));
         InputStream xslStr = new ByteArrayInputStream(xsl.getBytes("utf-8"));
