@@ -12,6 +12,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import static spark.Spark.port;
 import static spark.Spark.post;
@@ -22,9 +24,6 @@ public class Server {
     private final String INPUT_KEY = "xml";
     private final String XSL_KEY = "xsl";
     private Logger logger = LoggerFactory.getLogger(Server.class);
-    private Integer requestCount = 0;
-    private Integer finishedRequestCount = 0;
-
 
     public static void main(String[] args){
         Server s = new Server();
@@ -34,8 +33,8 @@ public class Server {
     public void configureRoutes(){
         port(getPort());
         post(ENDPOINT, (req,res) -> {
-            requestCount++;
-            logger.info(String.format("Received a request from %s (#%s)", req.ip(), requestCount.toString()));
+            long startTime = System.currentTimeMillis();
+            logger.info(String.format("Received a request from %s at %s", req.ip(), LocalDateTime.now()));
             try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
                 req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
                 try(InputStream input = getStreamFromPart(req.raw().getPart(INPUT_KEY))) {
@@ -53,7 +52,7 @@ public class Server {
                 return handleException(res, 500, e).body();
             }
             finally {
-                logger.info(String.format("Finished request #%s", requestCount.toString()));
+                logger.info(String.format("Finished request in %s milliseconds", System.currentTimeMillis() - startTime));
             }
         });
     }
