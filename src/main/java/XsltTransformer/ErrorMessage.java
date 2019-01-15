@@ -11,9 +11,6 @@ public class ErrorMessage {
 
     ErrorMessage(Response res, Exception e, int statusCode) {
         this.message = e.getMessage();
-        if(e instanceof SaxonApiException){
-            this.message.concat(e.getMessage());
-        }
         this.statusCode = statusCode;
         this.res = res;
         this.exceptionType = e.getClass().getSimpleName();
