@@ -9,7 +9,7 @@ public class ErrorMessage {
     public String message;
     private Response res;
 
-    ErrorMessage(Response res, Exception e, int statusCode) {
+    ErrorMessage(Response res, Throwable e, int statusCode) {
         this.message = e.getMessage();
         this.statusCode = statusCode;
         this.res = res;
