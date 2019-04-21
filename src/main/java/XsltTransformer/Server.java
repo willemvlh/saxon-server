@@ -47,7 +47,8 @@ public class Server {
                     SerializationProperties props = tf.transform(input, stylesheet, writeStream);
                     res.header("Content-type", props.contentType());
                     writeStream.writeTo(res.raw().getOutputStream());
-                    return "";
+                    res.raw().getOutputStream().close();
+                    return null;
                 }
             } catch (InvalidRequestException e) {
                 return handleException(res, 400, e);
