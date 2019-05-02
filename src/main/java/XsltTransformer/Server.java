@@ -41,7 +41,6 @@ public class Server {
             req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
             try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
                 try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
-                    res.header("Content-type", "bla");
                     SaxonTransformer tf = new SaxonTransformer();
                     ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
                     SerializationProperties props = tf.transform(input, stylesheet, writeStream);
