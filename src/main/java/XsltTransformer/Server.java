@@ -38,7 +38,7 @@ public class Server {
         post(ENDPOINT, (req, res) -> {
             long startTime = System.currentTimeMillis();
             logger.info(String.format("Received a request from %s at %s", req.ip(), LocalDateTime.now()));
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
             try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
                 try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
                     res.header("Content-type", "bla");
@@ -48,7 +48,7 @@ public class Server {
                     res.header("Content-type", props.contentType());
                     writeStream.writeTo(res.raw().getOutputStream());
                     res.raw().getOutputStream().close();
-                    return null;
+                    return "";
                 }
             } catch (InvalidRequestException e) {
                 return handleException(res, 400, e);
