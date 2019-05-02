@@ -10,3 +10,4 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 *.jar
 *.zip
+/.idea
