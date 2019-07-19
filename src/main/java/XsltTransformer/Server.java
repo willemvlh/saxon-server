@@ -13,15 +13,16 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 
-import static spark.Spark.port;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class Server {
+
 
     private final String ENDPOINT = "/transform";
     private final String INPUT_KEY = "xml";
@@ -30,7 +31,17 @@ public class Server {
 
     public static void main(String[] args) {
         Server s = new Server();
+        s.configureKeystore();
         s.configureRoutes();
+    }
+
+    private void configureKeystore() {
+        String keyStoreProp = System.getProperty("keystore");
+        if (keyStoreProp != null) {
+            String keyStorePassw = System.getProperty("keystorePassword");
+            if (keyStorePassw == null) keyStorePassw = "";
+            secure(keyStoreProp, keyStorePassw, null, null);
+        }
     }
 
     public void configureRoutes() {
@@ -81,12 +92,13 @@ public class Server {
         String systemEnvPort = System.getenv("PORT");
         String javaPropPort = System.getProperty("port");
 
-        if (systemEnvPort != null) {
-            return Integer.valueOf(systemEnvPort);
-        }
         if (javaPropPort != null) {
             return Integer.valueOf(javaPropPort);
         }
+        if (systemEnvPort != null) {
+            return Integer.valueOf(systemEnvPort);
+        }
+
         return 5000;
 
     }

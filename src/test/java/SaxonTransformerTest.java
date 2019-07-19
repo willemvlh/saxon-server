@@ -30,6 +30,16 @@ public class SaxonTransformerTest {
         Assertions.assertThrows(TransformationException.class, () -> transformWithStrings("bad xml", "bad xsl"), "Malformed input should trigger an exception");
     }
 
+    @Test
+    public void errorMsgTest() throws UnsupportedEncodingException {
+        try{
+            transformWithStrings("bad xml", "bad xsl");
+        }
+        catch (TransformationException e){
+            Assertions.assertTrue(e.getMessage().contains("a"));
+        }
+    }
+
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws UnsupportedEncodingException, TransformationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(xml.getBytes("utf-8"));
