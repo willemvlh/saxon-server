@@ -8,12 +8,12 @@ import spark.Request;
 import spark.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Spark;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
@@ -46,30 +46,40 @@ public class Server {
 
     public void configureRoutes() {
         port(getPort());
-        post(ENDPOINT, (req, res) -> {
-            long startTime = System.currentTimeMillis();
-            logger.info(String.format("Received a request from %s at %s", req.ip(), LocalDateTime.now()));
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
-            try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
-                try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
-                    SaxonTransformer tf = new SaxonTransformer();
-                    ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
-                    SerializationProperties props = tf.transform(input, stylesheet, writeStream);
-                    res.header("Content-type", props.contentType());
-                    writeStream.writeTo(res.raw().getOutputStream());
-                    res.raw().getOutputStream().close();
-                    return "";
-                }
-            } catch (InvalidRequestException e) {
-                return handleException(res, 400, e);
-            } catch (TransformationException e) {
-                return handleException(res, 400, e.getCause()).body();
-            } catch (Exception e) {
-                return handleException(res, 500, e).body();
-            } finally {
-                logger.info(String.format("Finished request in %s milliseconds", System.currentTimeMillis() - startTime));
+        post(ENDPOINT, (req, res) -> handleRequest(req,res));
+    }
+
+    public Object handleRequest(Request req, Response res){
+        long startTime = System.currentTimeMillis();
+        logger.info(String.format("Received a request from %s at %s", req.ip(), LocalDateTime.now()));
+        req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
+        try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
+            try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
+                SaxonTransformer tf = new SaxonTransformer();
+                ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
+                SerializationProperties props = tf.transform(input, stylesheet, writeStream);
+                res.header("Content-type", props.contentType());
+                writeStream.writeTo(res.raw().getOutputStream());
+                res.raw().getOutputStream().close();
+                return res;
             }
-        });
+        } catch (InvalidRequestException e) {
+            return handleInvalidRequestException(res, e).body();
+        } catch (TransformationException e) {
+            return handleInvalidRequestException(res, e.getCause()).body();
+        } catch (Exception e) {
+            return handleServerException(res, e);
+        } finally {
+            logger.info(String.format("Finished request in %s milliseconds", System.currentTimeMillis() - startTime));
+        }
+    }
+
+    private Response handleServerException(Response res, Throwable e) {
+        return handleException(res, 500, e);
+    }
+
+    private Response handleInvalidRequestException(Response res, Throwable e){
+        return handleException(res, 400, e);
     }
 
     private InputStream getStreamFromRequestByKey(Request req, String key) throws InvalidRequestException, IOException, ServletException {
@@ -91,22 +101,24 @@ public class Server {
     private int getPort() {
         String systemEnvPort = System.getenv("PORT");
         String javaPropPort = System.getProperty("port");
-
         if (javaPropPort != null) {
             return Integer.valueOf(javaPropPort);
         }
         if (systemEnvPort != null) {
             return Integer.valueOf(systemEnvPort);
         }
-
         return 5000;
-
     }
 
-    private static Response handleException(Response res, int status, Throwable e) {
+    private Response handleException(Response res, int status, Throwable e) {
         ErrorMessage err = new ErrorMessage(res, e, status);
         res.status(status);
         res.type("application/json");
+        res.body(serializeErrorMessage(err));
+        return res;
+    }
+
+    private String serializeErrorMessage(ErrorMessage message){
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setExclusionStrategies(new ExclusionStrategy() {
             @Override
@@ -120,8 +132,11 @@ public class Server {
             }
         });
         Gson gson = gsonBuilder.create();
-        res.body(gson.toJson(err));
-        return res;
+        return gson.toJson(message);
+    }
+
+    public void stop(){
+        Spark.stop();
     }
 
 }

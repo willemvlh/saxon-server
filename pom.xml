@@ -14,9 +14,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>wvl</groupId>
     <artifactId>saxon</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.0.0</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -97,7 +103,7 @@
         </testResources>
 
         <directory>.\target</directory>
-        <finalName>saxon</finalName>
+        <finalName>saxon-${project.version}</finalName>
 
         <pluginManagement>
             <plugins>
