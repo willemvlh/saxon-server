@@ -9,26 +9,17 @@ import java.nio.charset.StandardCharsets;
 
 public class SaxonTransformerTest {
     SaxonTransformer tf = new SaxonTransformer();
-    private String wellFormedXml = "<root/>";
-    private String wellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
-            "    <xsl:output method=\"text\"/>\n" +
-            "    <xsl:template match=\"/\">\n" +
-            "        <xsl:text>hello</xsl:text>\n" +
-            "    </xsl:template>\n" +
-            "</xsl:stylesheet>";
 
     @Test
     public void transformTest() throws UnsupportedEncodingException, TransformationException {
-        ByteArrayOutputStream output = transformWithStrings(wellFormedXml, wellFormedXsl);
+        ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedXml, TestHelpers.WellFormedXsl);
         Assert.isTrue(output.toString("utf-8").equals("hello"), "The output should be 'hello'");
-
     }
 
     @Test
     public void malformedXslTest(){
 
-        Assertions.assertThrows(TransformationException.class, () -> transformWithStrings("bad xml", "bad xsl"), "Malformed input should trigger an exception");
+        Assertions.assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
     }
 
     @Test

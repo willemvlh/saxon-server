@@ -4,11 +4,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import spark.Request;
 import spark.Response;
-
+import com.google.gson.Gson;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -51,6 +52,8 @@ public class ServerTest {
 
     @BeforeEach
     public void before() throws IOException, ServletException{
+        server = new Server();
+        server.configureRoutes();
         MockitoAnnotations.initMocks(this);
         when(req.raw()).thenReturn(raw);
         when(raw.getPart("xml")).thenReturn(xmlPart);
@@ -59,13 +62,12 @@ public class ServerTest {
         when(res.raw().getOutputStream()).thenReturn(outputStreamForTest);
         when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream);
         when(xslPart.getInputStream()).thenReturn(TestHelpers.WellFormedXslStream);
-        server = new Server();
-        server.configureRoutes();
     }
 
     @AfterEach
-    public void after(){
+    public void after() throws InterruptedException {
         server.stop();
+        Thread.sleep(500);
     }
 
     @Test
@@ -80,7 +82,9 @@ public class ServerTest {
         server.handleRequest(req, res);
         verify(res).status(400);
         verify(res).type("application/json");
-        verify(res).body(startsWith("{"));
+        ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+        verify(res).body(arg.capture());
+        verifyErrorMessageFromJsonString(arg.getValue());
     }
 
     @Test
@@ -88,6 +92,16 @@ public class ServerTest {
         when(xmlPart.getInputStream()).thenReturn(TestHelpers.MalformedXmlStream);
         server.handleRequest(req, res);
         verify(res).status(400);
-        verify(res).body(startsWith("{"));
+        ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+        verify(res).body(arg.capture());
+        verifyErrorMessageFromJsonString(arg.getValue());
+    }
+
+    private void verifyErrorMessageFromJsonString(String str){
+        Gson g = new Gson();
+        ErrorMessage msg = g.fromJson(str, ErrorMessage.class);
+        Assertions.assertNotNull(msg.message);
+        Assertions.assertNotNull(msg.exceptionType);
+        Assertions.assertNotNull(msg.statusCode);
     }
 }

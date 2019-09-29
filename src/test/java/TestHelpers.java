@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class TestHelpers {
-    private static String WellFormedXml = "<root/>";
-    private static String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String WellFormedXml = "<root/>";
+    public static String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
             "    <xsl:output method=\"text\"/>\n" +
             "    <xsl:template match=\"/\">\n" +
