@@ -69,6 +69,7 @@ public class SaxonTransformer implements XsltTransformer {
 
     private Processor newProcessor() throws SaxonApiException {
         if(this.config != null){
+            LoggerFactory.getLogger(this.getClass()).info("Using config file: " + this.config.getSystemId());
             return new Processor(this.config);
         }
         return new Processor(false);

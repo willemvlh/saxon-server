@@ -27,8 +27,8 @@ public class ServerOptions {
     public static ServerOptions fromArgs(String[] args) throws ParseException {
         ServerOptions serverOptions = new ServerOptions();
         Options options = new Options();
-        options.addOption("port", "Port on which the server runs");
-        options.addOption("config", "Location to Saxon configuration XML");
+        options.addOption("port", true, "Port on which the server runs");
+        options.addOption("config", true, "Location to Saxon configuration XML");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if(cmd.hasOption("port")){
@@ -37,7 +37,7 @@ public class ServerOptions {
                 serverOptions.setPort(portAsInt);
             }
             catch(NumberFormatException e){
-             throw new ParseException("Could not parse port (must be integer)");
+             throw new ParseException(e.getMessage());
             }
         }
         if(cmd.hasOption("config")){
