@@ -3,14 +3,27 @@ import net.sf.saxon.s9api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SaxonTransformer implements XsltTransformer {
+
+    public SaxonTransformer(File config){
+        if(config != null){
+            this.config = new StreamSource(config);
+        }
+    }
+
+    public SaxonTransformer(){
+        this(null);
+    }
+
+    private Source config;
     /**
      * When errors occur during the transformation, they are stored in this list.
      */
@@ -35,7 +48,7 @@ public class SaxonTransformer implements XsltTransformer {
     public SerializationProperties transform(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
         SaxonMessageListener ml = new SaxonMessageListener();
         try{
-            Processor p = new Processor(false);
+            Processor p = newProcessor();
             XsltCompiler c = p.newXsltCompiler();
             c.setErrorList(errorList);
             XsltExecutable e = c.compile(new StreamSource(stylesheet));
@@ -52,6 +65,13 @@ public class SaxonTransformer implements XsltTransformer {
             throw new TransformationException(msg);
         }
 
+    }
+
+    private Processor newProcessor() throws SaxonApiException {
+        if(this.config != null){
+            return new Processor(this.config);
+        }
+        return new Processor(false);
     }
 
 }

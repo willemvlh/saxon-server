@@ -4,6 +4,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.cli.*;
 import spark.Request;
 import spark.Response;
 import org.slf4j.Logger;
@@ -23,16 +24,34 @@ import static spark.Spark.*;
 
 public class Server {
 
+    public static void main(String[] args) {
+
+        try{
+            ServerOptions options = ServerOptions.fromArgs(args);
+            Server s = new Server(options);
+            s.configureKeystore();
+            s.configureRoutes();
+        }
+        catch(ParseException e){
+            System.err.println(e.getMessage());
+            System.exit(-1);
+        }
+
+    }
 
     private final String ENDPOINT = "/transform";
     private final String INPUT_KEY = "xml";
     private final String XSL_KEY = "xsl";
     private Logger logger = LoggerFactory.getLogger(Server.class);
+    private ServerOptions options;
 
-    public static void main(String[] args) {
-        Server s = new Server();
-        s.configureKeystore();
-        s.configureRoutes();
+    public Server(ServerOptions options){
+        if(options == null){
+            this.options = new ServerOptions();
+        }
+        else{
+            this.options = options;
+        }
     }
 
     private void configureKeystore() {
@@ -46,7 +65,7 @@ public class Server {
 
     public void configureRoutes() {
         port(getPort());
-        post(ENDPOINT, (req, res) -> handleRequest(req,res));
+        post(ENDPOINT, this::handleRequest);
     }
 
     public Object handleRequest(Request req, Response res){
@@ -55,7 +74,7 @@ public class Server {
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
         try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
             try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
-                SaxonTransformer tf = new SaxonTransformer();
+                SaxonTransformer tf = new SaxonTransformer(options.getConfigFile());
                 ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
                 SerializationProperties props = tf.transform(input, stylesheet, writeStream);
                 res.header("Content-type", props.contentType());
@@ -99,8 +118,13 @@ public class Server {
     }
 
     private int getPort() {
+
         String systemEnvPort = System.getenv("PORT");
         String javaPropPort = System.getProperty("port");
+        Integer optionsPort = options.getPort();
+        if(optionsPort != null){
+            return optionsPort;
+        }
         if (javaPropPort != null) {
             return Integer.valueOf(javaPropPort);
         }

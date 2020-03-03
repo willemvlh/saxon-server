@@ -52,7 +52,7 @@ public class ServerTest {
 
     @BeforeEach
     public void before() throws IOException, ServletException{
-        server = new Server();
+        server = new Server(null);
         server.configureRoutes();
         MockitoAnnotations.initMocks(this);
         when(req.raw()).thenReturn(raw);
@@ -60,14 +60,12 @@ public class ServerTest {
         when(raw.getPart("xsl")).thenReturn(xslPart);
         when(res.raw()).thenReturn(raw_);
         when(res.raw().getOutputStream()).thenReturn(outputStreamForTest);
-        when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream);
-        when(xslPart.getInputStream()).thenReturn(TestHelpers.WellFormedXslStream);
+        when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream());
+        when(xslPart.getInputStream()).thenReturn(TestHelpers.WellFormedXslStream());
     }
 
     @AfterEach
-    public void after() throws InterruptedException, IOException {
-        TestHelpers.WellFormedXmlStream.reset();
-        TestHelpers.WellFormedXslStream.reset();
+    public void after() throws InterruptedException {
         server.stop();
         Thread.sleep(250);
     }
@@ -80,7 +78,7 @@ public class ServerTest {
 
     @Test
     public void testIncorrectXslRequest() throws IOException{
-        when(xslPart.getInputStream()).thenReturn(TestHelpers.IncorrectXslStream);
+        when(xslPart.getInputStream()).thenReturn(TestHelpers.IncorrectXslStream());
         server.handleRequest(req, res);
         verify(res).status(400);
         verify(res).type("application/json");
@@ -91,7 +89,7 @@ public class ServerTest {
 
     @Test
     public void testIncorrectXmlRequest() throws IOException{
-        when(xmlPart.getInputStream()).thenReturn(TestHelpers.MalformedXmlStream);
+        when(xmlPart.getInputStream()).thenReturn(TestHelpers.MalformedXmlStream());
         server.handleRequest(req, res);
         verify(res).status(400);
         ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
@@ -101,8 +99,8 @@ public class ServerTest {
 
     @Test
     public void testErrorGeneratedByXslMessage() throws IOException {
-        when(xslPart.getInputStream()).thenReturn(TestHelpers.MessageInvokingXslStream);
-        when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream);
+        when(xslPart.getInputStream()).thenReturn(TestHelpers.MessageInvokingXslStream());
+        when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream());
         server.handleRequest(req, res);
         verify(res).status(400);
         ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
