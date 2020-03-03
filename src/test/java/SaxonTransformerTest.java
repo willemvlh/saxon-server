@@ -1,5 +1,4 @@
 import XsltTransformer.*;
-import net.sf.saxon.s9api.SaxonApiException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import spark.utils.Assert;
@@ -17,33 +16,41 @@ public class SaxonTransformerTest {
     }
 
     @Test
-    public void malformedXslTest(){
+    public void malformedXslTest() {
 
         Assertions.assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
     }
 
     @Test
-    public void errorMsgTest() throws UnsupportedEncodingException {
-        try{
+    public void errorMsgTest() {
+        try {
             transformWithStrings("bad xml", "bad xsl");
-        }
-        catch (TransformationException e){
+        } catch (TransformationException e) {
             Assertions.assertTrue(e.getMessage().contains("a"));
         }
     }
 
     @Test
-    public void errorListTest(){
-        try{
+    public void messageTest() {
+        try {
+            transformWithStrings("<x/>", TestHelpers.MessageInvokingXsl);
+            Assertions.fail("should have thrown");
+        } catch (TransformationException e) {
+            Assertions.assertEquals(e.getMessage(), TestHelpers.message);
+        }
+
+    }
+
+    @Test
+    public void errorListTest() {
+        try {
             transformWithStrings("<root/>", "<badXSl/>");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (TransformationException e) {
             Assertions.assertFalse(tf.getErrorList().isEmpty());
         }
     }
 
-    private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws UnsupportedEncodingException, TransformationException {
+    private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         InputStream xslStr = new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8));

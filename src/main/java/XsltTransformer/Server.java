@@ -66,7 +66,7 @@ public class Server {
         } catch (InvalidRequestException e) {
             return handleInvalidRequestException(res, e).body();
         } catch (TransformationException e) {
-            return handleInvalidRequestException(res, e.getCause()).body();
+            return handleInvalidRequestException(res, e.getCause() != null ? e.getCause() : e).body();
         } catch (Exception e) {
             return handleServerException(res, e);
         } finally {

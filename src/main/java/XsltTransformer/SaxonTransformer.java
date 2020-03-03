@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -32,20 +33,23 @@ public class SaxonTransformer implements XsltTransformer {
      * @throws TransformationException
      */
     public SerializationProperties transform(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
+        SaxonMessageListener ml = new SaxonMessageListener();
         try{
             Processor p = new Processor(false);
             XsltCompiler c = p.newXsltCompiler();
             c.setErrorList(errorList);
             XsltExecutable e = c.compile(new StreamSource(stylesheet));
             Xslt30Transformer xf = e.load30();
+            xf.setMessageListener(ml);
             Serializer s = xf.newSerializer(output);
             xf.transform(new StreamSource(input), s);
             return new SerializationProperties(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
         }
         catch(SaxonApiException e){
             Logger l = LoggerFactory.getLogger(Server.class);
-            l.error(e.getMessage());
-            throw new TransformationException(e);
+            String msg = ml.errorString != null ? ml.errorString : e.getMessage();
+            l.error(msg);
+            throw new TransformationException(msg);
         }
 
     }

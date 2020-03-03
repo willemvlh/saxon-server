@@ -65,9 +65,11 @@ public class ServerTest {
     }
 
     @AfterEach
-    public void after() throws InterruptedException {
+    public void after() throws InterruptedException, IOException {
+        TestHelpers.WellFormedXmlStream.reset();
+        TestHelpers.WellFormedXslStream.reset();
         server.stop();
-        Thread.sleep(500);
+        Thread.sleep(100);
     }
 
     @Test
@@ -97,11 +99,27 @@ public class ServerTest {
         verifyErrorMessageFromJsonString(arg.getValue());
     }
 
+    @Test
+    public void testErrorGeneratedByXslMessage() throws IOException {
+        when(xslPart.getInputStream()).thenReturn(TestHelpers.MessageInvokingXslStream);
+        when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream);
+        server.handleRequest(req, res);
+        verify(res).status(400);
+        ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+        verify(res).body(arg.capture());
+        ErrorMessage error = captureError(arg.getValue());
+        Assertions.assertEquals(TestHelpers.message, error.message);
+    }
+
     private void verifyErrorMessageFromJsonString(String str){
-        Gson g = new Gson();
-        ErrorMessage msg = g.fromJson(str, ErrorMessage.class);
+        ErrorMessage msg = captureError(str);
         Assertions.assertNotNull(msg.message);
         Assertions.assertNotNull(msg.exceptionType);
-        Assertions.assertNotNull(msg.statusCode);
+        Assertions.assertTrue(msg.statusCode >= 400);
+    }
+
+    private ErrorMessage captureError(String str){
+        Gson g = new Gson();
+        return g.fromJson(str, ErrorMessage.class);
     }
 }
