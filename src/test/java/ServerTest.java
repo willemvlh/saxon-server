@@ -69,7 +69,7 @@ public class ServerTest {
         TestHelpers.WellFormedXmlStream.reset();
         TestHelpers.WellFormedXslStream.reset();
         server.stop();
-        Thread.sleep(100);
+        Thread.sleep(250);
     }
 
     @Test
