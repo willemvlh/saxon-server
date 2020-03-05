@@ -1,4 +1,6 @@
-import XsltTransformer.*;
+package XsltTransformer;
+
+import com.google.gson.Gson;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -9,17 +11,18 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import spark.Request;
 import spark.Response;
-import com.google.gson.Gson;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class ServerTest {
+class ServerTest {
 
     @Mock Request req;
     @Mock Response res;
@@ -28,9 +31,9 @@ public class ServerTest {
     @Mock MultiPartInputStreamParser.MultiPart xmlPart;
     @Mock MultiPartInputStreamParser.MultiPart xslPart;
 
-    Server server;
+    private Server server;
 
-    ServletOutputStream outputStreamForTest = new ServletOutputStream() {
+    private ServletOutputStream outputStreamForTest = new ServletOutputStream() {
         private StringBuilder builder = new StringBuilder();
         @Override
         public boolean isReady() {
@@ -51,7 +54,7 @@ public class ServerTest {
     };
 
     @BeforeEach
-    public void before() throws IOException, ServletException{
+    void before() throws IOException, ServletException{
         server = new Server(null);
         server.configureRoutes();
         MockitoAnnotations.initMocks(this);
@@ -65,19 +68,19 @@ public class ServerTest {
     }
 
     @AfterEach
-    public void after() throws InterruptedException {
+    void after() throws InterruptedException {
         server.stop();
         Thread.sleep(250);
     }
 
     @Test
-    public void testCorrectRequest() throws IOException {
+    void testCorrectRequest() throws IOException {
         Response result = (Response) server.handleRequest(req, res);
         Assertions.assertEquals("hello", result.raw().getOutputStream().toString());
     }
 
     @Test
-    public void testIncorrectXslRequest() throws IOException{
+    void testIncorrectXslRequest() throws IOException{
         when(xslPart.getInputStream()).thenReturn(TestHelpers.IncorrectXslStream());
         server.handleRequest(req, res);
         verify(res).status(400);
@@ -88,7 +91,7 @@ public class ServerTest {
     }
 
     @Test
-    public void testIncorrectXmlRequest() throws IOException{
+    void testIncorrectXmlRequest() throws IOException{
         when(xmlPart.getInputStream()).thenReturn(TestHelpers.MalformedXmlStream());
         server.handleRequest(req, res);
         verify(res).status(400);
@@ -98,7 +101,26 @@ public class ServerTest {
     }
 
     @Test
-    public void testErrorGeneratedByXslMessage() throws IOException {
+    void testPartWithNoStream() throws IOException {
+        when(xmlPart.getInputStream()).thenReturn(null);
+        server.handleRequest(req, res);
+        ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+        verify(res).status(400);
+    }
+
+    @Test
+    void testRequestWithPartNull() throws IOException, ServletException {
+        when(req.raw().getPart("xml")).thenReturn(null);
+        server.handleRequest(req,res);
+        verify(res).status(400);
+        ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+        verify(res).body(arg.capture());
+        ErrorMessage msg = captureError(arg.getValue());
+        Assertions.assertEquals(InvalidRequestException.class.getSimpleName(), msg.exceptionType);
+    }
+
+    @Test
+    void testErrorGeneratedByXslMessage() throws IOException {
         when(xslPart.getInputStream()).thenReturn(TestHelpers.MessageInvokingXslStream());
         when(xmlPart.getInputStream()).thenReturn(TestHelpers.WellFormedXmlStream());
         server.handleRequest(req, res);
@@ -107,6 +129,13 @@ public class ServerTest {
         verify(res).body(arg.capture());
         ErrorMessage error = captureError(arg.getValue());
         Assertions.assertEquals(TestHelpers.message, error.message);
+    }
+
+    @Test
+    void generalExceptionTest() throws IOException{
+        when(xmlPart.getInputStream()).thenThrow(IllegalArgumentException.class);
+        server.handleRequest(req,res);
+        verify(res).status(500);
     }
 
     private void verifyErrorMessageFromJsonString(String str){
