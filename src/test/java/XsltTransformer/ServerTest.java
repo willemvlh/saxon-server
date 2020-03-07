@@ -55,8 +55,7 @@ class ServerTest {
 
     @BeforeEach
     void before() throws IOException, ServletException{
-        server = new Server(null);
-        server.configureRoutes();
+        server = Server.newServer(null);
         MockitoAnnotations.initMocks(this);
         when(req.raw()).thenReturn(raw);
         when(raw.getPart("xml")).thenReturn(xmlPart);

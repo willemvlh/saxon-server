@@ -28,9 +28,7 @@ public class Server {
 
         try{
             ServerOptions options = ServerOptions.fromArgs(args);
-            Server s = new Server(options);
-            s.configureKeystore();
-            s.configureRoutes();
+            Server.newServer(options);
         }
         catch(ParseException e){
             System.err.println(e.getMessage());
@@ -45,13 +43,20 @@ public class Server {
     private Logger logger = LoggerFactory.getLogger(Server.class);
     private ServerOptions options;
 
-    public Server(ServerOptions options){
+    private Server(ServerOptions options){
         if(options == null){
             this.options = new ServerOptions();
         }
         else{
             this.options = options;
         }
+    }
+
+    public static Server newServer(ServerOptions options){
+        Server s = new Server(options);
+        s.configureKeystore();
+        s.configureRoutes();
+        return s;
     }
 
     private void configureKeystore() {
