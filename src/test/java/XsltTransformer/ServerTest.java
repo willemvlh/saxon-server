@@ -33,6 +33,8 @@ class ServerTest {
 
     private Server server;
 
+    private final int PORT = 4938;
+
     private ServletOutputStream outputStreamForTest = new ServletOutputStream() {
         private StringBuilder builder = new StringBuilder();
         @Override
@@ -44,7 +46,7 @@ class ServerTest {
         public void setWriteListener(WriteListener writeListener) { }
 
         @Override
-        public void write(int b) throws IOException {
+        public void write(int b) {
                 builder.append((char) b);
         }
 
@@ -55,7 +57,9 @@ class ServerTest {
 
     @BeforeEach
     void before() throws IOException, ServletException{
-        server = Server.newServer(null);
+        ServerOptions opts = new ServerOptions();
+        opts.setPort(PORT);
+        server = Server.newServer(opts);
         MockitoAnnotations.initMocks(this);
         when(req.raw()).thenReturn(raw);
         when(raw.getPart("xml")).thenReturn(xmlPart);
