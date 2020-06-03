@@ -173,7 +173,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>XsltTransformer.Server</mainClass>
+                            <mainClass>tv.mediagenix.xslt.transformer.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -217,7 +217,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>XsltTransformer.Server</mainClass>
+                            <mainClass>tv.mediagenix.xslt.transformer.Server</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

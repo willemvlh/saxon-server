@@ -1,4 +1,4 @@
-package XsltTransformer;
+package tv.mediagenix.xslt.transformer;
 
 import java.io.IOException;
 import java.io.InputStream;

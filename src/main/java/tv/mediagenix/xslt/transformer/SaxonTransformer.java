@@ -1,4 +1,4 @@
-package XsltTransformer;
+package tv.mediagenix.xslt.transformer;
 import net.sf.saxon.s9api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

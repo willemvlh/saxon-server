@@ -1,4 +1,4 @@
-package XsltTransformer;
+package tv.mediagenix.xslt.transformer;
 
 import net.sf.saxon.s9api.MessageListener;
 import net.sf.saxon.s9api.XdmNode;

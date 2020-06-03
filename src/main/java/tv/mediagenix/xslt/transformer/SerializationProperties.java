@@ -1,4 +1,4 @@
-package XsltTransformer;
+package tv.mediagenix.xslt.transformer;
 
 public class SerializationProperties {
     private String encoding;

@@ -1,14 +1,10 @@
-package XsltTransformer;
+package tv.mediagenix.xslt.transformer;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.cli.*;
-import spark.Request;
-import spark.Response;
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Request;
+import spark.Response;
 import spark.Spark;
 
 import javax.servlet.MultipartConfigElement;
@@ -17,20 +13,20 @@ import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 
 import static spark.Spark.*;
 
 public class Server {
 
+    private static final int DEFAULT_PORT = 5000;
+
     public static void main(String[] args) {
 
-        try{
+        try {
             ServerOptions options = ServerOptions.fromArgs(args);
             Server.newServer(options);
-        }
-        catch(ParseException e){
+        } catch (ParseException e) {
             System.err.println(e.getMessage());
             System.exit(-1);
         }
@@ -43,16 +39,15 @@ public class Server {
     private Logger logger = LoggerFactory.getLogger(Server.class);
     private ServerOptions options;
 
-    private Server(ServerOptions options){
-        if(options == null){
+    private Server(ServerOptions options) {
+        if (options == null) {
             this.options = new ServerOptions();
-        }
-        else{
+        } else {
             this.options = options;
         }
     }
 
-    public static Server newServer(ServerOptions options){
+    public static Server newServer(ServerOptions options) {
         Server s = new Server(options);
         s.configureKeystore();
         s.configureRoutes();
@@ -68,12 +63,12 @@ public class Server {
         }
     }
 
-    public void configureRoutes() {
+    private void configureRoutes() {
         port(getPort());
         post(ENDPOINT, this::handleRequest);
     }
 
-    public Object handleRequest(Request req, Response res){
+    Object handleRequest(Request req, Response res) {
         long startTime = System.currentTimeMillis();
         logger.info(String.format("Received a request from %s at %s", req.ip(), LocalDateTime.now()));
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
@@ -98,73 +93,41 @@ public class Server {
         }
     }
 
+
     private Response handleServerException(Response res, Throwable e) {
         return handleException(res, 500, e);
     }
 
-    private Response handleInvalidRequestException(Response res, Throwable e){
+    private Response handleInvalidRequestException(Response res, Throwable e) {
         return handleException(res, 400, e);
     }
 
     private InputStream getStreamFromRequestByKey(Request req, String key) throws InvalidRequestException, IOException, ServletException {
-        try {
-            Part part = req.raw().getPart(key);
-            return getStreamFromPart(part);
-        } catch (NullPointerException e) {
+        Part part = req.raw().getPart(key);
+        if (part == null) {
             throw new InvalidRequestException(String.format("No part found for key \"%s\"", key));
         }
+        return getStreamFromPart(part);
+
     }
 
-    private InputStream getStreamFromPart(Part part) throws IOException, InvalidRequestException {
-        if (part == null) {
-            throw new InvalidRequestException(String.format("No input found for file with key \"%s\"", part.getName()));
-        }
+    private InputStream getStreamFromPart(Part part) throws IOException {
         return part.getInputStream();
     }
 
     private int getPort() {
-
-        String systemEnvPort = System.getenv("PORT");
-        String javaPropPort = System.getProperty("port");
-        Integer optionsPort = options.getPort();
-        if(optionsPort != null){
-            return optionsPort;
-        }
-        if (javaPropPort != null) {
-            return Integer.valueOf(javaPropPort);
-        }
-        if (systemEnvPort != null) {
-            return Integer.valueOf(systemEnvPort);
-        }
-        return 5000;
+        return options.getPort() != null ? options.getPort() : DEFAULT_PORT;
     }
 
     private Response handleException(Response res, int status, Throwable e) {
-        ErrorMessage err = new ErrorMessage(res, e, status);
+        ErrorMessage err = new ErrorMessage(e, status);
         res.status(status);
         res.type("application/json");
-        res.body(serializeErrorMessage(err));
+        res.body(err.toJson());
         return res;
     }
 
-    private String serializeErrorMessage(ErrorMessage message){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                return fieldAttributes.hasModifier(Modifier.PRIVATE);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> aClass) {
-                return false;
-            }
-        });
-        Gson gson = gsonBuilder.create();
-        return gson.toJson(message);
-    }
-
-    public void stop(){
+    public void stop() {
         Spark.stop();
     }
 

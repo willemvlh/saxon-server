@@ -1,4 +1,4 @@
-package XsltTransformer;
+package tv.mediagenix.xslt.transformer;
 
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 public class ServerOptionsTest {
     @Test
     public void ParseTest() throws URISyntaxException, TransformationException {
-        File configFile = new File(this.getClass().getResource("/XsltTransformer/saxon-config.xml").toURI());
+        File configFile = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI());
         SaxonTransformer xf = new SaxonTransformer(configFile);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
@@ -36,7 +36,7 @@ public class ServerOptionsTest {
     @Test
     public void DisallowExternalFunctionTest() throws URISyntaxException, TransformationException {
         //enabling the disallow-external-functions makes it impossible to access java system properties.
-        File f = new File(this.getClass().getResource("/XsltTransformer/saxon-config-no-external-fn.xml").toURI());
+        File f = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config-no-external-fn.xml").toURI());
         SaxonTransformer xf = new SaxonTransformer(f);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
@@ -45,7 +45,7 @@ public class ServerOptionsTest {
 
     @Test
     public void SetOptionsFromArgumentsTest() throws ParseException, URISyntaxException {
-        String configFilePath = new File(this.getClass().getResource("/XsltTransformer/saxon-config.xml").toURI()).getPath();
+        String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI()).getPath();
         String[] args = {"-port", "3000", "-config", configFilePath};
         ServerOptions opts = ServerOptions.fromArgs(args);
         Assertions.assertEquals(3000, (int) opts.getPort());
