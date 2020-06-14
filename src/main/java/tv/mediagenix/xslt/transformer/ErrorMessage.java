@@ -12,7 +12,7 @@ public class ErrorMessage {
     }
 
     public String toJson() {
-        return new ObjectTransformer().render(this);
+        return new JsonTransformer().render(this);
     }
 
 

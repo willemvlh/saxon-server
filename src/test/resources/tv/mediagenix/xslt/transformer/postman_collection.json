@@ -1,0 +1,479 @@
+{
+	"info": {
+		"_postman_id": "c129152b-91f4-423c-bbcb-1f721a99a5b5",
+		"name": "Saxon",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Simple transformation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ac88e68-61e2-45f5-968b-19d7cfa09871",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+							"pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-1.xsl"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Simple transformation in iso-8859-15",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5fac28e2-fb12-4c5c-84aa-909992e7a497",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+							"pm.test(\"The response body should be 'é'\", () => pm.expect(res.text()).to.equal(\"é\"));\r",
+							"pm.test(\"The response character set should be detected as iso-8859-15\", () => pm.expect)\r",
+							"pm.test(\"Content-Type header includes the encoding of the stylesheet output\", () => pm.response.headers.find(h => h[\"key\"] == \"Content-Type\").value.includes(\"iso-8859-15\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-iso-8859-15.xsl"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wrong URL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c6311a4a-3146-4706-bac7-f9163f3ce555",
+						"exec": [
+							"const res = pm.response;\r",
+							"pm.test(\"Response code should be 404\", () => pm.expect(res.to.have.status(404)));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-iso-8859-15.xsl"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/abc",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"abc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "XSLT syntax error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3196939e-cdd1-46f0-9080-16a7fa2ab976",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-syntax-error.xsl"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Missing key 'xml'",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "abac13a3-2007-4fc1-9501-2052df4d7065",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-syntax-error.xsl"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Missing key 'xsl'",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2c656697-b28a-4ce9-9b01-78c64ea41557",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-syntax-error.xsl",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "No body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1fe26151-6926-409f-bbcf-81ac2bb3bfb2",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Xsl form item is not a stylesheet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "831d39ed-4533-41c0-81a6-7ec0e36256b9",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/text-file.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "XSLT terminated by message",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "807b7cad-f0b2-434d-973d-5ea987e224a4",
+						"exec": [
+							"const res = pm.response;\r",
+							"\r",
+							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+							"});\r",
+							"pm.test(\"The response body object should have a message equal to the XSLT message\", () => pm.expect(res.json()[\"message\"]).to.equal(\"terminated\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "xml",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+						},
+						{
+							"key": "xsl",
+							"type": "file",
+							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-message.xsl"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{url}}/transform",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"transform"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "369d705b-292d-411c-92de-29f12ee23f3f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "2535e0ea-4e4c-4114-8e4c-24756ff685a6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "2dfd8576-54f3-446b-9c98-13aebe7628d0",
+			"key": "url",
+			"value": "localhost:5000",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

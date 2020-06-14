@@ -8,7 +8,7 @@ import spark.ResponseTransformer;
 
 import java.lang.reflect.Modifier;
 
-public class ObjectTransformer implements ResponseTransformer {
+public class JsonTransformer implements ResponseTransformer {
 
     @Override
     public String render(Object o) {
