@@ -4,14 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import spark.utils.Assert;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class SaxonTransformerTest {
     SaxonTransformer tf = new SaxonTransformer();
+
+    public SaxonTransformerTest() throws TransformationException {
+    }
 
     @Test
     public void transformTest() throws UnsupportedEncodingException, TransformationException {
@@ -43,6 +43,14 @@ public class SaxonTransformerTest {
             Assertions.assertEquals(e.getMessage(), TestHelpers.message);
         }
 
+    }
+
+    @Test
+    public void insecureTest() throws TransformationException {
+        SaxonTransformer xf = new SaxonTransformer(true);
+        Assertions.assertDoesNotThrow(
+                () -> xf.transform(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream())
+        );
     }
 
     @Test

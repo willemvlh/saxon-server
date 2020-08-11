@@ -18,7 +18,6 @@ import static spark.Spark.*;
 
 public class Server {
 
-    private static final int DEFAULT_PORT = 5000;
     private final String ENDPOINT = "/transform";
     private final String INPUT_KEY = "xml";
     private final String XSL_KEY = "xsl";
@@ -58,6 +57,11 @@ public class Server {
                 halt(401);
             }
         });
+
+
+        before("/*", (req, res) -> {
+            res.raw().setHeader("Server", "/");
+        });
     }
 
     private boolean isAuthenticated(){
@@ -85,7 +89,7 @@ public class Server {
     }
 
     private void configureRoutes() {
-        port(getPort());
+        port(options.getPort());
         post(ENDPOINT, this::handleRequest);
     }
 
@@ -94,7 +98,9 @@ public class Server {
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
         try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
             try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
-                SaxonTransformer tf = new SaxonTransformer(options.getConfigFile());
+                SaxonTransformer tf = options.getConfigFile() != null
+                        ? new SaxonTransformer(options.getConfigFile())
+                        : new SaxonTransformer(options.isInsecure());
                 ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
                 SerializationProperties props = tf.transform(input, stylesheet, writeStream);
                 res.header("Content-type", props.contentType());
@@ -124,14 +130,10 @@ public class Server {
         return part.getInputStream();
     }
 
-    private int getPort() {
-        return options.getPort() != null ? options.getPort() : DEFAULT_PORT;
-    }
-
     private static Response handleException(Throwable e, Response res, int status) {
         ErrorMessage err = new ErrorMessage(e, status);
         res.status(status);
-        res.type("application/json");
+        res.type("application/json;charset=utf-8");
         res.body(new JsonTransformer().render(err));
         return res;
     }

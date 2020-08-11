@@ -6,8 +6,9 @@ import org.apache.commons.cli.*;
 import java.io.File;
 
 public class ServerOptions {
-    private Integer port;
+    private Integer port = 5000;
     private File configFile;
+    private boolean insecure = false;
 
     public Integer getPort() {
         return port;
@@ -25,6 +26,15 @@ public class ServerOptions {
         this.configFile = configFile;
     }
 
+    public boolean isInsecure() {
+        return insecure;
+    }
+
+    public void setInsecure(boolean insecure) {
+        this.insecure = insecure;
+    }
+
+
     public static ServerOptions fromArgs(String[] args) throws ParseException {
         ServerOptions serverOptions = new ServerOptions();
         Options options = new Options();
@@ -32,6 +42,7 @@ public class ServerOptions {
         options.addOption("c", "config", true, "Location to Saxon configuration XML file");
         options.addOption("v", "version", false, "Display Saxon version info");
         options.addOption("h", "help", false, "Display help");
+        options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
@@ -52,7 +63,14 @@ public class ServerOptions {
             }
         }
         if (cmd.hasOption("config")) {
+            if (cmd.hasOption("insecure")) {
+                throw new RuntimeException("Options 'config' and 'insecure' are mutually exclusive.");
+            }
             serverOptions.setConfigFile(new File(cmd.getOptionValue("config")));
+        }
+
+        if (cmd.hasOption("insecure")) {
+            serverOptions.setInsecure(true);
         }
         return serverOptions;
     }
@@ -64,4 +82,5 @@ public class ServerOptions {
         System.out.println(String.format("Saxon %s %s", edition, version));
 
     }
+
 }

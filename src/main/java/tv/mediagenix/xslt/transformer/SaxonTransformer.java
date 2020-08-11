@@ -1,9 +1,11 @@
 package tv.mediagenix.xslt.transformer;
+
+import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
-import org.slf4j.Logger;
+import net.sf.saxon.trans.XPathException;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.InputStream;
@@ -13,66 +15,88 @@ import java.util.List;
 
 public class SaxonTransformer implements XsltTransformer {
 
-    public SaxonTransformer(File config){
-        if(config != null){
-            this.config = new StreamSource(config);
+    public SaxonTransformer(File config) throws TransformationException {
+        if (config != null) {
+            try {
+                this.config = Configuration.readConfiguration(new StreamSource(config));
+            } catch (XPathException e) {
+                LoggerFactory.getLogger(this.getClass()).error(e.getMessage());
+                throw new TransformationException(e);
+            }
         }
+        this.setProcessor(newProcessor());
     }
 
-    public SaxonTransformer(){
+    public SaxonTransformer(boolean insecure) throws TransformationException {
+        this(null);
+        this.configurationFactory = insecure ? new SaxonDefaultConfigurationFactory() : new SaxonSecureConfigurationFactory();
+    }
+
+    public SaxonTransformer() throws TransformationException {
         this(null);
     }
 
-    private Source config;
+    private Processor processor;
+    private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
+    private Configuration config;
+
     /**
      * When errors occur during the transformation, they are stored in this list.
      */
     private ArrayList<StaticError> errorList = new ArrayList<>();
 
     /**
-     *
      * @return The error list
      */
-    public List<StaticError> getErrorList(){
+    public List<StaticError> getErrorList() {
         return errorList;
     }
 
     /**
-     *
-     * @param input The input XML stream
+     * @param input      The input XML stream
      * @param stylesheet The input stylesheet stream
-     * @param output The stream to which the output should be written
+     * @param output     The stream to which the output should be written
      * @return The serialization properties of the transformation
      * @throws TransformationException
      */
     public SerializationProperties transform(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
         SaxonMessageListener ml = new SaxonMessageListener();
-        try{
-            Processor p = newProcessor();
-            XsltCompiler c = p.newXsltCompiler();
-            c.setErrorList(errorList);
-            XsltExecutable e = c.compile(new StreamSource(stylesheet));
-            Xslt30Transformer xf = e.load30();
+        try {
+            Xslt30Transformer xf = newTransformer(stylesheet);
             xf.setMessageListener(ml);
             Serializer s = xf.newSerializer(output);
-            xf.transform(new StreamSource(input), s);
+            xf.transform(newSAXSource(input), s);
             return new SerializationProperties(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
-        }
-        catch(SaxonApiException e){
-            Logger l = LoggerFactory.getLogger(Server.class);
+        } catch (SaxonApiException e) {
             String msg = ml.errorString != null ? ml.errorString : e.getMessage();
-            l.error(msg);
+            LoggerFactory.getLogger(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
 
     }
 
-    private Processor newProcessor() throws SaxonApiException {
-        if(this.config != null){
-            LoggerFactory.getLogger(this.getClass()).info("Using config file: " + this.config.getSystemId());
-            return new Processor(this.config);
-        }
-        return new Processor(false);
+    Xslt30Transformer newTransformer(InputStream stylesheet) throws SaxonApiException {
+        Processor p = getProcessor();
+        XsltCompiler c = p.newXsltCompiler();
+        c.setErrorList(errorList);
+        XsltExecutable e = c.compile(newSAXSource(stylesheet));
+        return e.load30();
     }
 
+    private SAXSource newSAXSource(InputStream stream) {
+        return this.configurationFactory.newSAXSource(stream);
+    }
+
+    private Processor newProcessor() {
+        Configuration config = this.config == null ? configurationFactory.newConfiguration() : this.config;
+        return new Processor(config);
+    }
+
+    Processor getProcessor() {
+        return processor;
+    }
+
+    void setProcessor(Processor processor) {
+        this.processor = processor;
+    }
 }

@@ -28,9 +28,9 @@ public class ServerOptionsTest {
 
     @Test
     public void WrongConfigFileTest() {
-        SaxonTransformer xf = new SaxonTransformer(new File("unknown"));
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Assertions.assertThrows(TransformationException.class, () -> xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os));
+        Assertions.assertThrows(TransformationException.class, () -> {
+            SaxonTransformer xf = new SaxonTransformer(new File("unknown"));
+        });
     }
 
     @Test
@@ -44,11 +44,25 @@ public class ServerOptionsTest {
     }
 
     @Test
+    public void SecureConfigurationTest() throws TransformationException, URISyntaxException {
+        SaxonTransformer xf = new SaxonTransformer(false);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        Assertions.assertEquals(os.size(), 0);
+        Assertions.assertThrows(TransformationException.class, () -> xf.transform(
+                TestHelpers.WellFormedXmlStream(),
+                TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()),
+                new ByteArrayOutputStream()));
+    }
+
+    @Test
     public void SetOptionsFromArgumentsTest() throws ParseException, URISyntaxException {
         String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI()).getPath();
         String[] args = {"-port", "3000", "-config", configFilePath};
         ServerOptions opts = ServerOptions.fromArgs(args);
         Assertions.assertEquals(3000, (int) opts.getPort());
+        Assertions.assertThrows(RuntimeException.class, () -> ServerOptions.fromArgs(new String[]{"-config", configFilePath, "-insecure"}));
+        Assertions.assertTrue(ServerOptions.fromArgs(new String[]{"-insecure"}).isInsecure());
         Assertions.assertEquals(configFilePath, opts.getConfigFile().getPath());
 
     }
