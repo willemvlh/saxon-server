@@ -10,9 +10,11 @@ import spark.Spark;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 import static spark.Spark.*;
 
@@ -52,8 +54,8 @@ public class Server {
     }
 
     private void configureFilters() {
-        before("/*", (req,res) -> {
-            if(!isAuthenticated()){
+        before("/*", (req, res) -> {
+            if (!isAuthenticated()) {
                 halt(401);
             }
         });
@@ -64,7 +66,7 @@ public class Server {
         });
     }
 
-    private boolean isAuthenticated(){
+    private boolean isAuthenticated() {
         return true;
     }
 
@@ -114,20 +116,41 @@ public class Server {
     }
 
     private InputStream getStreamFromRequestByKey(Request req, String key) throws InvalidRequestException, IOException, ServletException {
-        try{
+        try {
             Part part = req.raw().getPart(key);
             if (part == null) {
                 throw new InvalidRequestException(String.format("No part found for key \"%s\"", key));
             }
             return getStreamFromPart(part);
-        }
-        catch (ServletException e){
-            throw new InvalidRequestException(String.format("Could not read parts for key \"%s\" - did you forget to attach a file?", key));
+        } catch (ServletException e) {
+            throw new InvalidRequestException(String.format("Could not read parts for key \"%s\" - did you forget to attach a file? (%s)", key, e.getMessage()));
         }
     }
 
-    private InputStream getStreamFromPart(Part part) throws IOException {
-        return part.getInputStream();
+    private InputStream getStreamFromPart(Part part) throws IOException, InvalidRequestException {
+        switch (part.getContentType().toLowerCase()) {
+            case "application/xml":
+                return part.getInputStream();
+            case "application/gzip":
+                return getZippedStreamFromPart(part.getInputStream());
+        }
+        throw new InvalidRequestException("Unexpected content type for part " + part.getName());
+    }
+
+    private InputStream getZippedStreamFromPart(InputStream input) throws InvalidRequestException {
+        ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
+        try {
+            GZIPInputStream s = new GZIPInputStream(input);
+            int data = s.read();
+            while (data != -1) {
+                writeStream.write(data);
+                data = s.read();
+            }
+            return new ByteArrayInputStream(writeStream.toByteArray());
+        } catch (IOException e) {
+            throw new InvalidRequestException(e.getMessage());
+        }
+
     }
 
     private static Response handleException(Throwable e, Response res, int status) {
