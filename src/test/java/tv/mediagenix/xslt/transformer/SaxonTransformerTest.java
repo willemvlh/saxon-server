@@ -3,6 +3,8 @@ package tv.mediagenix.xslt.transformer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import spark.utils.Assert;
+import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +51,7 @@ public class SaxonTransformerTest {
     public void insecureTest() throws TransformationException {
         SaxonTransformer xf = new SaxonTransformer(true);
         Assertions.assertDoesNotThrow(
-                () -> xf.transform(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream())
+                () -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream())
         );
     }
 
@@ -66,7 +68,7 @@ public class SaxonTransformerTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         InputStream xslStr = new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8));
-        tf.transform(input, xslStr, output);
+        tf.act(input, xslStr, output);
         return output;
     }
 }

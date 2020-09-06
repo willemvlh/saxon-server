@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.xslt.transformer.server;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
+import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.actors.*;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -20,7 +23,8 @@ import static spark.Spark.*;
 
 public class Server {
 
-    private final String ENDPOINT = "/transform";
+    private final String XSL_ENDPOINT = "/transform";
+    private final String XQ_ENDPOINT = "/query";
     private final String INPUT_KEY = "xml";
     private final String XSL_KEY = "xsl";
     private Logger logger = LoggerFactory.getLogger(Server.class);
@@ -60,7 +64,6 @@ public class Server {
             }
         });
 
-
         before("/*", (req, res) -> {
             res.raw().setHeader("Server", "/");
         });
@@ -92,19 +95,27 @@ public class Server {
 
     private void configureRoutes() {
         port(options.getPort());
-        post(ENDPOINT, this::handleRequest);
+        post(XSL_ENDPOINT, this::handleXsltRequest);
+        post(XQ_ENDPOINT, this::handleXQueryRequest);
+
     }
 
-    Object handleRequest(Request req, Response res) throws Exception {
+    private Object handleXQueryRequest(Request req, Response res) throws Exception {
+        return handleRequest(req, res, ActorType.QUERY);
+    }
+
+    private Object handleXsltRequest(Request req, Response res) throws Exception {
+        return handleRequest(req, res, ActorType.TRANSFORM);
+    }
+
+    private Object handleRequest(Request req, Response res, ActorType actorType) throws Exception {
         long startTime = System.currentTimeMillis();
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
         try (InputStream input = getStreamFromRequestByKey(req, INPUT_KEY)) {
             try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY)) {
-                SaxonTransformer tf = options.getConfigFile() != null
-                        ? new SaxonTransformer(options.getConfigFile())
-                        : new SaxonTransformer(options.isInsecure());
+                SaxonActor actor = newActor(actorType);
                 ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
-                SerializationProperties props = tf.transform(input, stylesheet, writeStream);
+                SerializationProperties props = actor.act(input, stylesheet, writeStream);
                 res.header("Content-type", props.contentType());
                 writeStream.writeTo(res.raw().getOutputStream());
                 res.raw().getOutputStream().close();
@@ -128,13 +139,10 @@ public class Server {
     }
 
     private InputStream getStreamFromPart(Part part) throws IOException, InvalidRequestException {
-        switch (part.getContentType().toLowerCase()) {
-            case "application/xml":
-                return part.getInputStream();
-            case "application/gzip":
-                return getZippedStreamFromPart(part.getInputStream());
+        if ("application/gzip".equals(part.getContentType().toLowerCase())) {
+            return getZippedStreamFromPart(part.getInputStream());
         }
-        throw new InvalidRequestException("Unexpected content type for part " + part.getName());
+        return part.getInputStream();
     }
 
     private InputStream getZippedStreamFromPart(InputStream input) throws InvalidRequestException {
@@ -159,6 +167,23 @@ public class Server {
         res.type("application/json;charset=utf-8");
         res.body(new JsonTransformer().render(err));
         return res;
+    }
+
+    private SaxonActor newActor(ActorType type) throws TransformationException {
+        SaxonActorFactory factory;
+        switch (type) {
+            case QUERY:
+                factory = new SaxonXQueryPerformerFactory();
+                break;
+            case TRANSFORM:
+                factory = new SaxonTransformerFactory();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
+        return options.getConfigFile() != null
+                ? factory.newActorWithConfig(options.getConfigFile())
+                : factory.newActor(options.isInsecure());
     }
 
     public void stop() {
