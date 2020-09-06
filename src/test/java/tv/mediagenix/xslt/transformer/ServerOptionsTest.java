@@ -3,6 +3,9 @@ package tv.mediagenix.xslt.transformer;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
+import tv.mediagenix.xslt.transformer.server.ServerOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -14,15 +17,15 @@ public class ServerOptionsTest {
         File configFile = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI());
         SaxonTransformer xf = new SaxonTransformer(configFile);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertNotEquals(os.size(), 0);
     }
 
     @Test
     public void NoOptionsParseTest() throws TransformationException {
-        SaxonTransformer xf = new SaxonTransformer(null);
+        SaxonTransformer xf = new SaxonTransformer();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os);
+        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os);
         Assertions.assertNotEquals(os.size(), 0);
     }
 
@@ -39,7 +42,7 @@ public class ServerOptionsTest {
         File f = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config-no-external-fn.xml").toURI());
         SaxonTransformer xf = new SaxonTransformer(f);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertEquals(os.size(), 0);
     }
 
@@ -47,9 +50,9 @@ public class ServerOptionsTest {
     public void SecureConfigurationTest() throws TransformationException, URISyntaxException {
         SaxonTransformer xf = new SaxonTransformer(false);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.transform(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertEquals(os.size(), 0);
-        Assertions.assertThrows(TransformationException.class, () -> xf.transform(
+        Assertions.assertThrows(TransformationException.class, () -> xf.act(
                 TestHelpers.WellFormedXmlStream(),
                 TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()),
                 new ByteArrayOutputStream()));

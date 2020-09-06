@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.xslt.transformer.saxon;
 
 import net.sf.saxon.Configuration;
 import org.xml.sax.InputSource;

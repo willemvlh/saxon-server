@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.xslt.transformer.saxon;
 
 import com.sun.org.apache.xerces.internal.parsers.SAXParser;
 import net.sf.saxon.Configuration;

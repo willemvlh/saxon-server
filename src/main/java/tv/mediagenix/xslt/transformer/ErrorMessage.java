@@ -5,7 +5,7 @@ public class ErrorMessage {
     public String exceptionType;
     public String message;
 
-    ErrorMessage(Throwable e, int statusCode) {
+    public ErrorMessage(Throwable e, int statusCode) {
         this.message = e.getMessage();
         this.statusCode = statusCode;
         this.exceptionType = e.getClass().getSimpleName();

@@ -39,6 +39,17 @@ public class TestHelpers {
         return getInputStreamFromUtf8String(MessageInvokingXsl);
     }
 
+    public static InputStream WellFormedXQueryStream() {
+        return getInputStreamFromUtf8String(
+                "declare option saxon:output 'method=text';'abc'"
+        );
+    }
+
+    public static InputStream IncorrectXQueryStream() {
+        return getInputStreamFromUtf8String("let $x = \"abc\";\n" +
+                "return $x;");
+    }
+
     public static InputStream SystemPropertyInvokingXslStream() {
         return getInputStreamFromUtf8String(
                 "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
