@@ -6,15 +6,9 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-import tv.mediagenix.xslt.transformer.ErrorMessage;
-import tv.mediagenix.xslt.transformer.JsonTransformer;
-import tv.mediagenix.xslt.transformer.SerializationProperties;
-import tv.mediagenix.xslt.transformer.saxon.AbstractSaxonActorFactory;
-import tv.mediagenix.xslt.transformer.saxon.SaxonTransformerFactory;
-import tv.mediagenix.xslt.transformer.saxon.SaxonXQueryPerformerFactory;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
-import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
+import tv.mediagenix.xslt.transformer.saxon.actors.*;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -176,7 +170,7 @@ public class Server {
     }
 
     private SaxonActor newActor(ActorType type) throws TransformationException {
-        AbstractSaxonActorFactory factory;
+        SaxonActorFactory factory;
         switch (type) {
             case QUERY:
                 factory = new SaxonXQueryPerformerFactory();

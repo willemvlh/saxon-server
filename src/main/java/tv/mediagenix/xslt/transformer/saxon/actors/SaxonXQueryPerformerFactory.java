@@ -1,11 +1,10 @@
-package tv.mediagenix.xslt.transformer.saxon;
+package tv.mediagenix.xslt.transformer.saxon.actors;
 
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformer;
+import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import java.io.File;
 
-public class SaxonXQueryPerformerFactory extends AbstractSaxonActorFactory {
+public class SaxonXQueryPerformerFactory extends SaxonActorFactory {
 
     @Override
     public SaxonActor newActor(boolean insecure) throws TransformationException {

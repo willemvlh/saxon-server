@@ -2,8 +2,8 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import org.slf4j.LoggerFactory;
-import tv.mediagenix.xslt.transformer.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.SaxonMessageListener;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import java.io.File;

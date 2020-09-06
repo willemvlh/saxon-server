@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer;
 
 import org.junit.jupiter.api.Test;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformer;
 

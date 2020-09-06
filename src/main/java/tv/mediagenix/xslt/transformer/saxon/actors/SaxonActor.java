@@ -6,11 +6,11 @@ import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.trans.XPathException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
-import tv.mediagenix.xslt.transformer.SerializationProperties;
-import tv.mediagenix.xslt.transformer.saxon.SaxonConfigurationFactory;
-import tv.mediagenix.xslt.transformer.saxon.SaxonDefaultConfigurationFactory;
-import tv.mediagenix.xslt.transformer.saxon.SaxonSecureConfigurationFactory;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
+import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFactory;
+import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFactory;
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;

@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.xslt.transformer.server;
 
 public class ErrorMessage {
     public int statusCode;
