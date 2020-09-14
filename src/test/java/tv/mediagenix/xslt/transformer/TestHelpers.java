@@ -56,6 +56,10 @@ public class TestHelpers {
         );
     }
 
+    public static InputStream XQueryStreamApplicationJsonMime() {
+        return getInputStreamFromUtf8String("declare option saxon:output 'media-type=application/json';  declare option saxon:output 'method=json'; map{'a':'b'}");
+    }
+
     public static InputStream IncorrectXQueryStream() {
         return getInputStreamFromUtf8String("let $x = \"abc\";\n" +
                 "return $x;");

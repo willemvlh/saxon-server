@@ -3,6 +3,7 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.XQueryEvaluator;
+import net.sf.saxon.s9api.XQueryExecutable;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
@@ -11,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class SaxonXQueryPerformer extends SaxonActor {
+    private XQueryExecutable executable;
+
     public SaxonXQueryPerformer(boolean insecure) {
         super(insecure);
     }
@@ -44,13 +47,15 @@ public class SaxonXQueryPerformer extends SaxonActor {
     }
 
     private XQueryEvaluator newEvaluatorOnQuery(InputStream query) throws SaxonApiException {
-        return this.getProcessor().newXQueryCompiler().compile(query).load();
+        this.executable = this.getProcessor().newXQueryCompiler().compile(query);
+        return this.executable.load();
     }
 
     private SerializationProperties evaluate(XQueryEvaluator e, OutputStream output) throws SaxonApiException {
         Serializer s = newSerializer(output);
         e.setDestination(s);
         e.run();
-        return new SerializationProperties("application/xml", "utf-8");
+        net.sf.saxon.serialize.SerializationProperties props = executable.getUnderlyingCompiledQuery().getExecutable().getPrimarySerializationProperties();
+        return new SerializationProperties(props.getProperty("media-type"), props.getProperty("encoding"));
     }
 }
