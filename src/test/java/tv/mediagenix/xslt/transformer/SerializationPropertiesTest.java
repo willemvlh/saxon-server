@@ -8,6 +8,6 @@ class SerializationPropertiesTest {
     @Test
     void ContentTypeTest(){
         SerializationProperties sb = new SerializationProperties("application/xml", "utf-8");
-        Assertions.assertEquals("application/xml;charset=utf-8", sb.contentType());
+        Assertions.assertEquals("application/xml;charset=utf-8", sb.getContentType());
     }
 }

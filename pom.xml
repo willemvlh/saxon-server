@@ -1,20 +1,8 @@
-<!-- ====================================================================== -->
-<!--                                                                        -->
-<!-- Generated on 2018-12-15T10:38:29                                       -->
-<!--                                                                        -->
-<!-- ====================================================================== -->
-
-<!-- ====================================================================== -->
-<!--                                                                        -->
-<!-- Effective POM for project 'wvl:saxon:jar:1.0-SNAPSHOT'                 -->
-<!--                                                                        -->
-<!-- ====================================================================== -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>tv.mediagenix</groupId>
     <artifactId>saxon-server</artifactId>
-    <version>1.5</version>
+    <version>1.7</version>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

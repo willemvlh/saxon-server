@@ -6,6 +6,7 @@ import tv.mediagenix.xslt.transformer.saxon.SaxonMessageListener;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
+import javax.xml.transform.Source;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,26 +46,41 @@ public class SaxonTransformer extends SaxonActor {
      * @return The serialization properties of the transformation
      * @throws TransformationException
      */
+
+    @Override
     public SerializationProperties act(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        SaxonMessageListener ml = new SaxonMessageListener();
+        return transform(newSAXSource(input), newSAXSource(stylesheet), output);
+    }
+
+    @Override
+    public SerializationProperties act(InputStream stylesheet, OutputStream output) throws TransformationException {
+        return transform(null, newSAXSource(stylesheet), output);
+    }
+
+    private SerializationProperties transform(Source input, Source stylesheet, OutputStream output) throws TransformationException {
+        SaxonMessageListener listener = new SaxonMessageListener();
         try {
-            Xslt30Transformer xf = newTransformer(stylesheet);
-            xf.setMessageListener(ml);
-            Serializer s = xf.newSerializer(output);
-            xf.transform(newSAXSource(input), s);
+            Xslt30Transformer transformer = newTransformer(stylesheet);
+            Serializer s = transformer.newSerializer(output);
+            transformer.setMessageListener(listener);
+            if (input == null) {
+                transformer.callTemplate(null, s);
+            } else {
+                transformer.transform(input, s);
+            }
             return getSerializationProperties(s);
         } catch (SaxonApiException e) {
-            String msg = ml.errorString != null ? ml.errorString : e.getMessage();
+            String msg = listener.errorString != null ? listener.errorString : e.getMessage();
             LoggerFactory.getLogger(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
     }
 
-    Xslt30Transformer newTransformer(InputStream stylesheet) throws SaxonApiException {
+    private Xslt30Transformer newTransformer(Source stylesheet) throws SaxonApiException {
         Processor p = getProcessor();
         XsltCompiler c = p.newXsltCompiler();
         c.setErrorList(errorList);
-        XsltExecutable e = c.compile(newSAXSource(stylesheet));
+        XsltExecutable e = c.compile(stylesheet);
         return e.load30();
     }
 

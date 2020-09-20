@@ -21,7 +21,7 @@ class SaxonXQueryPerformerTest {
     }
 
     @Test
-    void actFail() throws TransformationException {
+    void actFail() {
         SaxonXQueryPerformer p = new SaxonXQueryPerformer();
         assertThrows(TransformationException.class,
                 () -> p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.IncorrectXQueryStream(), new ByteArrayOutputStream()));
@@ -30,8 +30,10 @@ class SaxonXQueryPerformerTest {
     @Test
     void serializationProps() throws TransformationException {
         SaxonXQueryPerformer p = new SaxonXQueryPerformer();
-        SerializationProperties props = p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXQueryStream(), new ByteArrayOutputStream());
-        assertTrue(props.contentType().toLowerCase().contains("utf-8"));
+        SerializationProperties props = p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.XQueryStreamApplicationJsonMime(), new ByteArrayOutputStream());
+        assertEquals("utf-8", props.getEncoding().toLowerCase());
+        assertEquals("application/json", props.getMime().toLowerCase());
+
     }
 
 }

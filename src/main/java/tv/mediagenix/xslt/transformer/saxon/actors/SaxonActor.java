@@ -44,6 +44,8 @@ public abstract class SaxonActor {
 
     public abstract SerializationProperties act(InputStream input, InputStream input2, OutputStream output) throws TransformationException;
 
+    public abstract SerializationProperties act(InputStream input, OutputStream output) throws TransformationException;
+
     protected SAXSource newSAXSource(InputStream stream) {
         return this.configurationFactory.newSAXSource(stream);
     }

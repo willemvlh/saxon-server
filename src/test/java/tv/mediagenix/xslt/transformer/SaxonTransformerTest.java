@@ -22,6 +22,14 @@ public class SaxonTransformerTest {
     }
 
     @Test
+    public void transformWithoutInputTest() throws TransformationException {
+        SaxonTransformer xf = new SaxonTransformer();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        xf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
+        Assertions.assertEquals("hello", os.toString());
+    }
+
+    @Test
     public void malformedXslTest() {
 
         Assertions.assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
