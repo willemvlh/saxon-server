@@ -1,10 +1,11 @@
 package tv.mediagenix.xslt.transformer;
 
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformer;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
@@ -30,10 +31,18 @@ class SaxonXQueryPerformerTest {
     @Test
     void serializationProps() throws TransformationException {
         SaxonXQueryPerformer p = new SaxonXQueryPerformer();
-        SerializationProperties props = p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.XQueryStreamApplicationJsonMime(), new ByteArrayOutputStream());
+        SerializationProps props = p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.XQueryStreamApplicationJsonMime(), new ByteArrayOutputStream());
         assertEquals("utf-8", props.getEncoding().toLowerCase());
         assertEquals("application/json", props.getMime().toLowerCase());
 
+    }
+
+    @Test
+    void outputProperty() throws TransformationException, UnsupportedEncodingException {
+        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        p.act(new ByteArrayInputStream("declare option saxon:output 'method=json'; map{}".getBytes()), os);
+        assertTrue(os.toString("utf-8").startsWith("{"));
     }
 
 }

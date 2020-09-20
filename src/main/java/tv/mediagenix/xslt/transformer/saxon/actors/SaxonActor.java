@@ -6,7 +6,7 @@ import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.trans.XPathException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFactory;
@@ -42,9 +42,9 @@ public abstract class SaxonActor {
         }
     }
 
-    public abstract SerializationProperties act(InputStream input, InputStream input2, OutputStream output) throws TransformationException;
+    public abstract SerializationProps act(InputStream input, InputStream input2, OutputStream output) throws TransformationException;
 
-    public abstract SerializationProperties act(InputStream input, OutputStream output) throws TransformationException;
+    public abstract SerializationProps act(InputStream input, OutputStream output) throws TransformationException;
 
     protected SAXSource newSAXSource(InputStream stream) {
         return this.configurationFactory.newSAXSource(stream);
@@ -70,7 +70,7 @@ public abstract class SaxonActor {
         this.processor = processor;
     }
 
-    protected SerializationProperties getSerializationProperties(Serializer s) {
-        return new SerializationProperties(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
+    protected SerializationProps getSerializationProperties(Serializer s) {
+        return new SerializationProps(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
     }
 }

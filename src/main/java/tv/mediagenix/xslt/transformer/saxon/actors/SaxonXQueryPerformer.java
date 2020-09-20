@@ -4,7 +4,8 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.XQueryEvaluator;
 import net.sf.saxon.s9api.XQueryExecutable;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
+import net.sf.saxon.serialize.SerializationProperties;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class SaxonXQueryPerformer extends SaxonActor {
     }
 
     @Override
-    public SerializationProperties act(InputStream is, InputStream query, OutputStream output) throws TransformationException {
+    public SerializationProps act(InputStream is, InputStream query, OutputStream output) throws TransformationException {
         try {
             XQueryEvaluator e = newEvaluatorOnQuery(query);
             e.setSource(newSAXSource(is));
@@ -37,7 +38,7 @@ public class SaxonXQueryPerformer extends SaxonActor {
     }
 
     @Override
-    public SerializationProperties act(InputStream query, OutputStream output) throws TransformationException {
+    public SerializationProps act(InputStream query, OutputStream output) throws TransformationException {
         try {
             XQueryEvaluator e = newEvaluatorOnQuery(query);
             return evaluate(e, output);
@@ -51,11 +52,20 @@ public class SaxonXQueryPerformer extends SaxonActor {
         return this.executable.load();
     }
 
-    private SerializationProperties evaluate(XQueryEvaluator e, OutputStream output) throws SaxonApiException {
+    private SerializationProps evaluate(XQueryEvaluator e, OutputStream output) throws SaxonApiException {
         Serializer s = newSerializer(output);
         e.setDestination(s);
         e.run();
-        net.sf.saxon.serialize.SerializationProperties props = executable.getUnderlyingCompiledQuery().getExecutable().getPrimarySerializationProperties();
-        return new SerializationProperties(props.getProperty("media-type"), props.getProperty("encoding"));
+        return getSerializationProperties(s);
+    }
+
+    @Override
+    protected Serializer newSerializer(OutputStream os) {
+        Serializer s = super.newSerializer(os);
+        SerializationProperties defaults = new SerializationProperties();
+        defaults.setProperty("method", "adaptive");
+        SerializationProperties actualProps = this.executable.getUnderlyingCompiledQuery().getExecutable().getPrimarySerializationProperties().combineWith(defaults);
+        s.setOutputProperties(actualProps);
+        return s;
     }
 }

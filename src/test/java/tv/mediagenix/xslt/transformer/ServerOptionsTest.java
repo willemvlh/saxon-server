@@ -47,7 +47,7 @@ public class ServerOptionsTest {
     }
 
     @Test
-    public void SecureConfigurationTest() throws TransformationException, URISyntaxException {
+    public void SecureConfigurationTest() throws TransformationException {
         SaxonTransformer xf = new SaxonTransformer(false);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);

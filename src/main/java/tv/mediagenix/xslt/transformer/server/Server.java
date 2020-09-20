@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProperties;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.*;
 
@@ -112,7 +112,7 @@ public class Server {
         try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY).orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
             SaxonActor actor = newFactory(actorType).newActor(options);
             ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
-            SerializationProperties props = input.isPresent()
+            SerializationProps props = input.isPresent()
                     ? actor.act(input.get(), stylesheet, writeStream)
                     : actor.act(stylesheet, writeStream);
             res.header("Content-type", props.getContentType());
@@ -134,7 +134,8 @@ public class Server {
     }
 
     private Optional<InputStream> getStreamFromPart(Part part) throws IOException, InvalidRequestException {
-        if ("application/gzip".equals(part.getContentType().toLowerCase())) {
+        String contentType = part.getContentType();
+        if (contentType != null && "application/gzip".equals(contentType.toLowerCase())) {
             return Optional.of(getZippedStreamFromPart(part.getInputStream()));
         }
         return Optional.ofNullable(part.getInputStream());
