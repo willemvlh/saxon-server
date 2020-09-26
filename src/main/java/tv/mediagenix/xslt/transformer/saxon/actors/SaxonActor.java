@@ -3,6 +3,7 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.serialize.SerializationProperties;
 import net.sf.saxon.trans.XPathException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
@@ -17,11 +18,14 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class SaxonActor {
 
     protected SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
     private Processor processor;
+    private Map<String, String> serializationParameters = new HashMap<>();
 
     public SaxonActor(boolean insecure) {
         this();
@@ -59,7 +63,13 @@ public abstract class SaxonActor {
     }
 
     protected Serializer newSerializer(OutputStream os) {
-        return this.getProcessor().newSerializer(os);
+        Serializer serializer = this.getProcessor().newSerializer(os);
+        SerializationProperties props = new SerializationProperties();
+        for (String s : this.getSerializationParameters().keySet()) {
+            props.setProperty(s, this.getSerializationParameters().get(s));
+        }
+        serializer.setOutputProperties(props);
+        return serializer;
     }
 
     Processor getProcessor() {
@@ -72,5 +82,13 @@ public abstract class SaxonActor {
 
     protected SerializationProps getSerializationProperties(Serializer s) {
         return new SerializationProps(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
+    }
+
+    protected Map<String, String> getSerializationParameters() {
+        return serializationParameters;
+    }
+
+    public void setSerializationParameters(Map<String, String> serializationParameters) {
+        this.serializationParameters = serializationParameters;
     }
 }

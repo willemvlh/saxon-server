@@ -3,11 +3,9 @@ package tv.mediagenix.xslt.transformer.saxon;
 public class SerializationProps {
     private String encoding;
     private String mime;
-    private final String defaultEncoding = "utf-8";
-    private final String defaultMime = "application/xml";
 
     public String getEncoding() {
-        return encoding == null ? defaultEncoding : encoding;
+        return encoding == null ? "utf-8" : encoding;
     }
 
     public String getMime() {
@@ -15,7 +13,7 @@ public class SerializationProps {
     }
 
     protected String getDefaultMime() {
-        return defaultMime;
+        return "application/xml";
     }
 
     public SerializationProps(String mime, String encoding) {

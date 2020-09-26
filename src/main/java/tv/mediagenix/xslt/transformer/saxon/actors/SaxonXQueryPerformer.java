@@ -52,6 +52,13 @@ public class SaxonXQueryPerformer extends SaxonActor {
         return this.executable.load();
     }
 
+    @Override
+    protected SerializationProps getSerializationProperties(Serializer s) {
+        SerializationProperties props = this.executable.getUnderlyingCompiledQuery().getExecutable().getPrimarySerializationProperties();
+        props = props.combineWith(s.getSerializationProperties());
+        return new SerializationProps(props.getProperty("media-type"), props.getProperty("encoding"));
+    }
+
     private SerializationProps evaluate(XQueryEvaluator e, OutputStream output) throws SaxonApiException {
         Serializer s = newSerializer(output);
         e.setDestination(s);
@@ -59,13 +66,4 @@ public class SaxonXQueryPerformer extends SaxonActor {
         return getSerializationProperties(s);
     }
 
-    @Override
-    protected Serializer newSerializer(OutputStream os) {
-        Serializer s = super.newSerializer(os);
-        SerializationProperties defaults = new SerializationProperties();
-        defaults.setProperty("method", "adaptive");
-        SerializationProperties actualProps = this.executable.getUnderlyingCompiledQuery().getExecutable().getPrimarySerializationProperties().combineWith(defaults);
-        s.setOutputProperties(actualProps);
-        return s;
-    }
 }

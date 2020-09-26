@@ -27,25 +27,11 @@ public class SaxonTransformer extends SaxonActor {
         super();
     }
 
-    /**
-     * When errors occur during the transformation, they are stored in this list.
-     */
     private ArrayList<StaticError> errorList = new ArrayList<>();
 
-    /**
-     * @return The error list
-     */
     public List<StaticError> getErrorList() {
         return errorList;
     }
-
-    /**
-     * @param input      The input XML stream
-     * @param stylesheet The input stylesheet stream
-     * @param output     The stream to which the output should be written
-     * @return The serialization properties of the transformation
-     * @throws TransformationException
-     */
 
     @Override
     public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
@@ -76,12 +62,19 @@ public class SaxonTransformer extends SaxonActor {
         }
     }
 
-    private Xslt30Transformer newTransformer(Source stylesheet) throws SaxonApiException {
+    private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
         Processor p = getProcessor();
         XsltCompiler c = p.newXsltCompiler();
-        c.setErrorList(errorList);
-        XsltExecutable e = c.compile(stylesheet);
-        return e.load30();
+        c.setErrorList(this.getErrorList());
+        try {
+            XsltExecutable e = c.compile(stylesheet);
+            return e.load30();
+        } catch (SaxonApiException e) {
+            if (this.getErrorList().size() > 0) {
+                StaticError error = this.getErrorList().get(0);
+                throw new TransformationException("Compilation error: " + error.getMessage() + " (line " + error.getLineNumber() + ", col " + error.getColumnNumber() + ")");
+            }
+            throw new TransformationException(e);
+        }
     }
-
 }

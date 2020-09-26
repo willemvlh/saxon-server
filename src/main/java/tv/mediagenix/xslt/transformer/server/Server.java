@@ -13,10 +13,11 @@ import tv.mediagenix.xslt.transformer.saxon.actors.*;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
@@ -24,10 +25,6 @@ import static spark.Spark.*;
 
 public class Server {
 
-    private final String XSL_ENDPOINT = "/transform";
-    private final String XQ_ENDPOINT = "/query";
-    private final String INPUT_KEY = "xml";
-    private final String XSL_KEY = "xsl";
     private final Logger logger = LoggerFactory.getLogger(Server.class);
     private ServerOptions options;
 
@@ -93,8 +90,8 @@ public class Server {
 
     private void configureRoutes() {
         port(options.getPort());
-        post(XSL_ENDPOINT, this::handleXsltRequest);
-        post(XQ_ENDPOINT, this::handleXQueryRequest);
+        post("/transform", this::handleXsltRequest);
+        post("/query", this::handleXQueryRequest);
     }
 
     private Object handleXQueryRequest(Request req, Response res) throws Exception {
@@ -108,19 +105,30 @@ public class Server {
     private Object handleRequest(Request req, Response res, ActorType actorType) throws Exception {
         long startTime = System.currentTimeMillis();
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
-        Optional<InputStream> input = getStreamFromRequestByKey(req, INPUT_KEY);
-        try (InputStream stylesheet = getStreamFromRequestByKey(req, XSL_KEY).orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
+        Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
+        try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl").orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
             SaxonActor actor = newFactory(actorType).newActor(options);
+            actor.setSerializationParameters(this.getSerializationParams(req.raw().getPart("output")));
             ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
-            SerializationProps props = input.isPresent()
-                    ? actor.act(input.get(), stylesheet, writeStream)
-                    : actor.act(stylesheet, writeStream);
-            res.header("Content-type", props.getContentType());
+            SerializationProps props = input.isPresent() ? actor.act(input.get(), stylesheet, writeStream) : actor.act(stylesheet, writeStream);
+            res.header("Content-Type", props.getContentType());
             writeStream.writeTo(res.raw().getOutputStream());
             res.raw().getOutputStream().close();
             return res;
         } finally {
             logger.info(String.format("Finished request in %s milliseconds", System.currentTimeMillis() - startTime));
+        }
+    }
+
+    private Map<String, String> getSerializationParams(Part part) throws InvalidRequestException {
+        if (part == null) {
+            return new HashMap<>();
+        }
+        try {
+            InputStream s = part.getInputStream();
+            return new ParameterParser().parseStream(s, (int) part.getSize());
+        } catch (IOException e) {
+            throw new InvalidRequestException(e.getMessage());
         }
     }
 
@@ -140,9 +148,9 @@ public class Server {
         }
         return Optional.ofNullable(part.getInputStream());
     }
-    
-    private SaxonActorFactory newFactory(ActorType type){
-        switch(type){
+
+    private SaxonActorFactory newFactory(ActorType type) {
+        switch (type) {
             case TRANSFORM:
                 return new SaxonTransformerFactory();
             case QUERY:
@@ -153,17 +161,12 @@ public class Server {
     }
 
     private InputStream getZippedStreamFromPart(InputStream input) throws InvalidRequestException {
-        ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
         try {
             GZIPInputStream s = new GZIPInputStream(input);
-            int data = s.read();
-            while (data != -1) {
-                writeStream.write(data);
-                data = s.read();
-            }
-            return new ByteArrayInputStream(writeStream.toByteArray());
+            ZippedStreamReader r = new ZippedStreamReader();
+            return r.unzipStream(s);
         } catch (IOException e) {
-            throw new InvalidRequestException(e.getMessage());
+            throw new InvalidRequestException(e);
         }
     }
 
