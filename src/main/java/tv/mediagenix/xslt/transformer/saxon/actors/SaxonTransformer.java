@@ -34,33 +34,38 @@ public class SaxonTransformer extends SaxonActor {
     }
 
     @Override
-    public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        return transform(newSAXSource(input), newSAXSource(stylesheet), output);
+    public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output, XdmItem contextItem) throws TransformationException {
+        return transform(input != null ? newSAXSource(input) : null, newSAXSource(stylesheet), output, contextItem);
     }
 
     @Override
     public SerializationProps act(InputStream stylesheet, OutputStream output) throws TransformationException {
-        return transform(null, newSAXSource(stylesheet), output);
+        return transform(null, newSAXSource(stylesheet), output, null);
     }
 
-    private SerializationProps transform(Source input, Source stylesheet, OutputStream output) throws TransformationException {
-        SaxonMessageListener listener = new SaxonMessageListener();
+    private SerializationProps transform(Source input, Source stylesheet, OutputStream output, XdmItem contextItem) throws TransformationException {
+        Xslt30Transformer transformer = newTransformer(stylesheet);
+        Serializer s = transformer.newSerializer(output);
         try {
-            Xslt30Transformer transformer = newTransformer(stylesheet);
-            Serializer s = transformer.newSerializer(output);
-            transformer.setMessageListener(listener);
-            if (input == null) {
+            if (contextItem != null) {
+                //skip the input source, apply transformation on the context item
+                transformer.applyTemplates(contextItem, s);
+            } else if (input == null) {
+                //no input, use default template "xsl:initial-template"
                 transformer.callTemplate(null, s);
             } else {
+                //regular transformation with xml input source
                 transformer.transform(input, s);
             }
             return getSerializationProperties(s);
         } catch (SaxonApiException e) {
+            SaxonMessageListener listener = (SaxonMessageListener) transformer.getMessageListener2();
             String msg = listener.errorString != null ? listener.errorString : e.getMessage();
             LoggerFactory.getLogger(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
     }
+
 
     private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
         Processor p = getProcessor();
@@ -68,7 +73,9 @@ public class SaxonTransformer extends SaxonActor {
         c.setErrorList(this.getErrorList());
         try {
             XsltExecutable e = c.compile(stylesheet);
-            return e.load30();
+            Xslt30Transformer xf = e.load30();
+            xf.setMessageListener(new SaxonMessageListener());
+            return xf;
         } catch (SaxonApiException e) {
             if (this.getErrorList().size() > 0) {
                 StaticError error = this.getErrorList().get(0);

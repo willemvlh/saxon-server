@@ -50,10 +50,12 @@ public class TestHelpers {
         return getInputStreamFromUtf8String(MessageInvokingXsl);
     }
 
+    public static InputStream jsonInputStream() {
+        return getInputStreamFromUtf8String("{}");
+    }
+
     public static InputStream WellFormedXQueryStream() {
-        return getInputStreamFromUtf8String(
-                "declare option saxon:output 'method=text';'abc'"
-        );
+        return getInputStreamFromUtf8String("declare option saxon:output 'method=text';'abc'");
     }
 
     public static InputStream XQueryStreamApplicationJsonMime() {

@@ -1,9 +1,6 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.Serializer;
-import net.sf.saxon.s9api.XQueryEvaluator;
-import net.sf.saxon.s9api.XQueryExecutable;
+import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
@@ -27,10 +24,13 @@ public class SaxonXQueryPerformer extends SaxonActor {
     }
 
     @Override
-    public SerializationProps act(InputStream is, InputStream query, OutputStream output) throws TransformationException {
+    public SerializationProps act(InputStream is, InputStream query, OutputStream output, XdmItem contextItem) throws TransformationException {
         try {
             XQueryEvaluator e = newEvaluatorOnQuery(query);
-            e.setSource(newSAXSource(is));
+            e.setContextItem(contextItem);
+            if (is != null) {
+                e.setSource(newSAXSource(is));
+            }
             return evaluate(e, output);
         } catch (SaxonApiException e) {
             throw new TransformationException(e);

@@ -1,12 +1,12 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.Configuration;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
 import net.sf.saxon.trans.XPathException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
+import tv.mediagenix.xslt.transformer.saxon.JsonToXmlTransformer;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
@@ -15,9 +15,7 @@ import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFacto
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,12 +44,55 @@ public abstract class SaxonActor {
         }
     }
 
-    public abstract SerializationProps act(InputStream input, InputStream input2, OutputStream output) throws TransformationException;
+    public final SerializationProps act(InputStream input, InputStream input2, OutputStream output) throws TransformationException {
+        try {
+            if (isJsonStream(input)) {
+                JsonToXmlTransformer xf = new JsonToXmlTransformer();
+                XdmNode jsonAsXml = xf.transform(inputStreamToString(input), getProcessor());
+                return act(null, input2, output, jsonAsXml);
+            }
+            return act(input, input2, output, null);
+        } catch (SaxonApiException e) {
+            throw new TransformationException(e);
+        }
+    }
+
+    private String inputStreamToString(InputStream input) throws TransformationException {
+        StringBuilder builder = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        try {
+            int c;
+            while ((c = reader.read()) != -1) {
+                builder.append((char) c);
+            }
+            return builder.toString();
+        } catch (IOException e) {
+            throw new TransformationException(e);
+        }
+
+    }
+
+    //perhaps change the interface to send the input always as an XdmItem
+    public abstract SerializationProps act(InputStream input, InputStream input2, OutputStream output, XdmItem contextNode) throws TransformationException;
 
     public abstract SerializationProps act(InputStream input, OutputStream output) throws TransformationException;
 
     protected SAXSource newSAXSource(InputStream stream) {
         return this.configurationFactory.newSAXSource(stream);
+    }
+
+    private boolean isJsonStream(InputStream stream) throws TransformationException {
+        char c;
+        try {
+            c = (char) stream.read();
+            while (Character.isWhitespace(c)) {
+                c = (char) stream.read();
+            }
+            stream.reset();
+            return c != '<';
+        } catch (IOException e) {
+            throw new TransformationException(e);
+        }
     }
 
     private Processor newProcessorWithConfig(Configuration config) {
