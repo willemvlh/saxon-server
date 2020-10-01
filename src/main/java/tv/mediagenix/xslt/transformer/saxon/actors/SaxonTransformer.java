@@ -79,7 +79,14 @@ public class SaxonTransformer extends SaxonActor {
         } catch (SaxonApiException e) {
             if (this.getErrorList().size() > 0) {
                 StaticError error = this.getErrorList().get(0);
-                throw new TransformationException("Compilation error: " + error.getMessage() + " (line " + error.getLineNumber() + ", col " + error.getColumnNumber() + ")");
+                String message;
+                if (error instanceof XmlProcessingError && ((XmlProcessingError) error).getCause() != null) {
+                    message = ((XmlProcessingError) error).getCause().getMessage();
+                    //will usually contain a parsing error
+                } else {
+                    message = error.getMessage();
+                }
+                throw new TransformationException("Compilation error: " + message + " (line " + error.getLineNumber() + ", col " + error.getColumnNumber() + ")");
             }
             throw new TransformationException(e);
         }
