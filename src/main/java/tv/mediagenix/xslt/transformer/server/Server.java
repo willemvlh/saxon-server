@@ -12,6 +12,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.*;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class Server {
 
     private final Logger logger = LoggerFactory.getLogger(Server.class);
     private ServerOptions options;
+    private HttpServletRequest request;
 
     public static void main(String[] args) {
         try {
@@ -61,6 +63,7 @@ public class Server {
                 halt(401);
             }
         });
+        before("/*", (req, res) -> this.request = req.raw());
         before("/*", (req, res) -> res.raw().setHeader("Server", "/"));
     }
 
@@ -107,8 +110,7 @@ public class Server {
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
         Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
         try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl").orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
-            SaxonActor actor = newFactory(actorType).newActor(options);
-            actor.setSerializationParameters(this.getSerializationParams(req.raw().getPart("output")));
+            SaxonActor actor = getActorFromBuilder(newBuilder(actorType));
             ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
             SerializationProps props = input.isPresent() ? actor.act(input.get(), stylesheet, writeStream) : actor.act(stylesheet, writeStream);
             res.header("Content-Type", props.getContentType());
@@ -120,10 +122,16 @@ public class Server {
         }
     }
 
-    private Map<String, String> getSerializationParams(Part part) throws InvalidRequestException {
-        if (part == null) {
-            return new HashMap<>();
+    private SaxonActor getActorFromBuilder(SaxonActorBuilder builder) {
+        try {
+            return builder.setInsecure(this.options.isInsecure()).setConfigurationFile(options.getConfigFile()).setSerializationProperties(getSerializationParams(request.getPart("output"))).build();
+        } catch (Exception e) {
+            throw new InvalidRequestException(e);
         }
+    }
+
+    private Map<String, String> getSerializationParams(Part part) {
+        if (part == null) return new HashMap<>();
         try {
             InputStream s = part.getInputStream();
             return new ParameterParser().parseStream(s, (int) part.getSize());
@@ -132,7 +140,7 @@ public class Server {
         }
     }
 
-    private Optional<InputStream> getStreamFromRequestByKey(Request req, String key) throws InvalidRequestException, IOException {
+    private Optional<InputStream> getStreamFromRequestByKey(Request req, String key) throws IOException {
         try {
             Part part = req.raw().getPart(key);
             return part == null ? Optional.empty() : getStreamFromPart(part);
@@ -141,7 +149,7 @@ public class Server {
         }
     }
 
-    private Optional<InputStream> getStreamFromPart(Part part) throws IOException, InvalidRequestException {
+    private Optional<InputStream> getStreamFromPart(Part part) throws IOException {
         String contentType = part.getContentType();
         if (contentType != null && "application/gzip".equals(contentType.toLowerCase())) {
             return Optional.of(getZippedStreamFromPart(part.getInputStream()));
@@ -149,18 +157,18 @@ public class Server {
         return Optional.ofNullable(part.getInputStream());
     }
 
-    private SaxonActorFactory newFactory(ActorType type) {
+    private SaxonActorBuilder newBuilder(ActorType type) {
         switch (type) {
             case TRANSFORM:
-                return new SaxonTransformerFactory();
+                return new SaxonTransformerBuilder();
             case QUERY:
-                return new SaxonXQueryPerformerFactory();
+                return new SaxonXQueryPerformerBuilder();
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
     }
 
-    private InputStream getZippedStreamFromPart(InputStream input) throws InvalidRequestException {
+    private InputStream getZippedStreamFromPart(InputStream input) {
         try {
             GZIPInputStream s = new GZIPInputStream(input);
             ZippedStreamReader r = new ZippedStreamReader();

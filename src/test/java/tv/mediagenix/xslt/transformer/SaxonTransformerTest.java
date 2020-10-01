@@ -4,13 +4,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import spark.utils.Assert;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class SaxonTransformerTest {
-    SaxonTransformer tf = new SaxonTransformer();
+    SaxonActor tf = new SaxonTransformerBuilder().build();
 
     public SaxonTransformerTest() throws TransformationException {
     }
@@ -23,9 +25,8 @@ public class SaxonTransformerTest {
 
     @Test
     public void transformWithoutInputTest() throws TransformationException {
-        SaxonTransformer xf = new SaxonTransformer();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
+        tf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
         Assertions.assertEquals("hello", os.toString());
     }
 
@@ -56,20 +57,10 @@ public class SaxonTransformerTest {
     }
 
     @Test
-    public void insecureTest() throws TransformationException {
-        SaxonTransformer xf = new SaxonTransformer(true);
-        Assertions.assertDoesNotThrow(
-                () -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream())
-        );
-    }
-
-    @Test
-    public void errorListTest() {
-        try {
-            transformWithStrings("<root/>", "<badXSl/>");
-        } catch (TransformationException e) {
-            Assertions.assertFalse(tf.getErrorList().isEmpty());
-        }
+    public void insecureTest() {
+        SaxonTransformer xf = new SaxonTransformer();
+        xf.setInsecure(true);
+        Assertions.assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
     }
 
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {

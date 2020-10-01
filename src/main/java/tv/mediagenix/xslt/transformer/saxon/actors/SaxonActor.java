@@ -3,9 +3,6 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import net.sf.saxon.trans.XPathException;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.LoggerFactory;
 import tv.mediagenix.xslt.transformer.saxon.JsonToXmlTransformer;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
@@ -14,7 +11,6 @@ import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFact
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFactory;
 
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,26 +18,12 @@ import java.util.Map;
 public abstract class SaxonActor {
 
     protected SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
-    private Processor processor;
+    private Processor processor = new Processor(this.configurationFactory.newConfiguration());
     private Map<String, String> serializationParameters = new HashMap<>();
+    private Configuration configuration;
+    private boolean insecure = false;
 
-    public SaxonActor(boolean insecure) {
-        this();
-        this.configurationFactory = insecure ? new SaxonDefaultConfigurationFactory() : new SaxonSecureConfigurationFactory();
-    }
-
-    public SaxonActor() {
-        this.setProcessor(newProcessorWithDefaults());
-    }
-
-    public SaxonActor(@NotNull File configFile) throws TransformationException {
-        try {
-            Configuration config = Configuration.readConfiguration(new StreamSource(configFile));
-            setProcessor(newProcessorWithConfig(config));
-        } catch (XPathException e) {
-            LoggerFactory.getLogger(this.getClass()).error(e.getMessage());
-            throw new TransformationException(e);
-        }
+    SaxonActor() {
     }
 
     public final SerializationProps act(InputStream input, InputStream input2, OutputStream output) throws TransformationException {
@@ -99,14 +81,6 @@ public abstract class SaxonActor {
         }
     }
 
-    private Processor newProcessorWithConfig(Configuration config) {
-        return new Processor(config);
-    }
-
-    private Processor newProcessorWithDefaults() {
-        return new Processor(this.configurationFactory.newConfiguration());
-    }
-
     protected Serializer newSerializer(OutputStream os) {
         Serializer serializer = this.getProcessor().newSerializer(os);
         SerializationProperties props = new SerializationProperties();
@@ -121,10 +95,6 @@ public abstract class SaxonActor {
         return processor;
     }
 
-    private void setProcessor(Processor processor) {
-        this.processor = processor;
-    }
-
     protected SerializationProps getSerializationProperties(Serializer s) {
         return new SerializationProps(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
     }
@@ -135,5 +105,30 @@ public abstract class SaxonActor {
 
     public void setSerializationParameters(Map<String, String> serializationParameters) {
         this.serializationParameters = serializationParameters;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+        this.setProcessor(new Processor(configuration));
+    }
+
+    public Configuration getConfiguration() {
+        if (configuration == null) {
+            configuration = configurationFactory.newConfiguration();
+        }
+        return configuration;
+    }
+
+    public void setInsecure(boolean insecure) {
+        this.insecure = insecure;
+        if (insecure) {
+            this.configurationFactory = new SaxonDefaultConfigurationFactory();
+            this.setProcessor(new Processor(this.getConfiguration()));
+        }
+    }
+
+
+    public void setProcessor(Processor processor) {
+        this.processor = processor;
     }
 }

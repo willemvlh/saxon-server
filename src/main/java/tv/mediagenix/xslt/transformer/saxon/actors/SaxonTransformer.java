@@ -7,25 +7,12 @@ import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import javax.xml.transform.Source;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SaxonTransformer extends SaxonActor {
-
-    public SaxonTransformer(File config) throws TransformationException {
-        super(config);
-    }
-
-    public SaxonTransformer(boolean b) {
-        super(b);
-    }
-
-    public SaxonTransformer() {
-        super();
-    }
 
     private ArrayList<StaticError> errorList = new ArrayList<>();
 

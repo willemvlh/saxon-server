@@ -5,23 +5,11 @@ import net.sf.saxon.serialize.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class SaxonXQueryPerformer extends SaxonActor {
     private XQueryExecutable executable;
-
-    public SaxonXQueryPerformer(boolean insecure) {
-        super(insecure);
-    }
-
-    public SaxonXQueryPerformer() {
-    }
-
-    public SaxonXQueryPerformer(File config) throws TransformationException {
-        super(config);
-    }
 
     @Override
     public SerializationProps act(InputStream is, InputStream query, OutputStream output, XdmItem contextItem) throws TransformationException {

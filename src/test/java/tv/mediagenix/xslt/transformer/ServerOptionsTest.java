@@ -1,38 +1,46 @@
 package tv.mediagenix.xslt.transformer;
 
+import net.sf.saxon.Configuration;
+import net.sf.saxon.trans.XPathException;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.server.ServerOptions;
 
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URISyntaxException;
 
 public class ServerOptionsTest {
+
+    SaxonActor actor = new SaxonTransformerBuilder().build();
+
     @Test
-    public void ParseTest() throws URISyntaxException, TransformationException {
+    public void ParseTest() throws URISyntaxException, TransformationException, XPathException {
         File configFile = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI());
-        SaxonTransformer xf = new SaxonTransformer(configFile);
+        actor.setConfiguration(Configuration.readConfiguration(new StreamSource(configFile)));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertNotEquals(os.size(), 0);
     }
 
     @Test
     public void NoOptionsParseTest() throws TransformationException {
-        SaxonTransformer xf = new SaxonTransformer();
+        SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os);
+        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os);
         Assertions.assertNotEquals(os.size(), 0);
     }
 
     @Test
     public void WrongConfigFileTest() {
         Assertions.assertThrows(TransformationException.class, () -> {
-            SaxonTransformer xf = new SaxonTransformer(new File("unknown"));
+            new SaxonTransformerBuilder().setConfigurationFile(new File("unknown")).build();
         });
     }
 
@@ -40,22 +48,28 @@ public class ServerOptionsTest {
     public void DisallowExternalFunctionTest() throws URISyntaxException, TransformationException {
         //enabling the disallow-external-functions makes it impossible to access java system properties.
         File f = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config-no-external-fn.xml").toURI());
-        SaxonTransformer xf = new SaxonTransformer(f);
+        SaxonActor actor = new SaxonTransformerBuilder().setConfigurationFile(f).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertEquals(os.size(), 0);
     }
 
     @Test
     public void SecureConfigurationTest() throws TransformationException {
-        SaxonTransformer xf = new SaxonTransformer(false);
+        SaxonActor actor = new SaxonTransformerBuilder().setInsecure(false).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertEquals(os.size(), 0);
-        Assertions.assertThrows(TransformationException.class, () -> xf.act(
-                TestHelpers.WellFormedXmlStream(),
-                TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()),
-                new ByteArrayOutputStream()));
+        Assertions.assertThrows(TransformationException.class, () -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
+    }
+
+    @Test
+    public void InsecureConfigurationTest() throws TransformationException {
+        SaxonActor actor = new SaxonTransformerBuilder().setInsecure(true).build();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+        Assertions.assertNotEquals(os.size(), 0);
+        Assertions.assertDoesNotThrow(() -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
     }
 
     @Test
