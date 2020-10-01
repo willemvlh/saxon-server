@@ -85,6 +85,10 @@ public abstract class SaxonActor {
         char c;
         try {
             c = (char) stream.read();
+            if (c == '\uFFFF') {
+                //eof
+                return false;
+            }
             while (Character.isWhitespace(c)) {
                 c = (char) stream.read();
             }
