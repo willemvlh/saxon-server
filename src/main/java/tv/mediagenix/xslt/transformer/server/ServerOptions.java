@@ -9,20 +9,29 @@ public class ServerOptions {
     private Integer port = 5000;
     private File configFile;
     private boolean insecure = false;
+    private long transformationTimeoutMs = 10000;
 
     public Integer getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    private void setPort(int port) {
         this.port = port;
+    }
+
+    public long getTransformationTimeoutMs() {
+        return transformationTimeoutMs;
+    }
+
+    private void setTransformationTimeoutMs(long milliseconds) {
+        this.transformationTimeoutMs = milliseconds;
     }
 
     public File getConfigFile() {
         return configFile;
     }
 
-    public void setConfigFile(File configFile) {
+    private void setConfigFile(File configFile) {
         this.configFile = configFile;
     }
 
@@ -30,10 +39,9 @@ public class ServerOptions {
         return insecure;
     }
 
-    public void setInsecure(boolean insecure) {
+    private void setInsecure(boolean insecure) {
         this.insecure = insecure;
     }
-
 
     public static ServerOptions fromArgs(String[] args) throws ParseException {
         ServerOptions serverOptions = new ServerOptions();
@@ -43,11 +51,12 @@ public class ServerOptions {
         options.addOption("v", "version", false, "Display Saxon version info");
         options.addOption("h", "help", false, "Display help");
         options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
+        options.addOption("t", "timeout", true, "Timeout for transformation in milliseconds");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("java -jar saxon-servlet-XX.jar", options);
+            formatter.printHelp("java -jar saxon-server-XX.jar", options);
             System.exit(0);
         }
         if (cmd.hasOption("version")) {
@@ -56,7 +65,7 @@ public class ServerOptions {
         }
         if (cmd.hasOption("port")) {
             try {
-                int portAsInt = Integer.valueOf(cmd.getOptionValue("port"));
+                int portAsInt = Integer.parseInt(cmd.getOptionValue("port"));
                 serverOptions.setPort(portAsInt);
             } catch (NumberFormatException e) {
                 throw new ParseException(e.getMessage());
@@ -72,6 +81,10 @@ public class ServerOptions {
         if (cmd.hasOption("insecure")) {
             serverOptions.setInsecure(true);
         }
+
+        if (cmd.hasOption("timeout")) {
+            serverOptions.setTransformationTimeoutMs(Long.parseLong(cmd.getOptionValue("timeout")));
+        }
         return serverOptions;
     }
 
@@ -79,7 +92,7 @@ public class ServerOptions {
         Processor p = new Processor(false);
         String version = p.getSaxonProductVersion();
         String edition = p.getSaxonEdition();
-        System.out.println(String.format("Saxon %s %s", edition, version));
+        System.out.printf("Saxon %s %s%n", edition, version);
 
     }
 

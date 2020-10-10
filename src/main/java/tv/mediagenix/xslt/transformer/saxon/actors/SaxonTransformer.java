@@ -21,38 +21,25 @@ public class SaxonTransformer extends SaxonActor {
     }
 
     @Override
-    public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output, XdmItem contextItem) throws TransformationException {
-        return transform(input != null ? newSAXSource(input) : null, newSAXSource(stylesheet), output, contextItem);
-    }
-
-    @Override
-    public SerializationProps act(InputStream stylesheet, OutputStream output) throws TransformationException {
-        return transform(null, newSAXSource(stylesheet), output, null);
-    }
-
-    private SerializationProps transform(Source input, Source stylesheet, OutputStream output, XdmItem contextItem) throws TransformationException {
-        Xslt30Transformer transformer = newTransformer(stylesheet);
+    public SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
+        Xslt30Transformer transformer = newTransformer(newSAXSource(stylesheet));
         Serializer s = transformer.newSerializer(output);
         try {
-            if (contextItem != null) {
-                //skip the input source, apply transformation on the context item
-                transformer.applyTemplates(contextItem, s);
-            } else if (input == null) {
+            if (input.isEmpty()) {
                 //no input, use default template "xsl:initial-template"
                 transformer.callTemplate(null, s);
             } else {
-                //regular transformation with xml input source
-                transformer.transform(input, s);
+                //apply templates on context item
+                transformer.applyTemplates(input, s);
             }
             return getSerializationProperties(s);
         } catch (SaxonApiException e) {
             SaxonMessageListener listener = (SaxonMessageListener) transformer.getMessageListener2();
-            String msg = listener.errorString != null ? listener.errorString : e.getMessage();
+            String msg = listener.errorString != null ? listener.errorString : e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
             LoggerFactory.getLogger(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
     }
-
 
     private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
         Processor p = getProcessor();

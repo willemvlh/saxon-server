@@ -73,7 +73,7 @@ public class Server {
 
     private void configureExceptions() {
         exception(InvalidRequestException.class, (e, req, res) -> Server.handleException(e, res, 400));
-        exception(TransformationException.class, (e, req, res) -> Server.handleException(e.getCause() != null ? e.getCause() : e, res, 400));
+        exception(TransformationException.class, (e, req, res) -> Server.handleException(e, res, 400));
         exception(Exception.class, (e, req, res) -> Server.handleException(e, res, 500));
         notFound((req, res) -> {
             res.type("application/json");
@@ -124,7 +124,7 @@ public class Server {
 
     private SaxonActor getActorFromBuilder(SaxonActorBuilder builder) {
         try {
-            return builder.setInsecure(this.options.isInsecure()).setConfigurationFile(options.getConfigFile()).setSerializationProperties(getSerializationParams(request.getPart("output"))).build();
+            return builder.setInsecure(this.options.isInsecure()).setConfigurationFile(options.getConfigFile()).setSerializationProperties(getSerializationParams(request.getPart("output"))).setTimeout(this.options.getTransformationTimeoutMs()).build();
         } catch (Exception e) {
             throw new InvalidRequestException(e);
         }

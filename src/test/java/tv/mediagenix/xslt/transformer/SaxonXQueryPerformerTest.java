@@ -22,10 +22,18 @@ class SaxonXQueryPerformerTest {
     }
 
     @Test
+    void actWithoutInput() throws TransformationException, UnsupportedEncodingException {
+        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        p.act(TestHelpers.WellFormedXQueryStream(), os);
+        assertEquals("abc", os.toString("utf-8"));
+
+    }
+
+    @Test
     void actFail() {
         SaxonXQueryPerformer p = new SaxonXQueryPerformer();
-        assertThrows(TransformationException.class,
-                () -> p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.IncorrectXQueryStream(), new ByteArrayOutputStream()));
+        assertThrows(TransformationException.class, () -> p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.IncorrectXQueryStream(), new ByteArrayOutputStream()));
     }
 
     @Test

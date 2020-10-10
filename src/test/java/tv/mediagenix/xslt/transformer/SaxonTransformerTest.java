@@ -12,7 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class SaxonTransformerTest {
-    SaxonActor tf = new SaxonTransformerBuilder().build();
+    SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
 
     public SaxonTransformerTest() throws TransformationException {
     }
@@ -50,7 +50,7 @@ public class SaxonTransformerTest {
             transformWithStrings("<x/>", TestHelpers.MessageInvokingXsl);
             Assertions.fail("should have thrown");
         } catch (TransformationException e) {
-            Assertions.assertEquals(e.getMessage(), TestHelpers.message);
+            Assertions.assertEquals(TestHelpers.message, e.getMessage());
         }
 
     }

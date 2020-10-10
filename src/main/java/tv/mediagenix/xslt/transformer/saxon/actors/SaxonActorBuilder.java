@@ -26,6 +26,13 @@ public abstract class SaxonActorBuilder {
         return this;
     }
 
+    public SaxonActorBuilder setTimeout(long milliseconds) {
+        if (milliseconds > 0) {
+            instance.setTimeout(milliseconds);
+        }
+        return this;
+    }
+
     public SaxonActorBuilder setConfigurationFile(File file) throws TransformationException {
         if (file == null) return this;
         Configuration config;
