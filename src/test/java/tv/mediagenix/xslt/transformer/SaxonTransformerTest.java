@@ -32,7 +32,6 @@ public class SaxonTransformerTest {
 
     @Test
     public void malformedXslTest() {
-
         Assertions.assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
     }
 
@@ -58,7 +57,7 @@ public class SaxonTransformerTest {
 
     @Test
     public void insecureTest() {
-        SaxonTransformer xf = new SaxonTransformer();
+        SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
         xf.setInsecure(true);
         Assertions.assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
     }

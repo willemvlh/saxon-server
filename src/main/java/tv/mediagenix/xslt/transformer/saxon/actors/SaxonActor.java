@@ -17,13 +17,12 @@ import java.util.Map;
 
 public abstract class SaxonActor {
 
-    protected SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
+    private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
     private Processor processor = new Processor(this.configurationFactory.newConfiguration());
     private Map<String, String> serializationParameters = new HashMap<>();
     private Configuration configuration;
-    private boolean insecure = false;
 
-    SaxonActor() {
+    protected SaxonActor() {
     }
 
     public final SerializationProps act(InputStream input, InputStream input2, OutputStream output) throws TransformationException {
@@ -51,7 +50,6 @@ public abstract class SaxonActor {
         } catch (IOException e) {
             throw new TransformationException(e);
         }
-
     }
 
     //perhaps change the interface to send the input always as an XdmItem
@@ -120,11 +118,12 @@ public abstract class SaxonActor {
     }
 
     public void setInsecure(boolean insecure) {
-        this.insecure = insecure;
         if (insecure) {
             this.configurationFactory = new SaxonDefaultConfigurationFactory();
-            this.setProcessor(new Processor(this.getConfiguration()));
+        } else {
+            this.configurationFactory = new SaxonSecureConfigurationFactory();
         }
+        this.setProcessor(new Processor(this.configurationFactory.newConfiguration()));
     }
 
 
