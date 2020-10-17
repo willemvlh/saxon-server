@@ -21,6 +21,7 @@ public abstract class SaxonActor {
     private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
     private Processor processor = new Processor(this.configurationFactory.newConfiguration());
     private Map<String, String> serializationParameters = new HashMap<>();
+    private Map<QName, XdmValue> parameters = new HashMap<>();
     private Configuration configuration;
     private long timeout = 10000;
 
@@ -120,6 +121,10 @@ public abstract class SaxonActor {
         return serializationParameters;
     }
 
+    protected Map<QName, XdmValue> getParameters() {
+        return parameters;
+    }
+
     public void setSerializationParameters(Map<String, String> serializationParameters) {
         this.serializationParameters = serializationParameters;
     }
@@ -152,5 +157,9 @@ public abstract class SaxonActor {
 
     public void setTimeout(long milliseconds) {
         this.timeout = milliseconds;
+    }
+
+    public void setParameters(Map<QName, XdmValue> parameters) {
+        this.parameters = parameters;
     }
 }

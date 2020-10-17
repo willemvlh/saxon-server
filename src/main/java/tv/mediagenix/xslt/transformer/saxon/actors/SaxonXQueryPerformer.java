@@ -13,7 +13,9 @@ public class SaxonXQueryPerformer extends SaxonActor {
 
     private XQueryEvaluator newEvaluatorOnQuery(InputStream query) throws SaxonApiException {
         this.executable = this.getProcessor().newXQueryCompiler().compile(query);
-        return this.executable.load();
+        XQueryEvaluator evaluator = this.executable.load();
+        this.getParameters().forEach(evaluator::setExternalVariable);
+        return evaluator;
     }
 
     @Override

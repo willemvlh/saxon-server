@@ -51,7 +51,7 @@ public class ServerOptions {
         options.addOption("v", "version", false, "Display Saxon version info");
         options.addOption("h", "help", false, "Display help");
         options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
-        options.addOption("t", "timeout", true, "Timeout for transformation in milliseconds");
+        options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {

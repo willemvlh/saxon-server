@@ -7,20 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 public class TestHelpers {
     public static String WellFormedXml = "<root/>";
-    public static String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
-            "    <xsl:output method=\"text\"/>\n" +
-            "    <xsl:template match=\"/\">\n" +
-            "        <xsl:text>hello</xsl:text>\n" +
-            "    </xsl:template>\n" +
-            "</xsl:stylesheet>";
-    public static String WellformedXslWithInitialTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
-            "    <xsl:output method=\"text\"/>\n" +
-            "    <xsl:template name=\"xsl:initial-template\">\n" +
-            "        <xsl:text>hello</xsl:text>\n" +
-            "    </xsl:template>\n" +
-            "</xsl:stylesheet>";
+    public static String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template match=\"/\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
+    public static String WellformedXslWithInitialTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template name=\"xsl:initial-template\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
     public static String message = "abc";
     public static String MessageInvokingXsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"yes\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
     public static String MalformedXml = "noXml";
@@ -38,22 +26,6 @@ public class TestHelpers {
         return getInputStreamFromUtf8String(WellFormedXsl);
     }
 
-    public static InputStream MalformedXmlStream() {
-        return getInputStreamFromUtf8String(MalformedXml);
-    }
-
-    public static InputStream IncorrectXslStream() {
-        return getInputStreamFromUtf8String(IncorrectXsl);
-    }
-
-    public static InputStream MessageInvokingXslStream() {
-        return getInputStreamFromUtf8String(MessageInvokingXsl);
-    }
-
-    public static InputStream jsonInputStream() {
-        return getInputStreamFromUtf8String("{}");
-    }
-
     public static InputStream WellFormedXQueryStream() {
         return getInputStreamFromUtf8String("declare option saxon:output 'method=text';'abc'");
     }
@@ -63,19 +35,11 @@ public class TestHelpers {
     }
 
     public static InputStream IncorrectXQueryStream() {
-        return getInputStreamFromUtf8String("let $x = \"abc\";\n" +
-                "return $x;");
+        return getInputStreamFromUtf8String("let $x = \"abc\";\n" + "return $x;");
     }
 
     public static InputStream SystemPropertyInvokingXslStream() {
-        return getInputStreamFromUtf8String(
-                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
-                        "\t<xsl:output method=\"text\"/>\n" +
-                        "\t<xsl:template match=\"/\">\n" +
-                        "\t\t<xsl:value-of select=\"system-property('java.home')\"/>\n" +
-                        "\t</xsl:template>\n" +
-                        "</xsl:stylesheet>"
-        );
+        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"system-property('java.home')\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
     }
 
     private static InputStream getInputStreamFromUtf8String(String s) {
@@ -83,13 +47,10 @@ public class TestHelpers {
     }
 
     public static InputStream xslWithDocAtURI(URI uri) {
-        return getInputStreamFromUtf8String(
-                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" +
-                        "\t<xsl:output method=\"text\"/>\n" +
-                        "\t<xsl:template match=\"/\">\n" +
-                        "\t\t<xsl:value-of select=\"doc('" + uri.toString() + "')\"/>\n" +
-                        "\t</xsl:template>\n" +
-                        "</xsl:stylesheet>"
-        );
+        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"doc('" + uri.toString() + "')\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
+    }
+
+    public static InputStream xslWithParameters() {
+        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "<xsl:param name=\"myParam\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"$myParam\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
     }
 }

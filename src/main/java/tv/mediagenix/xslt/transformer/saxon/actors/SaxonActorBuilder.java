@@ -1,11 +1,15 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.XdmAtomicValue;
+import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class SaxonActorBuilder {
@@ -54,5 +58,13 @@ public abstract class SaxonActorBuilder {
         return instance;
     }
 
+    public SaxonActorBuilder setParameters(Map<String, String> parameters) {
+        Map<QName, XdmValue> qNameParams = new HashMap<>();
+        parameters.forEach((k, v) -> {
+            qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v));
+        });
+        instance.setParameters(qNameParams);
+        return this;
+    }
 }
 

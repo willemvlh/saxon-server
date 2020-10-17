@@ -124,13 +124,13 @@ public class Server {
 
     private SaxonActor getActorFromBuilder(SaxonActorBuilder builder) {
         try {
-            return builder.setInsecure(this.options.isInsecure()).setConfigurationFile(options.getConfigFile()).setSerializationProperties(getSerializationParams(request.getPart("output"))).setTimeout(this.options.getTransformationTimeoutMs()).build();
+            return builder.setInsecure(this.options.isInsecure()).setConfigurationFile(options.getConfigFile()).setSerializationProperties(getParameters(request.getPart("output"))).setTimeout(this.options.getTransformationTimeoutMs()).setParameters(getParameters(request.getPart("parameters"))).build();
         } catch (Exception e) {
             throw new InvalidRequestException(e);
         }
     }
 
-    private Map<String, String> getSerializationParams(Part part) {
+    private Map<String, String> getParameters(Part part) {
         if (part == null) return new HashMap<>();
         try {
             InputStream s = part.getInputStream();

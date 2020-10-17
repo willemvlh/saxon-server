@@ -1,8 +1,6 @@
 package tv.mediagenix.xslt.transformer;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import spark.utils.Assert;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
@@ -10,6 +8,9 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SaxonTransformerTest {
     SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
@@ -20,19 +21,27 @@ public class SaxonTransformerTest {
     @Test
     public void transformTest() throws UnsupportedEncodingException, TransformationException {
         ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedXml, TestHelpers.WellFormedXsl);
-        Assert.isTrue(output.toString("utf-8").equals("hello"), "The output should be 'hello'");
+        assertEquals(output.toString("utf-8"), "hello", "The output should be 'hello'");
+    }
+
+    @Test
+    public void parameters() throws TransformationException, UnsupportedEncodingException {
+        SaxonActor actor = new SaxonTransformerBuilder().setParameters(Collections.singletonMap("myParam", "value")).build();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        actor.act(getStream("<abc/>"), TestHelpers.xslWithParameters(), output);
+        assertEquals("value", output.toString("UTF-8"));
     }
 
     @Test
     public void transformWithoutInputTest() throws TransformationException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         tf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
-        Assertions.assertEquals("hello", os.toString());
+        assertEquals("hello", os.toString());
     }
 
     @Test
     public void malformedXslTest() {
-        Assertions.assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
+        assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
     }
 
     @Test
@@ -40,7 +49,7 @@ public class SaxonTransformerTest {
         try {
             transformWithStrings("bad xml", "bad xsl");
         } catch (TransformationException e) {
-            Assertions.assertTrue(e.getMessage().contains("a"));
+            assertTrue(e.getMessage().contains("a"));
         }
     }
 
@@ -48,9 +57,9 @@ public class SaxonTransformerTest {
     public void messageTest() {
         try {
             transformWithStrings("<x/>", TestHelpers.MessageInvokingXsl);
-            Assertions.fail("should have thrown");
+            fail("should have thrown");
         } catch (TransformationException e) {
-            Assertions.assertEquals(TestHelpers.message, e.getMessage());
+            assertEquals(TestHelpers.message, e.getMessage());
         }
 
     }
@@ -59,7 +68,7 @@ public class SaxonTransformerTest {
     public void insecureTest() {
         SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
         xf.setInsecure(true);
-        Assertions.assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
+        assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
     }
 
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
@@ -68,5 +77,9 @@ public class SaxonTransformerTest {
         InputStream xslStr = new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8));
         tf.act(input, xslStr, output);
         return output;
+    }
+
+    private InputStream getStream(String s) {
+        return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
     }
 }

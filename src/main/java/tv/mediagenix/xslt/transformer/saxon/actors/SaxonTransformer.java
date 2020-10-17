@@ -25,6 +25,7 @@ public class SaxonTransformer extends SaxonActor {
         Xslt30Transformer transformer = newTransformer(newSAXSource(stylesheet));
         Serializer s = transformer.newSerializer(output);
         try {
+            transformer.setStylesheetParameters(this.getParameters());
             if (input.isEmpty()) {
                 //no input, use default template "xsl:initial-template"
                 transformer.callTemplate(null, s);
