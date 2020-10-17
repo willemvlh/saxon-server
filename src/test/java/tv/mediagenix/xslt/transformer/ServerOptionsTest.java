@@ -1,5 +1,6 @@
 package tv.mediagenix.xslt.transformer;
 
+import net.sf.saxon.Configuration;
 import net.sf.saxon.trans.XPathException;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +11,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.server.ServerOptions;
 
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -21,7 +23,7 @@ public class ServerOptionsTest {
     @Test
     public void ParseTest() throws URISyntaxException, TransformationException, XPathException {
         File configFile = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI());
-
+        actor.setConfiguration(Configuration.readConfiguration(new StreamSource(configFile)));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
         Assertions.assertNotEquals(os.size(), 0);
