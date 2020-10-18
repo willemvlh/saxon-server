@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>tv.mediagenix</groupId>
     <artifactId>saxon-server</artifactId>
-    <version>1.8</version>
+    <version>1.9</version>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
