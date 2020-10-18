@@ -8,7 +8,9 @@ import spark.Response;
 import spark.Spark;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
-import tv.mediagenix.xslt.transformer.saxon.actors.*;
+import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -110,7 +112,7 @@ public class Server {
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
         Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
         try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl").orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
-            SaxonActor actor = getActorFromBuilder(newBuilder(actorType));
+            SaxonActor actor = getActorFromBuilder(SaxonActorBuilder.newBuilder(actorType));
             ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
             SerializationProps props = input.isPresent() ? actor.act(input.get(), stylesheet, writeStream) : actor.act(stylesheet, writeStream);
             res.header("Content-Type", props.getContentType());
@@ -157,16 +159,6 @@ public class Server {
         return Optional.ofNullable(part.getInputStream());
     }
 
-    private SaxonActorBuilder newBuilder(ActorType type) {
-        switch (type) {
-            case TRANSFORM:
-                return new SaxonTransformerBuilder();
-            case QUERY:
-                return new SaxonXQueryPerformerBuilder();
-            default:
-                throw new IllegalStateException("Unexpected value: " + type);
-        }
-    }
 
     private InputStream getZippedStreamFromPart(InputStream input) {
         try {

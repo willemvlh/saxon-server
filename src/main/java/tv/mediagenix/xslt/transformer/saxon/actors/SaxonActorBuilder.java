@@ -15,7 +15,18 @@ import java.util.Map;
 public abstract class SaxonActorBuilder {
     private final SaxonActor instance;
 
-    public SaxonActorBuilder() {
+    public static SaxonActorBuilder newBuilder(ActorType type) {
+        switch (type) {
+            case TRANSFORM:
+                return new SaxonTransformerBuilder();
+            case QUERY:
+                return new SaxonXQueryPerformerBuilder();
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
+    }
+
+    protected SaxonActorBuilder() {
         try {
             this.instance = this.getActorClass().newInstance();
         } catch (Exception e) {
