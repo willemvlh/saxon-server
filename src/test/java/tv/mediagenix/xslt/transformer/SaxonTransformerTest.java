@@ -65,6 +65,18 @@ public class SaxonTransformerTest {
     }
 
     @Test
+    public void testWithCompilationError() {
+        try {
+            transformWithStrings("<abc/>", "<xsl:template xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"/>");
+            fail();
+        } catch (TransformationException e) {
+            System.out.println(e.getMessage());
+            ;
+        }
+        ;
+    }
+
+    @Test
     public void insecureTest() {
         SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
         xf.setInsecure(true);

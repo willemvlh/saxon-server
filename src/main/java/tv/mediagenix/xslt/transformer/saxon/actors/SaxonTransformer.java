@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
+import net.sf.saxon.serialize.SerializationProperties;
 import org.slf4j.LoggerFactory;
 import tv.mediagenix.xslt.transformer.saxon.SaxonMessageListener;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
@@ -15,6 +16,7 @@ import java.util.List;
 public class SaxonTransformer extends SaxonActor {
 
     private ArrayList<StaticError> errorList = new ArrayList<>();
+    private Xslt30Transformer transformer;
 
     public List<StaticError> getErrorList() {
         return errorList;
@@ -22,8 +24,8 @@ public class SaxonTransformer extends SaxonActor {
 
     @Override
     public SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        Xslt30Transformer transformer = newTransformer(newSAXSource(stylesheet));
-        Serializer s = transformer.newSerializer(output);
+        transformer = newTransformer(newSAXSource(stylesheet));
+        Serializer s = newSerializer(output);
         try {
             transformer.setStylesheetParameters(this.getParameters());
             if (input.isEmpty()) {
@@ -40,6 +42,15 @@ public class SaxonTransformer extends SaxonActor {
             LoggerFactory.getLogger(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
+    }
+
+    @Override
+    protected Serializer newSerializer(OutputStream os) {
+        Serializer s = transformer.newSerializer(os);
+        SerializationProperties props = new SerializationProperties();
+        getSerializationParameters().forEach(props::setProperty);
+        s.setOutputProperties(s.getSerializationProperties().combineWith(props));
+        return s;
     }
 
     private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
@@ -61,7 +72,10 @@ public class SaxonTransformer extends SaxonActor {
                 } else {
                     message = error.getMessage();
                 }
-                throw new TransformationException("Compilation error: " + message + " (line " + error.getLineNumber() + ", col " + error.getColumnNumber() + ")");
+                if (error.getLocation() != null) {
+                    message = message + " (line " + error.getLineNumber() + ", col " + error.getColumnNumber() + ")";
+                }
+                throw new TransformationException("Compilation error: " + message);
             }
             throw new TransformationException(e);
         }

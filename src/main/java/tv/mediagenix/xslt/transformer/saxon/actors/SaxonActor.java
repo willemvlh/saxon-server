@@ -73,7 +73,7 @@ public abstract class SaxonActor {
         } catch (TimeoutException | InterruptedException e) {
             throw new TransformationException(e);
         } catch (ExecutionException e) {
-            throw new TransformationException(e.getCause().getMessage(), e);
+            throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
         }
     }
 
