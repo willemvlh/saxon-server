@@ -11,6 +11,7 @@ import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
+import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -63,6 +64,16 @@ public class Server {
         before("/*", (req, res) -> {
             if (!isAuthenticated()) {
                 halt(401);
+            }
+        });
+        before("/*", (req, res) -> {
+            RateLimiter rl = this.options.getRateLimiter();
+            String ip = req.ip();
+            if (rl.canRequest(ip)) {
+                rl.registerRequest(ip);
+            } else {
+                long seconds = rl.timeToAllowed(ip).getSeconds();
+                halt(403, "Rate limit exceeded - wait " + seconds + " seconds.");
             }
         });
         before("/*", (req, res) -> this.request = req.raw());

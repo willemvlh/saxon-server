@@ -453,13 +453,14 @@
 							"script": {
 								"id": "fd463698-b2cb-4f47-bff7-d41254902baf",
 								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});"
-								],
+                                  "const res = pm.response;\r",
+                                  "\r",
+                                  "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                  "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                  "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                  "});\r",
+                                  "pm.test(\"Error message should be :-(\", () => pm.expect(res.json()[\"message\"]).to.equal(\":-(\"))"
+                                ],
 								"type": "text/javascript"
 							}
 						}
@@ -653,13 +654,13 @@
 					"script": {
 						"id": "5fac28e2-fb12-4c5c-84aa-909992e7a497",
 						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'é'\", () => pm.expect(res.text()).to.equal(\"é\"));\r",
-							"pm.test(\"The response character set should be detected as iso-8859-15\", () => pm.expect)\r",
-							"pm.test(\"Content-Type header includes the encoding of the stylesheet output\", () => pm.response.headers.find(h => h[\"key\"] == \"Content-Type\").value.includes(\"iso-8859-15\"));"
-						],
+                          "const res = pm.response;\r",
+                          "\r",
+                          "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                          "pm.test(\"The response body should be 'é'\", () => pm.expect(res.text()).to.equal(\"é\"));\r",
+                          "pm.test(\"The response character set should be detected as iso-8859-15\", () => pm.expect(res.headers.get(\"Content-Type\")).to.match(/iso-8859/))\r",
+                          "pm.test(\"Content-Type header includes the encoding of the stylesheet output\", () => pm.response.headers.find(h => h[\"key\"] == \"Content-Type\").value.includes(\"iso-8859-15\"));"
+                        ],
 						"type": "text/javascript"
 					}
 				}
@@ -749,14 +750,15 @@
 					"script": {
 						"id": "3196939e-cdd1-46f0-9080-16a7fa2ab976",
 						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
+                          "const res = pm.response;\r",
+                          "\r",
+                          "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                          "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                          "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                          "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                          "});\r",
+                          "pm.test(\"The error message must contain the parsing error description\", () => pm.expect(res.json().message).to.contain(\"Element type \\\"xsl:template\\\" must be followed by either attribute specifications\"))"
+                        ],
 						"type": "text/javascript"
 					}
 				}
@@ -821,26 +823,77 @@
 					"formdata": [
 						{
 							"key": "xml",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
-						},
-						{
-							"key": "xsl",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-compilation-error.xsl"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://{{url}}/transform",
-					"protocol": "http",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"transform"
-					]
-				}
+                          "type": "file",
+                          "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+                        },
+                      {
+                        "key": "xsl",
+                        "type": "file",
+                        "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-compilation-error.xsl"
+                      }
+                    ]
+                },
+              "url": {
+                "raw": "http://{{url}}/transform",
+                "protocol": "http",
+                "host": [
+                  "{{url}}"
+                ],
+                "path": [
+                  "transform"
+                ]
+              }
+            },
+          "response": []
+        },
+      {
+        "name": "Compilation error without location",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "27c676f4-7d99-4b51-bd02-2e44faf0ffd1",
+              "exec": [
+                "const res = pm.response;\r",
+                "\r",
+                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "xml",
+                "type": "file",
+                "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+              },
+              {
+                "key": "xsl",
+                "value": "<xsl:template xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"/>",
+                "type": "text"
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://{{url}}/transform",
+            "protocol": "http",
+            "host": [
+              "{{url}}"
+            ],
+            "path": [
+              "transform"
+            ]
+          }
 			},
 			"response": []
 		},
@@ -1258,26 +1311,185 @@
 					]
 				},
 				"url": {
-					"raw": "http://{{url}}/query",
-					"protocol": "http",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"query"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "JSON as input",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "0bd8bcd2-e5a4-4678-bccf-9db53521b946",
-						"exec": [
+                  "raw": "http://{{url}}/query",
+                  "protocol": "http",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "query"
+                  ]
+                }
+            },
+          "response": []
+        },
+      {
+        "name": "Serialization parameters XSLT",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "14040e85-940a-4f3d-844b-622e267e5ef5",
+              "exec": [
+                "const res = pm.response;\r",
+                "\r",
+                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                "pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
+                "pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
+                ""
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "xsl",
+                "value": "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n   <xsl:template name=\"xsl:initial-template\"><xsl:sequence select=\"map{'a': 'b'}\"/></xsl:template>\n</xsl:stylesheet>\n",
+                "type": "text"
+              },
+              {
+                "key": "output",
+                "value": "method=json;media-type=application/json",
+                "type": "text"
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://{{url}}/transform",
+            "protocol": "http",
+            "host": [
+              "{{url}}"
+            ],
+            "path": [
+              "transform"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Parameters",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "aeed910c-f476-42a2-8dad-9561ae8418ec",
+              "exec": [
+                "const res = pm.response;\r",
+                "\r",
+                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                "pm.test(\"The response body should be 'someText'\", () => pm.expect(res.text()).to.equal(\"someText\"));\r",
+                ""
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "xsl",
+                "value": "declare variable $myParam external; $myParam",
+                "type": "text"
+              },
+              {
+                "key": "parameters",
+                "value": "myParam=someText",
+                "type": "text"
+              },
+              {
+                "key": "output",
+                "value": "method=text",
+                "type": "text"
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://{{url}}/query",
+            "protocol": "http",
+            "host": [
+              "{{url}}"
+            ],
+            "path": [
+              "query"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Parameters XSLT",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "c80e0ee2-4fb4-4ab9-86db-653568b70aad",
+              "exec": [
+                "const res = pm.response;\r",
+                "\r",
+                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                "pm.test(\"The response body should be 'someText'\", () => pm.expect(res.text()).to.equal(\"someText\"));\r",
+                ""
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "xsl",
+                "value": "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n   <xsl:param name=\"myParam\"/>\n   <xsl:template name=\"xsl:initial-template\">\n      <xsl:value-of select=\"$myParam\"/>\n   </xsl:template>\n</xsl:stylesheet>\n",
+                "type": "text"
+              },
+              {
+                "key": "parameters",
+                "value": "myParam=someText",
+                "type": "text"
+              },
+              {
+                "key": "output",
+                "value": "method=text",
+                "type": "text"
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://{{url}}/transform",
+            "protocol": "http",
+            "host": [
+              "{{url}}"
+            ],
+            "path": [
+              "transform"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "JSON as input",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "0bd8bcd2-e5a4-4678-bccf-9db53521b946",
+              "exec": [
 							"const res = pm.response;\r",
 							"\r",
 							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
@@ -1314,19 +1526,75 @@
 					]
 				},
 				"url": {
-					"raw": "http://{{url}}/query",
-					"protocol": "http",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"query"
-					]
-				}
-			},
-			"response": []
-		}
-	],
+                  "raw": "http://{{url}}/query",
+                  "protocol": "http",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "query"
+                  ]
+                }
+            },
+        "response": []
+      },
+      {
+        "name": "JSON as input XSLT",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "3480fb2e-e6b0-485e-a405-8ce53f7a94d0",
+              "exec": [
+                "const res = pm.response;\r",
+                "\r",
+                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                "pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
+                "pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
+                ""
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "xsl",
+                "value": "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n   <xsl:template match=\"/\"><xsl:sequence select=\"xml-to-json(.)\"/></xsl:template>\n</xsl:stylesheet>\n",
+                "type": "text"
+              },
+              {
+                "key": "xml",
+                "value": "{\"a\": \"b\"}",
+                "type": "text"
+              },
+              {
+                "key": "output",
+                "value": "method=text;media-type=application/json",
+                "type": "text"
+              }
+            ]
+          },
+          "url": {
+            "raw": "http://{{url}}/transform",
+            "protocol": "http",
+            "host": [
+              "{{url}}"
+            ],
+            "path": [
+              "transform"
+            ]
+          }
+        },
+        "response": []
+      }
+    ],
 	"event": [
 		{
 			"listen": "prerequest",
@@ -1350,11 +1618,11 @@
 		}
 	],
 	"variable": [
-		{
-			"id": "fbb6ae34-c8dd-4888-ba90-794b7e53815a",
-			"key": "url",
-			"value": "localhost:5000"
-		}
+      {
+        "id": "b1568b1e-86c9-4dd1-b8aa-da675938ded9",
+        "key": "url",
+        "value": "localhost:5000"
+      }
 	],
 	"protocolProfileBehavior": {}
 }
