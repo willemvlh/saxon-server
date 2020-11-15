@@ -8,4 +8,6 @@ public interface RateLimiter {
     void registerRequest(String ip);
 
     boolean canRequest(String ip);
+
+    RateLimiterSettings getSettings();
 }

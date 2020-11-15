@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ParameterParserTest {
     @Test
@@ -16,7 +17,23 @@ class ParameterParserTest {
         assertEquals("kalf", result.get("koe"));
         assertEquals("big", result.get("varken"));
         assertEquals(2, result.size());
+    }
 
+    @Test
+    public void testParseEscape() {
+        ParameterParser p = new ParameterParser();
+        Map<String, String> result = p.parseString("param=nee\\;soms");
+        assertEquals(1, result.size());
+        assertEquals("nee;soms", result.get("param"));
+        assertFalse(result.containsKey("soms"));
+    }
+
+    @Test
+    public void testParseNoEscape() {
+        ParameterParser p = new ParameterParser();
+        Map<String, String> result = p.parseString("param=nee\\soms");
+        assertEquals(1, result.size());
+        assertEquals("nee\\soms", result.get("param"));
     }
 
     @Test

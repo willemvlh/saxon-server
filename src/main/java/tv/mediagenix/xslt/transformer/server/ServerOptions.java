@@ -101,9 +101,9 @@ public class ServerOptions {
             case "none":
                 return new NoRateLimiter();
             case "light":
-                return new RateLimiterImpl(120, 60);
+                return new RateLimiterImpl(60, 120);
             case "heavy":
-                return new RateLimiterImpl(10, 60);
+                return new RateLimiterImpl(60, 60);
             default:
                 throw new IllegalArgumentException("Unknown option: " + option);
         }

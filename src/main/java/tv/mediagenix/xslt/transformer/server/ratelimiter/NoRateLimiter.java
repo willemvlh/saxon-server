@@ -17,4 +17,9 @@ public class NoRateLimiter implements RateLimiter {
     public boolean canRequest(String ip) {
         return true;
     }
+
+    @Override
+    public RateLimiterSettings getSettings() {
+        return new RateLimiterSettings(-1, -1);
+    }
 }

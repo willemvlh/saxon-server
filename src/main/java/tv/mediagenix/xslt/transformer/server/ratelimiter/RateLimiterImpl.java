@@ -1,5 +1,7 @@
 package tv.mediagenix.xslt.transformer.server.ratelimiter;
 
+import tv.mediagenix.xslt.transformer.server.InvalidRequestException;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
@@ -9,17 +11,19 @@ import java.util.Map;
 
 public class RateLimiterImpl implements RateLimiter {
 
-    private final int maxNumberRequests;
-    private final int seconds;
+    private final RateLimiterSettings settings;
     private final Map<String, Deque<LocalDateTime>> requestMap;
 
-    public RateLimiterImpl(int maxNumberRequests, int seconds) {
-        if (seconds < 1 || maxNumberRequests < 1) {
+    public RateLimiterImpl(RateLimiterSettings settings) {
+        if (settings.getMaxNumberOfRequests() < 1 || settings.getSeconds() < 1) {
             throw new IllegalArgumentException("Seconds and maxNumberRequests must be positive integers");
         }
-        this.maxNumberRequests = maxNumberRequests;
-        this.seconds = seconds;
+        this.settings = settings;
         requestMap = new HashMap<>();
+    }
+
+    public RateLimiterImpl(int seconds, int maxNumberOfRequests) {
+        this(new RateLimiterSettings(seconds, maxNumberOfRequests));
     }
 
     private boolean hasSeenIp(String ip) {
@@ -30,12 +34,12 @@ public class RateLimiterImpl implements RateLimiter {
         if (requestMap.containsKey(ip)) {
             Deque<LocalDateTime> requests = requestMap.get(ip);
             //if max number of requests has not been reached, request is allowed
-            if (requests.size() < maxNumberRequests) {
+            if (requests.size() < settings.getMaxNumberOfRequests()) {
                 return true;
             }
             //else, if the last request was longer ago than the specified duration, it is also allowed.
             Duration d = Duration.between(requests.getLast(), LocalDateTime.now());
-            return d.getSeconds() > seconds;
+            return d.getSeconds() > settings.getSeconds();
         }
         return true;
     }
@@ -45,13 +49,13 @@ public class RateLimiterImpl implements RateLimiter {
             return Duration.ZERO;
         }
         Duration sinceLast = Duration.between(requestMap.get(ip).getLast(), LocalDateTime.now());
-        return Duration.ofSeconds(seconds - sinceLast.getSeconds());
+        return Duration.ofSeconds(settings.getSeconds() - sinceLast.getSeconds());
     }
 
     public synchronized void registerRequest(String ip) throws IllegalStateException {
         //first check if request is allowed - if not, throw exception.
         if (!canRequest(ip)) {
-            throw new IllegalStateException("Request not allowed by rate limiter");
+            throw new InvalidRequestException("Request not allowed by rate limiter");
         }
         if (!hasSeenIp(ip)) {
             //if the ip is unknown, add a new entry and register request
@@ -62,12 +66,16 @@ public class RateLimiterImpl implements RateLimiter {
             //if the number of requests == max number of requests, remove the last.
             //then add new request to the top.
             Deque<LocalDateTime> requests = requestMap.get(ip);
-            if (requests.size() == maxNumberRequests) {
+            if (requests.size() == settings.getMaxNumberOfRequests()) {
                 requests.removeLast();
             }
             requests.addFirst(LocalDateTime.now());
         }
 
+    }
+
+    public RateLimiterSettings getSettings() {
+        return this.settings;
     }
 }
 

@@ -2,7 +2,7 @@ package tv.mediagenix.xslt.transformer.server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,13 +10,17 @@ public class ParameterParser {
 
     public Map<String, String> parseString(String paramString) {
         HashMap<String, String> params = new HashMap<>();
-        for (String paramP : paramString.split(";")) {
-            String[] splits = paramP.split("=");
+        for (String param : paramString.split("(?<!\\\\);")) { //split on ; except when preceded by \
+            String[] splits = unescape(param).split("=");
             if (splits.length == 2) {
                 params.put(splits[0], splits[1]);
             }
         }
         return params;
+    }
+
+    private String unescape(String paramString) {
+        return paramString.replace("\\;", ";");
     }
 
     public Map<String, String> parseStream(InputStream s, int size) throws IOException {
@@ -28,6 +32,6 @@ public class ParameterParser {
             offset++;
             b = s.read();
         }
-        return parseString(new String(bytes, Charset.defaultCharset()));
+        return parseString(new String(bytes, StandardCharsets.UTF_8));
     }
 }

@@ -10,11 +10,18 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.server.ServerOptions;
+import tv.mediagenix.xslt.transformer.server.ratelimiter.NoRateLimiter;
+import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
+import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiterSettings;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.time.Duration;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ServerOptionsTest {
 
@@ -51,7 +58,7 @@ public class ServerOptionsTest {
         SaxonActor actor = new SaxonTransformerBuilder().setConfigurationFile(f).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        Assertions.assertEquals(os.size(), 0);
+        assertEquals(os.size(), 0);
     }
 
     @Test
@@ -59,7 +66,7 @@ public class ServerOptionsTest {
         SaxonActor actor = new SaxonTransformerBuilder().setInsecure(false).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        Assertions.assertEquals(os.size(), 0);
+        assertEquals(os.size(), 0);
         Assertions.assertThrows(TransformationException.class, () -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
     }
 
@@ -77,13 +84,25 @@ public class ServerOptionsTest {
         String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI()).getPath();
         String[] args = {"-port", "3000", "-config", configFilePath};
         ServerOptions opts = ServerOptions.fromArgs(args);
-        Assertions.assertEquals(3000, (int) opts.getPort());
+        assertEquals(3000, (int) opts.getPort());
         Assertions.assertThrows(RuntimeException.class, () -> ServerOptions.fromArgs(new String[]{"-config", configFilePath, "-insecure"}));
-        Assertions.assertTrue(ServerOptions.fromArgs(new String[]{"-insecure"}).isInsecure());
-        Assertions.assertEquals(configFilePath, opts.getConfigFile().getPath());
+        assertTrue(ServerOptions.fromArgs(new String[]{"-insecure"}).isInsecure());
+        assertEquals(configFilePath, opts.getConfigFile().getPath());
 
     }
 
+    @Test
+    public void rateLimitTest() throws ParseException {
+        RateLimiterSettings rl1 = ServerOptions.fromArgs(new String[]{"--rate-limit", "light"}).getRateLimiter().getSettings();
+        RateLimiterSettings rl2 = ServerOptions.fromArgs(new String[]{"--rate-limit", "heavy"}).getRateLimiter().getSettings();
+        assertTrue(rl1.getMaxNumberOfRequests() / rl1.getSeconds() > rl2.getMaxNumberOfRequests() / rl2.getSeconds());
+        RateLimiter rl3 = ServerOptions.fromArgs(new String[]{"--rate-limit", "none"}).getRateLimiter();
+        for (int i = 0; i < 100; i++) {
+            rl3.registerRequest("abc");
+        }
+        assertEquals(Duration.ZERO, rl3.timeToAllowed("abc"));
+        assertEquals(ServerOptions.fromArgs(new String[]{}).getRateLimiter().getSettings(), new NoRateLimiter().getSettings());
+    }
 
 }
 
