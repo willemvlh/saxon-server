@@ -65,15 +65,17 @@ public abstract class SaxonActor {
     protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException;
 
     protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
+        ExecutorService service = new ForkJoinPool();
         try {
             FutureTask<SerializationProps> task = new FutureTask<>(() -> act(input, stylesheet, output));
-            ExecutorService service = new ForkJoinPool();
             service.submit(task);
             return task.get(this.timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException e) {
             throw new TransformationException(e);
         } catch (ExecutionException e) {
             throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
+        } finally {
+            service.shutdown();
         }
     }
 

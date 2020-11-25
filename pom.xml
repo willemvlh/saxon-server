@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>tv.mediagenix</groupId>
     <artifactId>saxon-server</artifactId>
-    <version>1.9</version>
+    <version>1.11</version>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -263,12 +263,6 @@
                         </goals>
                         <configuration>
                             <outputDirectory>.\target\site</outputDirectory>
-                            <reportPlugins>
-                                <reportPlugin>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                                </reportPlugin>
-                            </reportPlugins>
                         </configuration>
                     </execution>
                     <execution>

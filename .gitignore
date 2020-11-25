@@ -12,3 +12,4 @@ buildNumber.properties
 *.zip
 /.idea
 keystore/
+deploy.bat
