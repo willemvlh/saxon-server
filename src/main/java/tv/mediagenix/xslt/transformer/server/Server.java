@@ -129,7 +129,6 @@ public class Server {
             res.header("Content-Type", props.getContentType());
             writeStream.writeTo(res.raw().getOutputStream());
             res.raw().getOutputStream().close();
-
             return res;
         } finally {
             logger.info(String.format("Finished request in %s milliseconds", System.currentTimeMillis() - startTime));

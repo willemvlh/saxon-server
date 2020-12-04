@@ -11,10 +11,9 @@ public class ParameterParser {
     public Map<String, String> parseString(String paramString) {
         HashMap<String, String> params = new HashMap<>();
         for (String param : paramString.split("(?<!\\\\);")) { //split on ; except when preceded by \
-            String[] splits = unescape(param).split("=");
-            if (splits.length == 2) {
-                params.put(splits[0], splits[1]);
-            }
+            String unescaped = unescape(param);
+            int separator = unescaped.indexOf('=');
+            params.put(unescaped.substring(0, separator), unescaped.substring(separator + 1));
         }
         return params;
     }

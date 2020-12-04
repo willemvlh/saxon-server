@@ -37,6 +37,12 @@ class ParameterParserTest {
     }
 
     @Test
+    public void testParseWithEqualsSign() {
+        ParameterParser p = new ParameterParser();
+        assertEquals("1=2", p.parseString("input=1=2").get("input"));
+    }
+
+    @Test
     public void testStream() throws IOException {
         ParameterParser p = new ParameterParser();
         String s = "koe=kalf;varken=big";
