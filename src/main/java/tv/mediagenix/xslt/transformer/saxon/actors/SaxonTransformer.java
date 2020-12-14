@@ -33,6 +33,7 @@ public class SaxonTransformer extends SaxonActor {
                 transformer.callTemplate(null, s);
             } else {
                 //apply templates on context item
+                transformer.setGlobalContextItem(input.itemAt(0));
                 transformer.applyTemplates(input, s);
             }
             return getSerializationProperties(s);

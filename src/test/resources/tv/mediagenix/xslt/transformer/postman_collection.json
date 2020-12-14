@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "c129152b-91f4-423c-bbcb-1f721a99a5b5",
-		"name": "Saxon",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
+      "_postman_id": "ac3f3a65-32c8-441c-9b07-96be598eb235",
+      "name": "Saxon",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
 	"item": [
 		{
 			"name": "Security",
@@ -14,17 +14,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "86a35ffe-8f0c-42a0-a7b5-40c5ba2853bb",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});"
-								],
-								"type": "text/javascript"
+                              "id": "2a796015-80f5-400e-bee8-fcdeddbb76a8",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                "});"
+                              ],
+                              "type": "text/javascript"
 							}
 						}
 					],
@@ -64,17 +64,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f405d7ab-ec18-40a7-a691-0502c30ded5a",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});"
-								],
-								"type": "text/javascript"
+                              "id": "3b2afe9d-844a-4b3b-9d95-a7add7671959",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                "});"
+                              ],
+                              "type": "text/javascript"
 							}
 						}
 					],
@@ -114,17 +114,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ce926750-3baf-4540-950e-e405e2e05c4b",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-									"pm.test(\"All functions should have thrown an error\", () => {\r",
-									"    pm.expect(Object.keys(res.json()).map(k => res.json()[k])).to.all.match(/^err/);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
+                              "id": "757f9585-77aa-4142-a4ae-bdcbb8fcdd2c",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                                "pm.test(\"All functions should have thrown an error\", () => {\r",
+                                "    pm.expect(Object.keys(res.json()).map(k => res.json()[k])).to.all.match(/^err/);\r",
+                                "});"
+                              ],
+                              "type": "text/javascript"
+                            }
 						}
 					],
 					"request": {
@@ -163,17 +163,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0f3f87bc-fc81-4259-af85-600f9d1271ac",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});"
-								],
-								"type": "text/javascript"
+                              "id": "ddcd5a62-da44-4762-8695-1d0fa69efae7",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                "});"
+                              ],
+                              "type": "text/javascript"
 							}
 						}
 					],
@@ -213,17 +213,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0b6f2199-882c-41eb-85bb-4fade61cf8e8",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});"
-								],
-								"type": "text/javascript"
+                              "id": "9789a01f-51a9-49e5-8208-a3be5e72174c",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                "});"
+                              ],
+                              "type": "text/javascript"
 							}
 						}
 					],
@@ -263,14 +263,14 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "df3cb8ad-77d7-46e7-83b3-e192e4fa5f7d",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Server header should not include Jetty\", () => pm.expect(res.headers.get(\"Server\")).not.to.match(/jetty/i));"
-								],
-								"type": "text/javascript"
-							}
+                              "id": "f5fc1234-9326-4319-99bb-26957168b9da",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Server header should not include Jetty\", () => pm.expect(res.headers.get(\"Server\")).not.to.match(/jetty/i));"
+                              ],
+                              "type": "text/javascript"
+                            }
 						}
 					],
 					"request": {
@@ -297,16 +297,16 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1cfe4b84-c081-41d0-b0c5-24ae0649ba94",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-									"pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
-									""
-								],
-								"type": "text/javascript"
-							}
+                              "id": "7aefd13a-4ffd-4173-8031-22966cac76c8",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                                "pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
+                                ""
+                              ],
+                              "type": "text/javascript"
+                            }
 						}
 					],
 					"request": {
@@ -345,16 +345,16 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "299b2380-0194-4f63-9a33-fb5b139995b0",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-									"pm.test(\"The response body should have a json key 'a'\", () => pm.expect(res.json()).to.have.keys(\"a\"))\r",
-									""
-								],
-								"type": "text/javascript"
-							}
+                              "id": "3110b381-8e90-414e-9820-d7a4e64c1d91",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                                "pm.test(\"The response body should have a json key 'a'\", () => pm.expect(res.json()).to.have.keys(\"a\"))\r",
+                                ""
+                              ],
+                              "type": "text/javascript"
+                            }
 						}
 					],
 					"request": {
@@ -393,17 +393,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1ce764a8-ef53-44e1-a8e8-04577206a58b",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
+                              "id": "0c119ca4-7b8b-45e6-9431-3dfc4c484e26",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                "});"
+                              ],
+                              "type": "text/javascript"
+                            }
 						}
 					],
 					"request": {
@@ -442,17 +442,17 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fd463698-b2cb-4f47-bff7-d41254902baf",
-								"exec": [
-									"const res = pm.response;\r",
-									"\r",
-									"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-									"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-									"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-									"});\r",
-									"pm.test(\"Error message should be :-(\", () => pm.expect(res.json()[\"message\"]).to.equal(\":-(\"))"
-								],
-								"type": "text/javascript"
+                              "id": "644660ab-4885-4c7a-9efa-3386921ec9a9",
+                              "exec": [
+                                "const res = pm.response;\r",
+                                "\r",
+                                "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                                "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                                "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                                "});\r",
+                                "pm.test(\"Error message should be :-(\", () => pm.expect(res.json()[\"message\"]).to.equal(\":-(\"))"
+                              ],
+                              "type": "text/javascript"
 							}
 						}
 					],
@@ -475,18 +475,218 @@
 							]
 						},
 						"url": {
-							"raw": "{{url}}/query",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"query"
-							]
-						}
-					},
-					"response": []
-				}
-			],
+                          "raw": "{{url}}/query",
+                          "host": [
+                            "{{url}}"
+                          ],
+                          "path": [
+                            "query"
+                          ]
+                        }
+                    },
+                  "response": []
+                },
+              {
+                "name": "XQuery without input XML",
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "6d9e4be0-7358-4767-8fc1-94c26cb70073",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"Response should contain the result as defined in the query\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"abc\"}))"
+                      ],
+                      "type": "text/javascript"
+                    }
+                  }
+                ],
+                "request": {
+                  "method": "POST",
+                  "header": [],
+                  "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                      {
+                        "key": "xsl",
+                        "type": "file",
+                        "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/hof.xquery"
+                      }
+                    ]
+                  },
+                  "url": {
+                    "raw": "{{url}}/query",
+                    "host": [
+                      "{{url}}"
+                    ],
+                    "path": [
+                      "query"
+                    ]
+                  }
+                },
+                "response": []
+              },
+              {
+                "name": "JSON as input",
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "4fc140a1-afa6-42fa-bf3a-5a69b4e2c3ff",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
+                        "pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
+                  }
+                ],
+                "request": {
+                  "method": "POST",
+                  "header": [],
+                  "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                      {
+                        "key": "xsl",
+                        "value": "xml-to-json(.)",
+                        "type": "text"
+                      },
+                      {
+                        "key": "xml",
+                        "value": "{\"a\": \"b\"}",
+                        "type": "text"
+                      },
+                      {
+                        "key": "output",
+                        "value": "method=text;media-type=application/json",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "url": {
+                    "raw": "{{url}}/query",
+                    "host": [
+                      "{{url}}"
+                    ],
+                    "path": [
+                      "query"
+                    ]
+                  }
+                },
+                "response": []
+              },
+              {
+                "name": "Parameters",
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "c1974d0e-4c9d-4778-ac9d-e7707e38631a",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should be 'someText'\", () => pm.expect(res.text()).to.equal(\"someText\"));\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
+                  }
+                ],
+                "request": {
+                  "method": "POST",
+                  "header": [],
+                  "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                      {
+                        "key": "xsl",
+                        "value": "declare variable $myParam external; $myParam",
+                        "type": "text"
+                      },
+                      {
+                        "key": "parameters",
+                        "value": "myParam=someText",
+                        "type": "text"
+                      },
+                      {
+                        "key": "output",
+                        "value": "method=text",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "url": {
+                    "raw": "{{url}}/query",
+                    "host": [
+                      "{{url}}"
+                    ],
+                    "path": [
+                      "query"
+                    ]
+                  }
+                },
+                "response": []
+              },
+              {
+                "name": "Serialization parameters",
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "62a3659b-0c67-4364-95af-3ab9dedae8d2",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
+                        "pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
+                  }
+                ],
+                "request": {
+                  "method": "POST",
+                  "header": [],
+                  "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                      {
+                        "key": "xsl",
+                        "value": "declare option saxon:output \"method=xml\";map{'a': 'b'}",
+                        "type": "text"
+                      },
+                      {
+                        "key": "output",
+                        "value": "method=json;media-type=application/json",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  "url": {
+                    "raw": "{{url}}/query",
+                    "host": [
+                      "{{url}}"
+                    ],
+                    "path": [
+                      "query"
+                    ]
+                  }
+                },
+                "response": []
+              }
+            ],
 			"protocolProfileBehavior": {}
 		},
 		{
@@ -495,16 +695,16 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6ac88e68-61e2-45f5-968b-19d7cfa09871",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
-							""
-						],
-						"type": "text/javascript"
-					}
+                      "id": "b4d1268d-f248-44cc-8da1-85ecd779faa6",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
@@ -537,22 +737,21 @@
 			},
 			"response": []
 		},
-		{
-			"name": "Package",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "01b940cc-a1ba-4c4b-8c3b-bb2daeee30bf",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
-							""
-						],
-						"type": "text/javascript"
-					}
+      {
+        "name": "Global context variables",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "2c73560a-50d8-42f9-be90-f2383796368c",
+              "exec": [
+                "const res = pm.response;\r",
+                "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                "pm.test(\"Response should equal 1\", () => pm.expect(res.text()).to.equal(\"1\"));\r",
+                ""
+              ],
+              "type": "text/javascript"
+            }
 				}
 			],
 			"request": {
@@ -566,11 +765,11 @@
 							"type": "file",
 							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
 						},
-						{
-							"key": "xsl",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-1.xsl"
-						}
+                      {
+                        "key": "xsl",
+                        "type": "file",
+                        "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-global-variable.xsl"
+                      }
 					]
 				},
 				"url": {
@@ -591,16 +790,16 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f259be7a-602f-44ef-b406-d49c4b1e8b77",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
-							""
-						],
-						"type": "text/javascript"
-					}
+                      "id": "6aa29153-4a1e-44aa-b86f-32b6004003c4",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
@@ -639,16 +838,16 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c9a36435-39c5-4eac-a66c-d605c441063e",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
-							""
-						],
-						"type": "text/javascript"
-					}
+                      "id": "98104501-582a-40db-82c5-d95d07eb3c6a",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should be 'abc'\", () => pm.expect(res.text()).to.equal(\"abc\"));\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
@@ -657,16 +856,16 @@
 				"body": {
 					"mode": "formdata",
 					"formdata": [
-						{
-							"key": "xml",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
-						},
-						{
-							"key": "xsl",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-1.xsl"
-						}
+                      {
+                        "key": "xml",
+                        "type": "file",
+                        "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml.gz"
+                      },
+                      {
+                        "key": "xsl",
+                        "type": "file",
+                        "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-1.xsl.gz"
+                      }
 					]
 				},
 				"url": {
@@ -687,32 +886,37 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5fac28e2-fb12-4c5c-84aa-909992e7a497",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'é'\", () => pm.expect(res.text()).to.equal(\"é\"));\r",
-							"pm.test(\"The response character set should be detected as iso-8859-15\", () => pm.expect(res.headers.get(\"Content-Type\")).to.match(/iso-8859/))\r",
-							"pm.test(\"Content-Type header includes the encoding of the stylesheet output\", () => pm.response.headers.find(h => h[\"key\"] == \"Content-Type\").value.includes(\"iso-8859-15\"));"
-						],
-						"type": "text/javascript"
-					}
+                      "id": "a2795407-0a6a-45f7-9341-e99672582511",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should be 'é'\", () => pm.expect(res.text()).to.equal(\"é\"));\r",
+                        "pm.test(\"The response character set should be detected as iso-8859-15\", () => pm.expect(res.headers.get(\"Content-Type\")).to.match(/iso-8859/i))"
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "xml",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
-						},
-						{
-							"key": "xsl",
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/octet-stream",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "formdata",
+                "formdata": [
+                  {
+                    "key": "xml",
+                    "type": "file",
+                    "src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/dummy.xml"
+                  },
+                  {
+                    "key": "xsl",
 							"type": "file",
 							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-iso-8859-15.xsl"
 						}
@@ -736,13 +940,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c6311a4a-3146-4706-bac7-f9163f3ce555",
-						"exec": [
-							"const res = pm.response;\r",
-							"pm.test(\"Response code should be 404\", () => pm.expect(res.to.have.status(404)));"
-						],
-						"type": "text/javascript"
-					}
+                      "id": "c8db4699-287f-43be-a591-29b42fefb5c1",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "pm.test(\"Response code should be 4XX\", () => pm.expect(res.code).to.be.gte(400));"
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
@@ -781,17 +985,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3196939e-cdd1-46f0-9080-16a7fa2ab976",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});\r",
-							"pm.test(\"The error message must contain the parsing error description\", () => pm.expect(res.json().message).to.contain(\"Element type \\\"xsl:template\\\" must be followed by either attribute specifications\"))"
-						],
+                      "id": "3ec0c9ef-9620-4aed-9635-f760e34c3cd7",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});\r",
+                        "pm.test(\"The error message must contain the parsing error description\", () => pm.expect(res.json().message).to.contain(\"Element type \\\"xsl:template\\\" must be followed by either attribute specifications\"))"
+                      ],
 						"type": "text/javascript"
 					}
 				}
@@ -815,14 +1019,14 @@
 					]
 				},
 				"url": {
-					"raw": "https://{{url}}/transform",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"transform"
-					]
-				}
+                  "raw": "{{url}}/transform",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "transform"
+                  ]
+                }
 			},
 			"response": []
 		},
@@ -832,17 +1036,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ec5466f7-03ce-465d-896d-e64d3d95ccbd",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});\r",
-							"pm.test(\"The message should contain 'compilation error'\", () => pm.expect(res.json()[\"message\"].toLowerCase()).to.contain(\"compilation error\"))"
-						],
+                      "id": "f23541fa-3dd1-4d60-b62a-200a528d5d7e",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});\r",
+                        "pm.test(\"The message should contain 'compilation error'\", () => pm.expect(res.json()[\"message\"].toLowerCase()).to.contain(\"compilation error\"))"
+                      ],
 						"type": "text/javascript"
 					}
 				}
@@ -883,17 +1087,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "27c676f4-7d99-4b51-bd02-2e44faf0ffd1",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
-						"type": "text/javascript"
+                      "id": "cc3d3b9f-aa45-43a8-9296-f4b67b794ce8",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -933,17 +1137,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "abac13a3-2007-4fc1-9501-2052df4d7065",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
-						"type": "text/javascript"
+                      "id": "a4a1cecb-0ebc-47e8-920d-b7ddfcc75cdc",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -984,17 +1188,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2c656697-b28a-4ce9-9b01-78c64ea41557",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
-						"type": "text/javascript"
+                      "id": "c52648dd-e669-4053-aea4-a4d211cc5c9e",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -1035,17 +1239,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "1fe26151-6926-409f-bbcf-81ac2bb3bfb2",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
-						"type": "text/javascript"
+                      "id": "9540a8c0-3867-4616-b0f1-242f7f67bf97",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -1070,17 +1274,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "831d39ed-4533-41c0-81a6-7ec0e36256b9",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
-						"type": "text/javascript"
+                      "id": "16e72168-8756-44af-9474-1dc15847154e",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -1120,17 +1324,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "807b7cad-f0b2-434d-973d-5ea987e224a4",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});\r",
-							"pm.test(\"The response body object should have a message equal to the XSLT message\", () => pm.expect(res.json()[\"message\"]).to.equal(\"terminated\"));"
-						],
+                      "id": "bdfb4acc-f31d-4bc4-b762-2ba344ef7641",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});\r",
+                        "pm.test(\"The response body object should have a message equal to the XSLT message\", () => pm.expect(res.json()[\"message\"]).to.equal(\"terminated\"));"
+                      ],
 						"type": "text/javascript"
 					}
 				}
@@ -1171,15 +1375,15 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6355e809-292e-4048-959a-5c770aede7a0",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should contain a string 'hello!'\", () => pm.expect(res.text()).to.equal(\"hello!\"));"
-						],
-						"type": "text/javascript"
-					}
+                      "id": "35124167-ddfb-49f0-a162-7480080a9fc4",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should contain a string 'hello!'\", () => pm.expect(res.text()).to.equal(\"hello!\"));"
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
@@ -1208,64 +1412,22 @@
 			"response": []
 		},
 		{
-			"name": "XQuery without input XML",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "46b6c0e9-941f-4ad8-83f8-db3fbced2c13",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"Response should contain the result as defined in the query\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"abc\"}))"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "xsl",
-							"type": "file",
-							"src": "/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/hof.xquery"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{url}}/query",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"query"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Transformation without xsl:initial-template and no XML",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "1f511508-bcf8-4ab4-bcae-732cd51a97a3",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
-							"    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
-							"});"
-						],
-						"type": "text/javascript"
+                      "id": "4194cc0a-72e2-4643-9c91-2d58c1cc93ab",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 400\", () => pm.expect(res.to.have.status(400)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The response body should have a status code, an exception type and a message\", () => {\r",
+                        "    pm.expect(res.json()).to.contain.all.keys([\"message\", \"statusCode\", \"exceptionType\"]);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -1295,72 +1457,22 @@
 			"response": []
 		},
 		{
-			"name": "Serialization parameters",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "3feec6a3-df96-4bc4-940f-f53b6940bfb2",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
-							"pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "xsl",
-							"value": "declare option saxon:output \"method=xml\";map{'a': 'b'}",
-							"type": "text"
-						},
-						{
-							"key": "output",
-							"value": "method=json;media-type=application/json",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{url}}/query",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"query"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Serialization parameters XSLT",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "14040e85-940a-4f3d-844b-622e267e5ef5",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
-							"pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
-							""
-						],
-						"type": "text/javascript"
+                      "id": "88eb4e01-81f9-4169-9813-9aff947ed83c",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
+                        "pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -1395,74 +1507,21 @@
 			"response": []
 		},
 		{
-			"name": "Parameters",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "aeed910c-f476-42a2-8dad-9561ae8418ec",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'someText'\", () => pm.expect(res.text()).to.equal(\"someText\"));\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "xsl",
-							"value": "declare variable $myParam external; $myParam",
-							"type": "text"
-						},
-						{
-							"key": "parameters",
-							"value": "myParam=someText",
-							"type": "text"
-						},
-						{
-							"key": "output",
-							"value": "method=text",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{url}}/query",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"query"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Parameters XSLT",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "c80e0ee2-4fb4-4ab9-86db-653568b70aad",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should be 'someText'\", () => pm.expect(res.text()).to.equal(\"someText\"));\r",
-							""
-						],
-						"type": "text/javascript"
-					}
+                      "id": "64f7eb3d-a11e-4c2f-9f6a-fc7c17bcedd8",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should be 'someText'\", () => pm.expect(res.text()).to.equal(\"someText\"));\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
+                    }
 				}
 			],
 			"request": {
@@ -1490,69 +1549,14 @@
 					]
 				},
 				"url": {
-					"raw": "https://{{url}}/transform",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"transform"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "JSON as input",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "0bd8bcd2-e5a4-4678-bccf-9db53521b946",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
-							"pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "xsl",
-							"value": "xml-to-json(.)",
-							"type": "text"
-						},
-						{
-							"key": "xml",
-							"value": "{\"a\": \"b\"}",
-							"type": "text"
-						},
-						{
-							"key": "output",
-							"value": "method=text;media-type=application/json",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{url}}/query",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"query"
-					]
-				}
+                  "raw": "{{url}}/transform",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "transform"
+                  ]
+                }
 			},
 			"response": []
 		},
@@ -1562,17 +1566,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3480fb2e-e6b0-485e-a405-8ce53f7a94d0",
-						"exec": [
-							"const res = pm.response;\r",
-							"\r",
-							"pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
-							"pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
-							"pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
-							"pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
-							""
-						],
-						"type": "text/javascript"
+                      "id": "9c0abd7b-f52a-4e83-bcb5-cb496dd28da9",
+                      "exec": [
+                        "const res = pm.response;\r",
+                        "\r",
+                        "pm.test(\"Response code should be 200\", () => pm.expect(res.to.have.status(200)));\r",
+                        "pm.test(\"The response body should contain a JSON object\", () => pm.expect(res.json()).to.be.an(\"object\"));\r",
+                        "pm.test(\"The content-type should be application/json\", () => pm.expect(res.headers.get(\"Content-Type\")).to.include(\"application/json\"));\r",
+                        "pm.test(\"The response object should have key a with value b\", () => pm.expect(res.json()).to.deep.equal({\"a\": \"b\"}))\r",
+                        ""
+                      ],
+                      "type": "text/javascript"
 					}
 				}
 			],
@@ -1582,21 +1586,22 @@
 				"body": {
 					"mode": "formdata",
 					"formdata": [
-						{
-							"key": "xsl",
-							"value": "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n   <xsl:template match=\"/\"><xsl:sequence select=\"xml-to-json(.)\"/></xsl:template>\n</xsl:stylesheet>\n",
-							"type": "text"
-						},
+                      {
+                        "key": "xsl",
+                        "value": "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n   <xsl:output media-type=\"application/json\"  method=\"text\"/>\n   <xsl:template match=\"/\"><xsl:sequence select=\"xml-to-json(.)\"/></xsl:template>\n</xsl:stylesheet>\n",
+                        "type": "text"
+                      },
 						{
 							"key": "xml",
 							"value": "{\"a\": \"b\"}",
 							"type": "text"
 						},
-						{
-							"key": "output",
-							"value": "method=text;media-type=application/json",
-							"type": "text"
-						}
+                      {
+                        "key": "output",
+                        "value": "method=text;media-type=application/json",
+                        "type": "text",
+                        "disabled": true
+                      }
 					]
 				},
 				"url": {
@@ -1616,22 +1621,22 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "369d705b-292d-411c-92de-29f12ee23f3f",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
+              "id": "1dfce350-c206-4067-8c60-d45d563cdb8a",
+              "type": "text/javascript",
+              "exec": [
+                ""
+              ]
+            }
 		},
 		{
 			"listen": "test",
 			"script": {
-				"id": "2535e0ea-4e4c-4114-8e4c-24756ff685a6",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
+              "id": "b12e635e-7da5-4d76-8d1a-9b0112615f57",
+              "type": "text/javascript",
+              "exec": [
+                ""
+              ]
+            }
 		}
 	],
 	"variable": [
