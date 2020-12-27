@@ -83,6 +83,12 @@ public class SaxonTransformerTest {
         assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
     }
 
+    @Test
+    public void globalContextItemTest() throws TransformationException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        tf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithGlobalContextVariable(), os);
+    }
+
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
