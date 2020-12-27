@@ -30,7 +30,7 @@ import static spark.Spark.*;
 public class Server {
 
     private final Logger logger = LoggerFactory.getLogger(Server.class);
-    private ServerOptions options;
+    private final ServerOptions options;
     private HttpServletRequest request;
 
     public static void main(String[] args) {

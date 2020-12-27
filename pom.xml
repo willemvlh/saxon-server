@@ -73,9 +73,9 @@
         </pluginRepository>
     </pluginRepositories>
     <build>
-        <sourceDirectory>.\src\main\java</sourceDirectory>
-        <scriptSourceDirectory>.\src\main\scripts</scriptSourceDirectory>
-        <testSourceDirectory>.\src\test\java</testSourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <outputDirectory>.\target\classes</outputDirectory>
         <testOutputDirectory>.\target\test-classes</testOutputDirectory>
         <resources>
@@ -278,12 +278,6 @@
                 </executions>
                 <configuration>
                     <outputDirectory>.\target\site</outputDirectory>
-                    <reportPlugins>
-                        <reportPlugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-project-info-reports-plugin</artifactId>
-                        </reportPlugin>
-                    </reportPlugins>
                 </configuration>
             </plugin>
         </plugins>

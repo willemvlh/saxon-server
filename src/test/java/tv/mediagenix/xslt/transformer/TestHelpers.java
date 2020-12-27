@@ -56,6 +56,9 @@ public class TestHelpers {
 
     public static InputStream xslWithGlobalContextVariable() {
         return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "<xsl:variable name=\"allElements\" select=\"count(//*)\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"count($allElements)\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
+    }
 
+    public static InputStream xslWithoutOutputElement() {
+        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<root/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
     }
 }

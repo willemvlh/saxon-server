@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer;
 
 import org.junit.jupiter.api.Test;
+import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
@@ -87,6 +88,13 @@ public class SaxonTransformerTest {
     public void globalContextItemTest() throws TransformationException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         tf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithGlobalContextVariable(), os);
+    }
+
+    @Test
+    public void defaultMimeTest() throws TransformationException {
+        SerializationProps sp = tf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithoutOutputElement(), new ByteArrayOutputStream());
+        assertEquals("application/xml", sp.getMime());
+        assertEquals("UTF-8", sp.getEncoding().toUpperCase());
     }
 
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
