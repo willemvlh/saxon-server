@@ -1,8 +1,7 @@
-package tv.mediagenix.transformer;
+package tv.mediagenix.transformer.saxon;
 
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.transformer.saxon.SerializationProps;
-import tv.mediagenix.transformer.saxon.TransformationException;
+import tv.mediagenix.transformer.TestHelpers;
 import tv.mediagenix.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.transformer.saxon.actors.SaxonXQueryPerformer;
 import tv.mediagenix.transformer.saxon.actors.SaxonXQueryPerformerBuilder;

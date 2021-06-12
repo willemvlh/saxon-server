@@ -1,6 +1,6 @@
 package tv.mediagenix.transformer.server.ratelimiter;
 
-import tv.mediagenix.transformer.server.InvalidRequestException;
+import tv.mediagenix.transformer.app.InvalidRequestException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

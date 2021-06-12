@@ -1,4 +1,4 @@
-package tv.mediagenix.transformer;
+package tv.mediagenix.transformer.app;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
