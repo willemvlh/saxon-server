@@ -1,4 +1,4 @@
-package tv.mediagenix.transformer;
+package tv.mediagenix.transformer.server;
 
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;

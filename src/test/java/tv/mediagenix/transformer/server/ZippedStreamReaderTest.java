@@ -1,6 +1,7 @@
 package tv.mediagenix.transformer.server;
 
 import org.junit.jupiter.api.Test;
+import tv.mediagenix.transformer.app.ZippedStreamReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

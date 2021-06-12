@@ -1,6 +1,7 @@
 package tv.mediagenix.transformer.server;
 
 import org.junit.jupiter.api.Test;
+import tv.mediagenix.transformer.app.InvalidRequestException;
 import tv.mediagenix.transformer.server.ratelimiter.RateLimiterImpl;
 
 import java.time.Duration;
