@@ -1,7 +1,9 @@
-package tv.mediagenix.xslt.transformer.saxon.actors;
+package tv.mediagenix.transformer.saxon.actors;
 
 import net.sf.saxon.lib.Feature;
 import org.junit.jupiter.api.Test;
+import tv.mediagenix.transformer.saxon.actors.SaxonActor;
+import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

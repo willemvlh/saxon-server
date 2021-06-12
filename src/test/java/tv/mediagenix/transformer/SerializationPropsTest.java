@@ -1,8 +1,8 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.transformer;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
+import tv.mediagenix.transformer.saxon.SerializationProps;
 
 class SerializationPropsTest {
     @Test

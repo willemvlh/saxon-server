@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer.server;
+package tv.mediagenix.transformer.server;
 
 import org.junit.jupiter.api.Test;
 

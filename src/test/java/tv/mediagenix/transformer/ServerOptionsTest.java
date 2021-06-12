@@ -1,18 +1,15 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.transformer;
 
 import net.sf.saxon.Configuration;
 import net.sf.saxon.trans.XPathException;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
-import tv.mediagenix.xslt.transformer.server.ServerOptions;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.NoRateLimiter;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiterSettings;
+import tv.mediagenix.transformer.saxon.TransformationException;
+import tv.mediagenix.transformer.saxon.actors.SaxonActor;
+import tv.mediagenix.transformer.saxon.actors.SaxonTransformer;
+import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.transformer.server.ServerOptions;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +26,7 @@ public class ServerOptionsTest {
 
     @Test
     public void ParseTest() throws URISyntaxException, TransformationException, XPathException {
-        File configFile = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI());
+        File configFile = new File(this.getClass().getResource("/tv/mediagenix/transformer/saxon-config.xml").toURI());
         actor.setConfiguration(Configuration.readConfiguration(new StreamSource(configFile)));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
@@ -54,7 +51,7 @@ public class ServerOptionsTest {
     @Test
     public void DisallowExternalFunctionTest() throws URISyntaxException, TransformationException {
         //enabling the disallow-external-functions makes it impossible to access java system properties.
-        File f = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config-no-external-fn.xml").toURI());
+        File f = new File(this.getClass().getResource("/tv/mediagenix/transformer/saxon-config-no-external-fn.xml").toURI());
         SaxonActor actor = new SaxonTransformerBuilder().setConfigurationFile(f).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
@@ -81,7 +78,7 @@ public class ServerOptionsTest {
 
     @Test
     public void SetOptionsFromArgumentsTest() throws ParseException, URISyntaxException {
-        String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI()).getPath();
+        String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/transformer/saxon-config.xml").toURI()).getPath();
         String[] args = {"-port", "3000", "-config", configFilePath};
         ServerOptions opts = ServerOptions.fromArgs(args);
         assertEquals(3000, (int) opts.getPort());

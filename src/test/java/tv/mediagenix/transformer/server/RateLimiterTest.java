@@ -1,7 +1,7 @@
-package tv.mediagenix.xslt.transformer.server;
+package tv.mediagenix.transformer.server;
 
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiterImpl;
+import tv.mediagenix.transformer.server.ratelimiter.RateLimiterImpl;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;

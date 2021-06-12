@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer;
+package tv.mediagenix.transformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
