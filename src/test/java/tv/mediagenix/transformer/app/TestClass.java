@@ -2,7 +2,6 @@ package tv.mediagenix.transformer.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,15 +12,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.StreamUtils;
 import tv.mediagenix.transformer.ErrorMessage;
 
-import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
-@SpringBootTest
+@SpringBootTest(args = {"--port", "10000"})
 @AutoConfigureMockMvc
 public abstract class TestClass {
 

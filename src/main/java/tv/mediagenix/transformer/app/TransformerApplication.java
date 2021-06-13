@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TransformerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TransformerApplication.class, args);
+        SpringApplication app = new SpringApplication(TransformerApplication.class);
+        app.setLogStartupInfo(false);
+        app.run(args);
     }
-
 }

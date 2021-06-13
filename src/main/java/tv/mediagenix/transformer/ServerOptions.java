@@ -2,18 +2,16 @@ package tv.mediagenix.transformer;
 
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;
-import tv.mediagenix.transformer.server.ratelimiter.NoRateLimiter;
-import tv.mediagenix.transformer.server.ratelimiter.RateLimiter;
-import tv.mediagenix.transformer.server.ratelimiter.RateLimiterImpl;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 
+@Component
 public class ServerOptions {
     private Integer port = 5000;
     private File configFile;
     private boolean insecure = false;
     private long transformationTimeoutMs = 10000;
-    private RateLimiter rateLimiter = new NoRateLimiter();
 
     public Integer getPort() {
         return port;
@@ -54,9 +52,8 @@ public class ServerOptions {
         options.addOption("c", "config", true, "Location to Saxon configuration XML file");
         options.addOption("v", "version", false, "Display Saxon version info");
         options.addOption("h", "help", false, "Display help");
-        options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
+        options.addOption("i", "insecure", false, "Run with Saxon's default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
-        options.addOption("r", "rate-limit", true, "Set up rate limiting (none | light | heavy)");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
@@ -90,27 +87,8 @@ public class ServerOptions {
         if (cmd.hasOption("timeout")) {
             serverOptions.setTransformationTimeoutMs(Long.parseLong(cmd.getOptionValue("timeout")));
         }
-        if (cmd.hasOption("rate-limit")) {
-            serverOptions.setRateLimiter(createRateLimiter(cmd.getOptionValue("rate-limit")));
-        }
+
         return serverOptions;
-    }
-
-    private static RateLimiter createRateLimiter(String option) {
-        switch (option) {
-            case "none":
-                return new NoRateLimiter();
-            case "light":
-                return new RateLimiterImpl(60, 120);
-            case "heavy":
-                return new RateLimiterImpl(60, 60);
-            default:
-                throw new IllegalArgumentException("Unknown option: " + option);
-        }
-    }
-
-    public void setRateLimiter(RateLimiter rl) {
-        this.rateLimiter = rl;
     }
 
     private static void printInformation() {
@@ -119,9 +97,5 @@ public class ServerOptions {
         String edition = p.getSaxonEdition();
         System.out.printf("Saxon %s %s%n", edition, version);
 
-    }
-
-    public RateLimiter getRateLimiter() {
-        return rateLimiter;
     }
 }

@@ -1,27 +1,31 @@
 package tv.mediagenix.transformer.app;
 
+import org.apache.commons.cli.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import tv.mediagenix.transformer.ParameterParser;
+import tv.mediagenix.transformer.ServerOptions;
 import tv.mediagenix.transformer.saxon.SerializationProps;
-import tv.mediagenix.transformer.saxon.TransformationException;
 import tv.mediagenix.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
-import tv.mediagenix.transformer.ParameterParser;
 import tv.mediagenix.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.Part;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.Collection;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
@@ -29,7 +33,14 @@ import java.util.zip.GZIPInputStream;
 @RestController
 public class TransformController {
 
-    @PostMapping(path={"/query", "/transform"})
+    @Autowired
+    public TransformController(ApplicationArguments args) throws ParseException {
+        this.options = ServerOptions.fromArgs(args.getSourceArgs());
+    }
+
+    private final ServerOptions options;
+
+    @PostMapping(path = {"/query", "/transform"})
     public ResponseEntity<byte[]> doQuery(
             @RequestPart(name = "xml", required = false) Part xml, //use Part instead of MultipartFile so that we can also send strings
             @RequestPart(name = "xsl", required = false) Part xsl,
@@ -37,13 +48,19 @@ public class TransformController {
             @RequestParam(name = "parameters", required = false) String parameters,
             HttpServletRequest request)
             throws Exception {
+
         SaxonActorBuilder builder = getBuilder(request.getRequestURI());
         Map<String, String> params = new ParameterParser().parseString(parameters);
         Map<String, String> serParams = new ParameterParser().parseString(output);
+
         SaxonActor tf = builder
                 .setParameters(params)
                 .setSerializationProperties(serParams)
+                .setTimeout(options.getTransformationTimeoutMs())
+                .setConfigurationFile(options.getConfigFile())
+                .setInsecure(options.isInsecure())
                 .build();
+
         Optional<InputStream> xmlStr = Optional.ofNullable(xml).flatMap(this::getInputStream);
         InputStream xslStr = Optional.ofNullable(xsl).flatMap(this::getInputStream)
                 .orElseThrow(() -> new InvalidRequestException("No XSL supplied"));

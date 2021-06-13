@@ -11,15 +11,11 @@ import tv.mediagenix.transformer.saxon.TransformationException;
 import tv.mediagenix.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
-import tv.mediagenix.transformer.server.ratelimiter.NoRateLimiter;
-import tv.mediagenix.transformer.server.ratelimiter.RateLimiter;
-import tv.mediagenix.transformer.server.ratelimiter.RateLimiterSettings;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,18 +88,6 @@ public class ServerOptionsTest {
 
     }
 
-    @Test
-    public void rateLimitTest() throws ParseException {
-        RateLimiterSettings rl1 = ServerOptions.fromArgs(new String[]{"--rate-limit", "light"}).getRateLimiter().getSettings();
-        RateLimiterSettings rl2 = ServerOptions.fromArgs(new String[]{"--rate-limit", "heavy"}).getRateLimiter().getSettings();
-        assertTrue(rl1.getMaxNumberOfRequests() / rl1.getSeconds() > rl2.getMaxNumberOfRequests() / rl2.getSeconds());
-        RateLimiter rl3 = ServerOptions.fromArgs(new String[]{"--rate-limit", "none"}).getRateLimiter();
-        for (int i = 0; i < 100; i++) {
-            rl3.registerRequest("abc");
-        }
-        assertEquals(Duration.ZERO, rl3.timeToAllowed("abc"));
-        assertEquals(ServerOptions.fromArgs(new String[]{}).getRateLimiter().getSettings(), new NoRateLimiter().getSettings());
-    }
 
 }
 
