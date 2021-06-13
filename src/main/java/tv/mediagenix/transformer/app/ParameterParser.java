@@ -1,4 +1,4 @@
-package tv.mediagenix.transformer;
+package tv.mediagenix.transformer.app;
 
 import java.io.IOException;
 import java.io.InputStream;

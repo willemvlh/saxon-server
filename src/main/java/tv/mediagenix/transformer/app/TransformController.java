@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import tv.mediagenix.transformer.ParameterParser;
-import tv.mediagenix.transformer.ServerOptions;
 import tv.mediagenix.transformer.saxon.SerializationProps;
 import tv.mediagenix.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
@@ -31,7 +29,7 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 @RestController
-public class TransformController {
+class TransformController {
 
     @Autowired
     public TransformController(ApplicationArguments args) throws ParseException {

@@ -10,7 +10,6 @@ import org.springframework.mock.web.MockPart;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.StreamUtils;
-import tv.mediagenix.transformer.ErrorMessage;
 
 import java.io.IOException;
 import java.util.function.Consumer;

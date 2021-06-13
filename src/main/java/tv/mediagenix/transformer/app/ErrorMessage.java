@@ -1,4 +1,4 @@
-package tv.mediagenix.transformer;
+package tv.mediagenix.transformer.app;
 
 public class ErrorMessage {
     private int statusCode;

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
-public class ZippedStreamReader {
+class ZippedStreamReader {
     public InputStream unzipStream(GZIPInputStream zipStream) throws IOException {
         ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
         int data = zipStream.read();

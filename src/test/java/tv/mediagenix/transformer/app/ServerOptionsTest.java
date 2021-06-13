@@ -5,7 +5,6 @@ import net.sf.saxon.trans.XPathException;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.transformer.ServerOptions;
 import tv.mediagenix.transformer.TestHelpers;
 import tv.mediagenix.transformer.saxon.TransformationException;
 import tv.mediagenix.transformer.saxon.actors.SaxonActor;

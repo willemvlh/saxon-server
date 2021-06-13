@@ -1,4 +1,4 @@
-package tv.mediagenix.transformer;
+package tv.mediagenix.transformer.app;
 
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;
@@ -12,6 +12,7 @@ public class ServerOptions {
     private File configFile;
     private boolean insecure = false;
     private long transformationTimeoutMs = 10000;
+    private String logFilePath;
 
     public Integer getPort() {
         return port;
@@ -54,6 +55,7 @@ public class ServerOptions {
         options.addOption("h", "help", false, "Display help");
         options.addOption("i", "insecure", false, "Run with Saxon's default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
+        options.addOption("l", "logfile", true, "Write logs to the specified file");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
@@ -88,6 +90,10 @@ public class ServerOptions {
             serverOptions.setTransformationTimeoutMs(Long.parseLong(cmd.getOptionValue("timeout")));
         }
 
+        if (cmd.hasOption("logfile")) {
+            serverOptions.setLogFilePath(cmd.getOptionValue("logfile"));
+        }
+
         return serverOptions;
     }
 
@@ -97,5 +103,13 @@ public class ServerOptions {
         String edition = p.getSaxonEdition();
         System.out.printf("Saxon %s %s%n", edition, version);
 
+    }
+
+    public String getLogFilePath() {
+        return logFilePath;
+    }
+
+    public void setLogFilePath(String logFilePath) {
+        this.logFilePath = logFilePath;
     }
 }

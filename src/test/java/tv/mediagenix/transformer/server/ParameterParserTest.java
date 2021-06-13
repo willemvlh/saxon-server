@@ -1,7 +1,7 @@
 package tv.mediagenix.transformer.server;
 
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.transformer.ParameterParser;
+import tv.mediagenix.transformer.app.ParameterParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

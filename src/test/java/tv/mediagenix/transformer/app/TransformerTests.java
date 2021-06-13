@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockPart;
-import tv.mediagenix.transformer.ErrorMessage;
 
 import java.nio.charset.StandardCharsets;
 
