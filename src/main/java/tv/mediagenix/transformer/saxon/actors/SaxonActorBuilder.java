@@ -42,9 +42,7 @@ public abstract class SaxonActorBuilder {
     }
 
     public SaxonActorBuilder setTimeout(long milliseconds) {
-        if (milliseconds > 0) {
-            instance.setTimeout(milliseconds);
-        }
+        instance.setTimeout(milliseconds);
         return this;
     }
 

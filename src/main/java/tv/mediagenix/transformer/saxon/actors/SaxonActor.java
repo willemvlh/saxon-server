@@ -161,7 +161,15 @@ public abstract class SaxonActor {
     }
 
     public void setTimeout(long milliseconds) {
-        this.timeout = milliseconds;
+        if (milliseconds < -1) {
+            throw new IllegalArgumentException("This argument requires a positive number or -1 for no timeout");
+        }
+        if (milliseconds == -1) {
+            this.timeout = 86400000;
+        } else {
+            this.timeout = milliseconds;
+        }
+
     }
 
     public void setParameters(Map<QName, XdmValue> parameters) {
