@@ -1,5 +1,4 @@
 package tv.mediagenix.transformer.app;
-
 import org.apache.commons.cli.ParseException;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +16,7 @@ class TransformerApplication {
             ServerOptions options = ServerOptions.fromArgs(args);
             Map<String, Object> optionsMap = new HashMap<>();
             optionsMap.put("server.port", options.getPort());
-            optionsMap.put("logging.file", options.getLogFilePath());
+            optionsMap.put("logging.file.name", options.getLogFilePath());
             app.setDefaultProperties(optionsMap);
             app.setLogStartupInfo(false);
             app.setBannerMode(Banner.Mode.OFF);

@@ -2,6 +2,7 @@ package tv.mediagenix.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
+import org.apache.commons.logging.LogFactory;
 import tv.mediagenix.transformer.saxon.SerializationProps;
 import tv.mediagenix.transformer.saxon.TransformationException;
 
@@ -27,6 +28,7 @@ public class SaxonXQueryPerformer extends SaxonActor {
             }
             return evaluate(e, output);
         } catch (SaxonApiException e) {
+            LogFactory.getLog(this.getClass()).error(e.getMessage());
             throw new TransformationException(e.getMessage(), e);
         }
     }

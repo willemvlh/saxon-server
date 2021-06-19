@@ -1,4 +1,6 @@
 package tv.mediagenix.transformer.app;
+
+import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +14,7 @@ class GlobalControllerExceptionHandler {
     @ExceptionHandler({TransformationException.class, InvalidRequestException.class})
     @ResponseBody
     ErrorMessage handleConflict(Exception e) {
+        LogFactory.getLog(this.getClass()).error(e.getMessage());
         return new ErrorMessage(e, 400);
     }
 }

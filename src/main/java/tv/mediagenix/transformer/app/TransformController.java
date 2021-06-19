@@ -1,12 +1,15 @@
 package tv.mediagenix.transformer.app;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -18,7 +21,13 @@ import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,15 +40,18 @@ import java.util.zip.GZIPInputStream;
 @RestController
 class TransformController {
 
+    private Log logger = LogFactory.getLog(TransformController.class);
+
     @Autowired
     public TransformController(ApplicationArguments args) throws ParseException {
         this.options = ServerOptions.fromArgs(args.getSourceArgs());
+        logger.info("Initialized TransformController");
     }
 
     private final ServerOptions options;
 
     @PostMapping(path = {"/query", "/transform"})
-    public ResponseEntity<byte[]> doQuery(
+    public ResponseEntity<byte[]> doTransform(
             @RequestPart(name = "xml", required = false) Part xml, //use Part instead of MultipartFile so that we can also send strings
             @RequestPart(name = "xsl", required = false) Part xsl,
             @RequestParam(name = "output", required = false) String output,
@@ -94,10 +106,30 @@ class TransformController {
     }
 
     private SaxonActorBuilder getBuilder(String requestURI) {
-        switch(requestURI) {
-            case "/query": return new SaxonXQueryPerformerBuilder();
-            case "/transform": return new SaxonTransformerBuilder();
-            default: throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        switch (requestURI) {
+            case "/query":
+                return new SaxonXQueryPerformerBuilder();
+            case "/transform":
+                return new SaxonTransformerBuilder();
+            default:
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+    }
+}
+
+@Component
+class LogRequestFilter extends HttpFilter {
+
+    private final Log logger = LogFactory.getLog(LogRequestFilter.class);
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        long time = System.currentTimeMillis();
+        logger.info(String.format("Received request for %s from %s", req.getRequestURL(), req.getRemoteAddr()));
+        chain.doFilter(request, response);
+        logger.info(String.format("Finished request in %s milliseconds (status = %s)", System.currentTimeMillis() - time, res.getStatus()));
+
     }
 }

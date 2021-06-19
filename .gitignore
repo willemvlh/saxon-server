@@ -13,3 +13,4 @@ buildNumber.properties
 /.idea
 keystore/
 deploy.bat
+*.log

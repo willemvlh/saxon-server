@@ -2,7 +2,7 @@ package tv.mediagenix.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.LogFactory;
 import tv.mediagenix.transformer.saxon.SaxonMessageListener;
 import tv.mediagenix.transformer.saxon.SerializationProps;
 import tv.mediagenix.transformer.saxon.TransformationException;
@@ -40,7 +40,7 @@ public class SaxonTransformer extends SaxonActor {
         } catch (SaxonApiException e) {
             SaxonMessageListener listener = (SaxonMessageListener) transformer.getMessageListener2();
             String msg = listener.errorString != null ? listener.errorString : e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-            LoggerFactory.getLogger(this.getClass()).error(msg);
+            LogFactory.getLog(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
     }
