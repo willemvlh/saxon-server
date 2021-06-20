@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import tv.mediagenix.transformer.saxon.TransformationException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 
 @ControllerAdvice
 class GlobalControllerExceptionHandler {
@@ -32,7 +35,10 @@ class GlobalControllerExceptionHandler {
     @ResponseBody
     public ErrorMessage handleServerError(Exception e) {
         log(e);
-        e.printStackTrace();
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        logger.error(sw.toString());
         return new ErrorMessage(e, 500);
     }
 }
