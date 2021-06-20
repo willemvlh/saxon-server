@@ -1,13 +1,10 @@
 package tv.mediagenix.transformer.app;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -19,13 +16,7 @@ import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -111,19 +102,3 @@ class TransformController {
     }
 }
 
-@Component
-class LogRequestFilter extends HttpFilter {
-
-    private final Log logger = LogFactory.getLog(LogRequestFilter.class);
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
-        long time = System.currentTimeMillis();
-        logger.info(String.format("Received request for %s from %s", req.getRequestURL(), req.getRemoteAddr()));
-        chain.doFilter(request, response);
-        logger.info(String.format("Finished request in %s milliseconds (status = %s)", System.currentTimeMillis() - time, res.getStatus()));
-
-    }
-}

@@ -28,7 +28,7 @@ public abstract class TestClass {
     public MockMvc mvc;
 
     @BeforeAll
-    public static void setUp(){
+    public static void setUp() {
         System.setProperty("javax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom", "net.sf.saxon.xpath.XPathFactoryImpl");
     }
 
@@ -57,11 +57,21 @@ public abstract class TestClass {
             assertEquals(400, res.getStatus());
             ErrorMessage msg = deserializeError(res.getContentAsString());
             validateErrorMessage(msg);
-            if(cb != null) cb.accept(msg);
+            if (cb != null) cb.accept(msg);
         });
     }
 
-    void validateErrorMessage(ErrorMessage msg){
+    void queryWithError(String xmlFn, String queryFn, Consumer<ErrorMessage> cb) throws Exception {
+        query(xmlFn, queryFn).andDo(mvcResult -> {
+            MockHttpServletResponse res = mvcResult.getResponse();
+            assertEquals(400, res.getStatus());
+            ErrorMessage msg = deserializeError(res.getContentAsString());
+            validateErrorMessage(msg);
+            if (cb != null) cb.accept(msg);
+        });
+    }
+
+    void validateErrorMessage(ErrorMessage msg) {
         assertNotNull(msg.getMessage());
         assertFalse(msg.getMessage().isEmpty());
         assertTrue(msg.getStatusCode() >= 200 && msg.getStatusCode() < 500);
@@ -69,12 +79,23 @@ public abstract class TestClass {
         assertFalse(msg.getExceptionType().isEmpty());
     }
 
-    ResultActions transformDummy(String xslFn) throws Exception{
+    ResultActions transformDummy(String xslFn) throws Exception {
         return transform("dummy.xml", xslFn);
     }
 
-    ErrorMessage deserializeError(String error) throws Exception{
+    ErrorMessage deserializeError(String error) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(error, ErrorMessage.class);
+    }
+
+    ResultActions query(String xmlFilename, String xqFilename) throws Exception {
+        return mvc.perform(multipart("/query")
+                .part(xslPart(xqFilename))
+                .part(xmlPart(xmlFilename)));
+    }
+
+    ResultActions query(String xqFilename) throws Exception {
+        return mvc.perform(multipart("/query")
+                .part(xslPart(xqFilename)));
     }
 }

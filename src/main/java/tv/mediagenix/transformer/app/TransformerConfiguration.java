@@ -29,7 +29,7 @@ public class TransformerConfiguration {
     }
 
     public SaxonXQueryPerformerBuilder getSaxonXQueryPerformerBuilder() throws TransformationException {
-        if (xQueryPerformer != null) {
+        if (xQueryPerformer == null) {
             xQueryPerformer = (SaxonXQueryPerformerBuilder) build(ActorType.QUERY);
         }
         return xQueryPerformer;
