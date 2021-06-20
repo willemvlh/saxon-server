@@ -1,26 +1,11 @@
 package tv.mediagenix.transformer.app;
-import org.hamcrest.collection.ArrayMatching;
-import org.hamcrest.collection.IsArrayContainingInAnyOrder;
-import org.hamcrest.core.StringStartsWith;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockPart;
-import org.springframework.test.context.event.annotation.BeforeTestExecution;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.result.XpathResultMatchers;
-import org.springframework.util.StreamUtils;
 
 import java.net.URI;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -65,8 +50,8 @@ public class SecurityTests extends TestClass {
     public void systemProperties() throws Exception{
         transform("dummy.xml", "test-system-properties.xsl")
                 .andExpect(xpath("//environment-variables/var").nodeCount(0))
-                .andExpect(xpath("//system-properties/prop[starts-with(@name, 'xsl:') => not()]").nodeCount(0)
+                .andExpect(xpath("//system-properties/prop[matches(@name, 'xsl:|file:|archive:|bin:') => not()]").nodeCount(0)
 
-        );
+                );
     }
 }
