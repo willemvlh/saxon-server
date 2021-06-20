@@ -1,5 +1,6 @@
 package tv.mediagenix.transformer.saxon.config;
 
+import com.saxonica.config.EnterpriseConfiguration;
 import net.sf.saxon.Configuration;
 import org.xml.sax.InputSource;
 
@@ -10,7 +11,7 @@ public class SaxonDefaultConfigurationFactory extends SaxonConfigurationFactory 
 
     @Override
     public Configuration newConfiguration() {
-        return new Configuration();
+        return new EnterpriseConfiguration();
     }
 
     @Override

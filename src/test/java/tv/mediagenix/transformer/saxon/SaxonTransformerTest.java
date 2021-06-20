@@ -15,9 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SaxonTransformerTest {
     SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
 
-    public SaxonTransformerTest() throws TransformationException {
-    }
-
     @Test
     public void transformTest() throws UnsupportedEncodingException, TransformationException {
         ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedXml, TestHelpers.WellFormedXsl);

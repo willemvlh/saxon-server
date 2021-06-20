@@ -8,13 +8,14 @@ import java.io.File;
 
 @Component
 public class ServerOptions {
-    private Integer port = 5000;
+    private int port = 5000;
     private File configFile;
     private boolean insecure = false;
     private long transformationTimeoutMs = 10000;
     private String logFilePath;
+    private String licenseFilepath;
 
-    public Integer getPort() {
+    public int getPort() {
         return port;
     }
 
@@ -38,6 +39,14 @@ public class ServerOptions {
         this.configFile = configFile;
     }
 
+    public String getLicenseFilepath() {
+        return licenseFilepath;
+    }
+
+    private void setLicenseFilepath(String filepath) {
+        this.licenseFilepath = filepath;
+    }
+
     public boolean isInsecure() {
         return insecure;
     }
@@ -55,7 +64,8 @@ public class ServerOptions {
         options.addOption("h", "help", false, "Display help");
         options.addOption("i", "insecure", false, "Run with Saxon's default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
-        options.addOption("l", "logfile", true, "Write logs to the specified file");
+        options.addOption("o", "output", true, "Write console output to the specified file");
+        options.addOption("l", "license", true, "Path to license file");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
@@ -90,8 +100,12 @@ public class ServerOptions {
             serverOptions.setTransformationTimeoutMs(Long.parseLong(cmd.getOptionValue("timeout")));
         }
 
-        if (cmd.hasOption("logfile")) {
-            serverOptions.setLogFilePath(cmd.getOptionValue("logfile"));
+        if (cmd.hasOption("output")) {
+            serverOptions.setLogFilePath(cmd.getOptionValue("output"));
+        }
+
+        if (cmd.hasOption("license")) {
+            serverOptions.setLicenseFilepath(cmd.getOptionValue("license"));
         }
 
         return serverOptions;

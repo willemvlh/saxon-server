@@ -1,5 +1,6 @@
 package tv.mediagenix.transformer.saxon.config;
 
+import com.saxonica.config.EnterpriseConfiguration;
 import com.sun.org.apache.xerces.internal.parsers.SAXParser;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.lib.Feature;
@@ -12,7 +13,7 @@ public class SaxonSecureConfigurationFactory extends SaxonConfigurationFactory {
 
     @Override
     public Configuration newConfiguration() {
-        Configuration config = new Configuration();
+        Configuration config = new EnterpriseConfiguration();
         config.setAllowedUriTest(uri -> false);
         config.setConfigurationProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS, false);
         return config;

@@ -13,36 +13,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class SaxonActorBuilder {
-    private final SaxonActor instance;
 
-    public static SaxonActorBuilder newBuilder(ActorType type) {
-        switch (type) {
-            case TRANSFORM:
-                return new SaxonTransformerBuilder();
-            case QUERY:
-                return new SaxonXQueryPerformerBuilder();
-            default:
-                throw new IllegalStateException("Unexpected value: " + type);
-        }
-    }
-
-    protected SaxonActorBuilder() {
-        try {
-            this.instance = this.getActorClass().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private long timeOut = 10000;
+    private Map<String, String> serializationParameters = new HashMap<>();
+    private Map<QName, XdmValue> parameters = new HashMap<>();
+    private Configuration configuration;
+    private String licenseFile;
+    private boolean isInsecure = false;
 
     public abstract Class<? extends SaxonActor> getActorClass();
 
     public SaxonActorBuilder setSerializationProperties(Map<String, String> parameters) {
-        instance.setSerializationParameters(parameters);
+        this.serializationParameters = parameters;
         return this;
     }
 
     public SaxonActorBuilder setTimeout(long milliseconds) {
-        instance.setTimeout(milliseconds);
+        this.timeOut = milliseconds;
         return this;
     }
 
@@ -54,17 +41,32 @@ public abstract class SaxonActorBuilder {
         } catch (XPathException e) {
             throw new TransformationException(e);
         }
-        instance.setConfiguration(config);
+        this.configuration = config;
         return this;
     }
 
     public SaxonActorBuilder setInsecure(boolean insecure) {
-        instance.setInsecure(insecure);
+        this.isInsecure = insecure;
+        return this;
+    }
+
+    public SaxonActorBuilder setLicenseFile(String file) {
+        this.licenseFile = file;
         return this;
     }
 
     public SaxonActor build() {
-        return instance;
+        try {
+            SaxonActor instance = this.getActorClass().newInstance();
+            instance.setConfiguration(configuration);
+            instance.setInsecure(isInsecure);
+            instance.setTimeout(timeOut);
+            instance.setParameters(parameters);
+            instance.setSerializationParameters(serializationParameters);
+            return instance;
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public SaxonActorBuilder setParameters(Map<String, String> parameters) {
@@ -72,7 +74,7 @@ public abstract class SaxonActorBuilder {
         parameters.forEach((k, v) -> {
             qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v));
         });
-        instance.setParameters(qNameParams);
+        this.parameters = qNameParams;
         return this;
     }
 }

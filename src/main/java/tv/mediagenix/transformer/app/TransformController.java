@@ -1,10 +1,8 @@
 package tv.mediagenix.transformer.app;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,15 +38,14 @@ import java.util.zip.GZIPInputStream;
 @RestController
 class TransformController {
 
-    private Log logger = LogFactory.getLog(TransformController.class);
+    private final SaxonTransformerBuilder transformer;
+    private final SaxonXQueryPerformerBuilder xQueryPerformer;
 
     @Autowired
-    public TransformController(ApplicationArguments args) throws ParseException {
-        this.options = ServerOptions.fromArgs(args.getSourceArgs());
-        logger.info("Initialized TransformController");
+    public TransformController(TransformerConfiguration configuration) throws Exception {
+        this.transformer = configuration.getSaxonTransformerBuilder();
+        this.xQueryPerformer = configuration.getSaxonXQueryPerformerBuilder();
     }
-
-    private final ServerOptions options;
 
     @PostMapping(path = {"/query", "/transform"})
     public ResponseEntity<byte[]> doTransform(
@@ -59,16 +56,13 @@ class TransformController {
             HttpServletRequest request)
             throws Exception {
 
-        SaxonActorBuilder builder = getBuilder(request.getRequestURI());
         Map<String, String> params = new ParameterParser().parseString(parameters);
         Map<String, String> serParams = new ParameterParser().parseString(output);
 
-        SaxonActor tf = builder
-                .setParameters(params)
+        SaxonActorBuilder builder = getBuilder(request.getRequestURI());
+        SaxonActor tf = builder.
+                setParameters(params)
                 .setSerializationProperties(serParams)
-                .setTimeout(options.getTransformationTimeoutMs())
-                .setConfigurationFile(options.getConfigFile())
-                .setInsecure(options.isInsecure())
                 .build();
 
         Optional<InputStream> xmlStr = Optional.ofNullable(xml).flatMap(this::getInputStream);
@@ -83,7 +77,7 @@ class TransformController {
         return new ResponseEntity<>(os.toByteArray(), headers, HttpStatus.OK);
     }
 
-    private Optional<InputStream> getInputStream(Part p){
+    private Optional<InputStream> getInputStream(Part p) {
         try {
             String contentType = p.getContentType();
             if ("application/gzip".equalsIgnoreCase(contentType)) {
@@ -108,9 +102,9 @@ class TransformController {
     private SaxonActorBuilder getBuilder(String requestURI) {
         switch (requestURI) {
             case "/query":
-                return new SaxonXQueryPerformerBuilder();
+                return xQueryPerformer;
             case "/transform":
-                return new SaxonTransformerBuilder();
+                return transformer;
             default:
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

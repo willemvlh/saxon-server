@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SaxonActorBuilderTestCase {
+public class SaxonActorBuilderTest {
 
     @Test
     public void NoOptionsParseTest() throws TransformationException {

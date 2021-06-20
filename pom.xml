@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.4.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>tv.mediagenix</groupId>
     <artifactId>saxon-server</artifactId>
@@ -23,8 +23,8 @@
         </dependency>
         <dependency>
             <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
-            <version>10.3</version>
+            <artifactId>Saxon-EE</artifactId>
+            <version>10.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

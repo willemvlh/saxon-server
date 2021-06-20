@@ -135,8 +135,10 @@ public abstract class SaxonActor {
     }
 
     public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-        this.setProcessor(new Processor(configuration));
+        if (configuration != null) {
+            this.configuration = configuration;
+            this.setProcessor(new Processor(configuration));
+        }
     }
 
     public Configuration getConfiguration() {
@@ -156,16 +158,15 @@ public abstract class SaxonActor {
     }
 
 
-    public void setProcessor(Processor processor) {
+    private void setProcessor(Processor processor) {
         this.processor = processor;
     }
 
     public void setTimeout(long milliseconds) {
-        if (milliseconds < -1) {
-            throw new IllegalArgumentException("This argument requires a positive number or -1 for no timeout");
-        }
         if (milliseconds == -1) {
             this.timeout = 86400000;
+        } else if (milliseconds < 1) {
+            throw new IllegalArgumentException("This argument requires a positive number or -1 for no timeout");
         } else {
             this.timeout = milliseconds;
         }
