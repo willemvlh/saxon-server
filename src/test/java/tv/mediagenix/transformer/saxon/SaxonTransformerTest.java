@@ -74,9 +74,14 @@ public class SaxonTransformerTest {
     }
 
     @Test
+    public void timeoutTest() {
+
+    }
+
+    @Test
     public void insecureTest() {
         SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
-        xf.setInsecure(true);
+        xf.setInsecure();
         assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
     }
 

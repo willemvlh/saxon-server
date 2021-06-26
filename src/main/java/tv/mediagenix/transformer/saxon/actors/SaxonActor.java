@@ -19,10 +19,10 @@ import java.util.concurrent.*;
 public abstract class SaxonActor {
 
     private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
-    private Processor processor = new Processor(this.configurationFactory.newConfiguration());
+    private Configuration configuration = configurationFactory.newConfiguration();
+    private Processor processor;
     private Map<String, String> serializationParameters = new HashMap<>();
     private Map<QName, XdmValue> parameters = new HashMap<>();
-    private Configuration configuration;
     private long timeout = 10000;
 
     protected SaxonActor() {
@@ -115,6 +115,9 @@ public abstract class SaxonActor {
     }
 
     Processor getProcessor() {
+        if (processor == null) {
+            processor = new Processor(this.configuration);
+        }
         return processor;
     }
 
@@ -148,13 +151,9 @@ public abstract class SaxonActor {
         return configuration;
     }
 
-    public void setInsecure(boolean insecure) {
-        if (insecure) {
-            this.configurationFactory = new SaxonDefaultConfigurationFactory();
-        } else {
-            this.configurationFactory = new SaxonSecureConfigurationFactory();
-        }
-        this.setProcessor(new Processor(this.configurationFactory.newConfiguration()));
+    public void setInsecure() {
+        this.configurationFactory = new SaxonDefaultConfigurationFactory();
+        this.configuration = configurationFactory.newConfiguration();
     }
 
 

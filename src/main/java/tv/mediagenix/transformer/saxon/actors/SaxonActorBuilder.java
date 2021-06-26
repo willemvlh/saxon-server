@@ -1,6 +1,7 @@
 package tv.mediagenix.transformer.saxon.actors;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.Feature;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
@@ -59,10 +60,13 @@ public abstract class SaxonActorBuilder {
         try {
             SaxonActor instance = this.getActorClass().newInstance();
             instance.setConfiguration(configuration);
-            instance.setInsecure(isInsecure);
+            if (isInsecure) instance.setInsecure();
             instance.setTimeout(timeOut);
             instance.setParameters(parameters);
             instance.setSerializationParameters(serializationParameters);
+            if (this.licenseFile != null) {
+                instance.getConfiguration().setConfigurationProperty(Feature.LICENSE_FILE_LOCATION, this.licenseFile);
+            }
             return instance;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);

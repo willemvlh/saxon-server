@@ -8,8 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TimeoutTest {
 
@@ -24,5 +23,23 @@ public class TimeoutTest {
             System.out.println(e.getMessage());
             assertTrue(e.getCause() instanceof TimeoutException);
         }
+    }
+
+    @Test
+    public void MinusOneTimeout() {
+        SaxonActor tf = new SaxonXQueryPerformerBuilder()
+                .setTimeout(-1)
+                .build();
+        String input = "for $i in 1 to 2000 \n" + "return (for $y in $i to 2000 return $y mod 4)";
+        try {
+            tf.act(new ByteArrayInputStream(input.getBytes()), new ByteArrayOutputStream());
+        } catch (TransformationException e) {
+            fail(); //Should not throw a timeout
+        }
+    }
+
+    @Test
+    public void negativeTimeout() {
+        assertThrows(Exception.class, () -> new SaxonXQueryPerformerBuilder().setTimeout(-1000).build());
     }
 }
