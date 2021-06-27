@@ -13,7 +13,7 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SaxonTransformerTest {
-    SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
+    private final SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
 
     @Test
     public void transformTest() throws UnsupportedEncodingException, TransformationException {
@@ -67,15 +67,8 @@ public class SaxonTransformerTest {
             transformWithStrings("<abc/>", "<xsl:template xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"/>");
             fail();
         } catch (TransformationException e) {
-            System.out.println(e.getMessage());
-            ;
+            assertTrue(e.getMessage().contains("Compilation error"));
         }
-        ;
-    }
-
-    @Test
-    public void timeoutTest() {
-
     }
 
     @Test

@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 public abstract class SaxonActor {
 
     private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
-    private Configuration configuration = configurationFactory.newConfiguration();
+    private Configuration configuration;
     private Processor processor;
     private Map<String, String> serializationParameters = new HashMap<>();
     private Map<QName, XdmValue> parameters = new HashMap<>();
@@ -115,9 +115,6 @@ public abstract class SaxonActor {
     }
 
     Processor getProcessor() {
-        if (processor == null) {
-            processor = new Processor(this.configuration);
-        }
         return processor;
     }
 
@@ -138,10 +135,8 @@ public abstract class SaxonActor {
     }
 
     public void setConfiguration(Configuration configuration) {
-        if (configuration != null) {
-            this.configuration = configuration;
-            this.setProcessor(new Processor(configuration));
-        }
+        this.configuration = configuration;
+        this.setProcessor(new Processor(configuration));
     }
 
     public Configuration getConfiguration() {
@@ -153,12 +148,12 @@ public abstract class SaxonActor {
 
     public void setInsecure() {
         this.configurationFactory = new SaxonDefaultConfigurationFactory();
-        this.configuration = configurationFactory.newConfiguration();
+        this.setConfiguration(configurationFactory.newConfiguration());
     }
 
-
-    private void setProcessor(Processor processor) {
-        this.processor = processor;
+    public void setSecure() {
+        this.configurationFactory = new SaxonSecureConfigurationFactory();
+        this.setConfiguration(configurationFactory.newConfiguration());
     }
 
     public void setTimeout(long milliseconds) {
@@ -175,4 +170,10 @@ public abstract class SaxonActor {
     public void setParameters(Map<QName, XdmValue> parameters) {
         this.parameters = parameters;
     }
+
+    public void setProcessor(Processor processor) {
+        this.processor = processor;
+    }
+
+    ;
 }

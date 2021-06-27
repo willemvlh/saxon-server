@@ -2,7 +2,9 @@ package tv.mediagenix.transformer.app;
 
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
+import tv.mediagenix.transformer.saxon.TransformationException;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
 
 import java.io.File;
@@ -24,10 +26,11 @@ public class ServerOptionsTest {
     }
 
     @Test
-    public void licenseTest() {
-        SaxonActorBuilder builder = new SaxonTransformerBuilder();
-        builder.setLicenseFile(this.getClass().getResource("dummy-license.lic").getPath());
-        assertThrows(IllegalArgumentException.class, () -> builder.build());
+    public void licenseTest() throws Exception {
+        ApplicationArguments args = new DefaultApplicationArguments("--license", this.getClass().getResource("dummy-license.lic").getPath());
+        TransformerConfiguration configuration = new TransformerConfiguration(args);
+        SaxonTransformerBuilder b = new SaxonTransformerBuilder();
+        assertThrows(TransformationException.class, configuration::getProcessor);
     }
 
 

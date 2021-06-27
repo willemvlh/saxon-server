@@ -1,5 +1,6 @@
 package tv.mediagenix.transformer.app;
 
+import net.sf.saxon.s9api.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,13 +30,11 @@ import java.util.zip.GZIPInputStream;
 @RestController
 class TransformController {
 
-    private final SaxonTransformerBuilder transformer;
-    private final SaxonXQueryPerformerBuilder xQueryPerformer;
+    private final Processor processor;
 
     @Autowired
-    public TransformController(TransformerConfiguration configuration) throws Exception {
-        this.transformer = configuration.getSaxonTransformerBuilder();
-        this.xQueryPerformer = configuration.getSaxonXQueryPerformerBuilder();
+    public TransformController(Processor processor) {
+        this.processor = processor;
     }
 
     @PostMapping(path = {"/query", "/transform"})
@@ -51,8 +50,9 @@ class TransformController {
         Map<String, String> serParams = new ParameterParser().parseString(output);
 
         SaxonActorBuilder builder = getBuilder(request.getRequestURI());
-        SaxonActor tf = builder.
-                setParameters(params)
+        SaxonActor tf = builder
+                .setProcessor(processor)
+                .setParameters(params)
                 .setSerializationProperties(serParams)
                 .build();
 
@@ -93,9 +93,9 @@ class TransformController {
     private SaxonActorBuilder getBuilder(String requestURI) {
         switch (requestURI) {
             case "/query":
-                return xQueryPerformer;
+                return new SaxonXQueryPerformerBuilder();
             case "/transform":
-                return transformer;
+                return new SaxonTransformerBuilder();
             default:
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

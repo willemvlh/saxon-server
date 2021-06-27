@@ -17,9 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SaxonXQueryPerformerTest {
 
+    private SaxonXQueryPerformer newXQueryPerformer() {
+        return (SaxonXQueryPerformer) new SaxonXQueryPerformerBuilder().build();
+    }
+
     @Test
     void act() throws TransformationException, UnsupportedEncodingException {
-        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        SaxonXQueryPerformer p = newXQueryPerformer();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXQueryStream(), os);
         assertEquals("abc", os.toString("utf-8"));
@@ -27,7 +31,7 @@ class SaxonXQueryPerformerTest {
 
     @Test
     void actWithoutInput() throws TransformationException, UnsupportedEncodingException {
-        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        SaxonXQueryPerformer p = newXQueryPerformer();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.act(TestHelpers.WellFormedXQueryStream(), os);
         assertEquals("abc", os.toString("utf-8"));
@@ -36,13 +40,13 @@ class SaxonXQueryPerformerTest {
 
     @Test
     void actFail() {
-        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        SaxonXQueryPerformer p = newXQueryPerformer();
         assertThrows(TransformationException.class, () -> p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.IncorrectXQueryStream(), new ByteArrayOutputStream()));
     }
 
     @Test
     void serializationProps() throws TransformationException {
-        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        SaxonXQueryPerformer p = newXQueryPerformer();
         SerializationProps props = p.act(TestHelpers.WellFormedXmlStream(), TestHelpers.XQueryStreamApplicationJsonMime(), new ByteArrayOutputStream());
         assertEquals("utf-8", props.getEncoding().toLowerCase());
         assertEquals("application/json", props.getMime().toLowerCase());
@@ -59,10 +63,28 @@ class SaxonXQueryPerformerTest {
 
     @Test
     void outputProperty() throws TransformationException, UnsupportedEncodingException {
-        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        SaxonXQueryPerformer p = newXQueryPerformer();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.act(new ByteArrayInputStream("declare option saxon:output 'method=json'; map{}".getBytes()), os);
         assertTrue(os.toString("utf-8").startsWith("{"));
+    }
+
+    @Test
+    void insecureTest() throws Exception {
+        SaxonXQueryPerformer p = newXQueryPerformer();
+        p.setSerializationParameters(Collections.singletonMap("method", "text"));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        p.act(getStream("available-environment-variables()"), os);
+        assertTrue(os.toString().isEmpty());
+        p.setInsecure();
+        os = new ByteArrayOutputStream();
+        p.act(getStream("available-environment-variables()"), os);
+        assertFalse(os.toString().isEmpty());
+        p.setSecure();
+        os = new ByteArrayOutputStream();
+        p.act(getStream("available-environment-variables()"), os);
+        assertTrue(os.toString().isEmpty());
+
     }
 
     private InputStream getStream(String s) {
