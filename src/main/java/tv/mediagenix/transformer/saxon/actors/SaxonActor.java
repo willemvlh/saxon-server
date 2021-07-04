@@ -71,7 +71,7 @@ public abstract class SaxonActor {
             service.submit(task);
             return task.get(this.timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException e) {
-            throw new TransformationException(e);
+            throw new TransformationException(String.format("Timeout exceeded (%s ms)", timeout), e);
         } catch (ExecutionException e) {
             throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
         } finally {

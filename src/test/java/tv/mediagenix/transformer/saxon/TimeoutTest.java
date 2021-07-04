@@ -20,7 +20,7 @@ public class TimeoutTest {
             tf.act(new ByteArrayInputStream(input.getBytes()), new ByteArrayOutputStream());
             fail();
         } catch (TransformationException e) {
-            System.out.println(e.getMessage());
+            assertTrue(e.getMessage().startsWith("Timeout exceeded"));
             assertTrue(e.getCause() instanceof TimeoutException);
         }
     }
