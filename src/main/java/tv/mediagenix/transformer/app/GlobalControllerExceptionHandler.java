@@ -30,7 +30,7 @@ class GlobalControllerExceptionHandler {
         return new ErrorMessage(e, 400);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({Exception.class})
     @ResponseBody
     public ErrorMessage handleServerError(Exception e) {

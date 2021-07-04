@@ -2,11 +2,9 @@ package tv.mediagenix.transformer.app;
 
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 
-@Component
 public class ServerOptions {
     private int port = 5000;
     private File configFile;

@@ -30,10 +30,12 @@ import java.util.zip.GZIPInputStream;
 class TransformController {
 
     private final Processor processor;
+    private final ServerOptions options;
 
     @Autowired
-    public TransformController(Processor processor) {
+    public TransformController(Processor processor, ServerOptions options) {
         this.processor = processor;
+        this.options = options;
     }
 
     @PostMapping(path = {"/query", "/transform"})
@@ -51,6 +53,7 @@ class TransformController {
         SaxonActorBuilder builder = getBuilder(request.getRequestURI());
         SaxonActor tf = builder
                 .setProcessor(processor)
+                .setTimeout(options.getTransformationTimeoutMs())
                 .setParameters(params)
                 .setSerializationProperties(serParams)
                 .build();

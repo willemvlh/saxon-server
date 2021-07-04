@@ -38,7 +38,6 @@ Following command-line options are available:
 * `-h,--help`: Display help
 * `-i, --insecure`: Run with default (insecure) configuration.*
 * `-p, --port <arg>`: Port on which the server runs
-* `-r, --rate-limit <arg>: none|light|heavy`: Enable rate limiting. `light` allows 120 requests per 60 seconds per IP address. `heavy` allows 60 requests per 60 seconds per IP address. `none` disables rate limiting.
 * `-t, --timeout <arg>`: The maximum time a transformation is allowed to run in milliseconds.
 * `-v, --version`: Display Saxon version info
 

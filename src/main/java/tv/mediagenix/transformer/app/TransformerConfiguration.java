@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import tv.mediagenix.transformer.saxon.TransformationException;
-import tv.mediagenix.transformer.saxon.actors.ActorType;
-import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
 import tv.mediagenix.transformer.saxon.config.SaxonConfigurationFactory;
 import tv.mediagenix.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import tv.mediagenix.transformer.saxon.config.SaxonSecureConfigurationFactory;
@@ -55,11 +53,5 @@ public class TransformerConfiguration {
     @Bean
     public ServerOptions getServerOptions() {
         return options;
-    }
-
-    private SaxonActorBuilder build(ActorType actorType) throws TransformationException {
-        SaxonActorBuilder builder = actorType.getBuilder();
-        return builder
-                .setTimeout(options.getTransformationTimeoutMs());
     }
 }
