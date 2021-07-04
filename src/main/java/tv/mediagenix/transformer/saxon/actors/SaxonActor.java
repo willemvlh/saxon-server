@@ -167,6 +167,10 @@ public abstract class SaxonActor {
 
     }
 
+    public long getTimeout() {
+        return this.timeout;
+    }
+
     public void setParameters(Map<QName, XdmValue> parameters) {
         this.parameters = parameters;
     }

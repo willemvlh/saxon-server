@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.DefaultApplicationArguments;
 import tv.mediagenix.transformer.saxon.TransformationException;
+import tv.mediagenix.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
 
 import java.io.File;
@@ -21,8 +22,15 @@ public class ServerOptionsTest {
         ServerOptions opts = ServerOptions.fromArgs(args);
         assertEquals(3000, opts.getPort());
         assertThrows(RuntimeException.class, () -> ServerOptions.fromArgs(new String[]{"-config", configFilePath, "-insecure"}));
-        assertTrue(ServerOptions.fromArgs(new String[]{"-insecure"}).isInsecure());
+        assertTrue(ServerOptions.fromArgs("-insecure").isInsecure());
         assertEquals(configFilePath, opts.getConfigFile().getPath());
+    }
+
+    @Test
+    public void timeoutTest() throws ParseException, TransformationException {
+        ServerOptions opts = ServerOptions.fromArgs("--timeout", "100");
+        SaxonActor actor = new SaxonTransformerBuilder().setTimeout(opts.getTransformationTimeoutMs()).build();
+        assertEquals(100, actor.getTimeout());
     }
 
     @Test

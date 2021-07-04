@@ -7,6 +7,7 @@ import org.apache.commons.cli.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import tv.mediagenix.transformer.saxon.TransformationException;
 import tv.mediagenix.transformer.saxon.actors.ActorType;
@@ -30,7 +31,9 @@ public class TransformerConfiguration {
         this.options = ServerOptions.fromArgs(args);
     }
 
+
     @Bean
+    @Scope("singleton")
     public Processor getProcessor() throws TransformationException {
         try {
             Configuration config;

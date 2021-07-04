@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import tv.mediagenix.transformer.saxon.SerializationProps;
+import tv.mediagenix.transformer.saxon.actors.ActorType;
 import tv.mediagenix.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.transformer.saxon.actors.SaxonActorBuilder;
-import tv.mediagenix.transformer.saxon.actors.SaxonTransformerBuilder;
-import tv.mediagenix.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
@@ -93,9 +92,9 @@ class TransformController {
     private SaxonActorBuilder getBuilder(String requestURI) {
         switch (requestURI) {
             case "/query":
-                return new SaxonXQueryPerformerBuilder();
+                return ActorType.QUERY.getBuilder();
             case "/transform":
-                return new SaxonTransformerBuilder();
+                return ActorType.TRANSFORM.getBuilder();
             default:
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

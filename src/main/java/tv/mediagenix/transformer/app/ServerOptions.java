@@ -55,7 +55,7 @@ public class ServerOptions {
         this.insecure = insecure;
     }
 
-    public static ServerOptions fromArgs(String[] args) throws ParseException {
+    public static ServerOptions fromArgs(String... args) throws ParseException {
         ServerOptions serverOptions = new ServerOptions();
         Options options = new Options();
         options.addOption("p", "port", true, "Port on which the server runs");
@@ -69,8 +69,7 @@ public class ServerOptions {
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("java -jar saxon-server-XX.jar", options);
+            printHelp(options);
             System.exit(0);
         }
         if (cmd.hasOption("version")) {
@@ -109,6 +108,11 @@ public class ServerOptions {
         }
 
         return serverOptions;
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp(String.format("java -jar saxon-server-%s.jar", Utils.getVersionNumber()), options);
     }
 
     private static void printInformation() {
