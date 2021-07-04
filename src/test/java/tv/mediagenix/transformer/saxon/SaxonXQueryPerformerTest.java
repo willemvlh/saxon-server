@@ -70,7 +70,7 @@ class SaxonXQueryPerformerTest {
     }
 
     @Test
-    void insecureTest() throws Exception {
+    void insecure() throws Exception {
         SaxonXQueryPerformer p = newXQueryPerformer();
         p.setSerializationParameters(Collections.singletonMap("method", "text"));
         ByteArrayOutputStream os = new ByteArrayOutputStream();

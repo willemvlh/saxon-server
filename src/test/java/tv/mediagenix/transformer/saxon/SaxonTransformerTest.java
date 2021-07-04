@@ -12,17 +12,17 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SaxonTransformerTest {
+class SaxonTransformerTest {
     private final SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
 
     @Test
-    public void transformTest() throws UnsupportedEncodingException, TransformationException {
+    void transform() throws UnsupportedEncodingException, TransformationException {
         ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedXml, TestHelpers.WellFormedXsl);
         assertEquals(output.toString("utf-8"), "hello", "The output should be 'hello'");
     }
 
     @Test
-    public void parameters() throws TransformationException, UnsupportedEncodingException {
+    void parameters() throws TransformationException, UnsupportedEncodingException {
         SaxonActor actor = new SaxonTransformerBuilder().setParameters(Collections.singletonMap("myParam", "value")).build();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         actor.act(getStream("<abc/>"), TestHelpers.xslWithParameters(), output);
@@ -30,19 +30,19 @@ public class SaxonTransformerTest {
     }
 
     @Test
-    public void transformWithoutInputTest() throws TransformationException {
+    void transformWithoutInput() throws TransformationException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         tf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
         assertEquals("hello", os.toString());
     }
 
     @Test
-    public void malformedXslTest() {
+    void malformedXsl() {
         assertThrows(TransformationException.class, () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl), "Malformed input should trigger an exception");
     }
 
     @Test
-    public void errorMsgTest() {
+    void errorMsg() {
         try {
             transformWithStrings("bad xml", "bad xsl");
         } catch (TransformationException e) {
@@ -51,7 +51,7 @@ public class SaxonTransformerTest {
     }
 
     @Test
-    public void messageTest() {
+    void message() {
         try {
             transformWithStrings("<x/>", TestHelpers.MessageInvokingXsl);
             fail("should have thrown");
@@ -62,7 +62,7 @@ public class SaxonTransformerTest {
     }
 
     @Test
-    public void testWithCompilationError() {
+    void testWithCompilationError() {
         try {
             transformWithStrings("<abc/>", "<xsl:template xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"/>");
             fail();
@@ -72,7 +72,7 @@ public class SaxonTransformerTest {
     }
 
     @Test
-    public void insecureTest() {
+    void insecure() {
         SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
         xf.setInsecure();
         assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));

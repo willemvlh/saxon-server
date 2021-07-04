@@ -14,40 +14,40 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class XQueryTests extends TestClass {
 
     @Test
-    void testXQuery() throws Exception {
+    void xQuery() throws Exception {
         query("dummy.xml", "abc.xquery")
                 .andExpect(status().isOk())
                 .andExpect(content().string("abc"));
     }
 
     @Test
-    void testXQueryJson() throws Exception {
+    void xQueryJson() throws Exception {
         query("dummy.xml", "hof.xquery")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.a").value("abc"));
     }
 
     @Test
-    void testXQueryError() throws Exception {
+    void xQueryError() throws Exception {
         queryWithError("dummy.xml", "syntax-error.xquery", null);
     }
 
     @Test
-    void testXQueryErrorFunction() throws Exception {
+    void xQueryErrorFunction() throws Exception {
         queryWithError("dummy.xml", "error.xquery", err -> {
             assertEquals(":-(", err.getMessage());
         });
     }
 
     @Test
-    void testXQueryNoInput() throws Exception {
+    void xQueryNoInput() throws Exception {
         query("hof.xquery")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.a").value("abc"));
     }
 
     @Test
-    void testJsonOutput() throws Exception {
+    void jsonOutput() throws Exception {
         mvc.perform(multipart("/query")
                 .part(new MockPart("xml", "{\"a\": \"b\"}".getBytes()))
                 .part(new MockPart("xsl", "xml-to-json(.)".getBytes()))
@@ -57,7 +57,7 @@ class XQueryTests extends TestClass {
     }
 
     @Test
-    void testParameters() throws Exception {
+    void parameters() throws Exception {
         mvc.perform(multipart("/query")
                 .part(new MockPart("parameters", "myParam=someText".getBytes()))
                 .part(new MockPart("xsl", "declare variable $myParam external; $myParam".getBytes()))

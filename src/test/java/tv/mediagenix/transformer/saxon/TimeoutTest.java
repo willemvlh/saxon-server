@@ -26,11 +26,11 @@ public class TimeoutTest {
     }
 
     @Test
-    public void MinusOneTimeout() {
+    public void minusOneTimeout() {
         SaxonActor tf = new SaxonXQueryPerformerBuilder()
                 .setTimeout(-1)
                 .build();
-        String input = "for $i in 1 to 2000 \n" + "return (for $y in $i to 2000 return $y mod 4)";
+        String input = "for $i in 1 to 2000 \n" + "return (for $y in $i to 1000 return $y mod 4)";
         try {
             tf.act(new ByteArrayInputStream(input.getBytes()), new ByteArrayOutputStream());
         } catch (TransformationException e) {

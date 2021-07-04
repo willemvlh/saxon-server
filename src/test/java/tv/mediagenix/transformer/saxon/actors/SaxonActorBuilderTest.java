@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SaxonActorBuilderTest {
 
     @Test
-    public void testBuilder() throws Exception {
+    void setProcessor() throws Exception {
         ApplicationArguments args = new DefaultApplicationArguments("--insecure");
         TransformerConfiguration configuration = new TransformerConfiguration(args);
         SaxonTransformerBuilder b = new SaxonTransformerBuilder();
