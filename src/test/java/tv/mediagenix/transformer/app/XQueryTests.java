@@ -34,9 +34,7 @@ class XQueryTests extends TestClass {
 
     @Test
     void xQueryErrorFunction() throws Exception {
-        queryWithError("dummy.xml", "error.xquery", err -> {
-            assertEquals(":-(", err.getMessage());
-        });
+        queryWithError("dummy.xml", "error.xquery", err -> assertEquals(":-(", err.getMessage()));
     }
 
     @Test

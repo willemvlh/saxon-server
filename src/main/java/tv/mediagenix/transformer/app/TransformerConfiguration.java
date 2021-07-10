@@ -18,7 +18,7 @@ import javax.xml.transform.stream.StreamSource;
 
 @Component
 public class TransformerConfiguration {
-    private ServerOptions options;
+    private final ServerOptions options;
 
     @Autowired
     public TransformerConfiguration(ApplicationArguments args) throws ParseException {

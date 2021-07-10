@@ -13,10 +13,10 @@ import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ServerOptionsTest {
+class ServerOptionsTest {
 
     @Test
-    public void setOptionsFromArguments() throws ParseException, URISyntaxException {
+    void setOptionsFromArguments() throws ParseException, URISyntaxException {
         String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/transformer/app/saxon-config.xml").toURI()).getPath();
         String[] args = {"-port", "3000", "-config", configFilePath};
         ServerOptions opts = ServerOptions.fromArgs(args);
@@ -27,14 +27,14 @@ public class ServerOptionsTest {
     }
 
     @Test
-    public void timeout() throws ParseException, TransformationException {
+    void timeout() throws ParseException {
         ServerOptions opts = ServerOptions.fromArgs("--timeout", "100");
         SaxonActor actor = new SaxonTransformerBuilder().setTimeout(opts.getTransformationTimeoutMs()).build();
         assertEquals(100, actor.getTimeout());
     }
 
     @Test
-    public void license() throws Exception {
+    void license() throws Exception {
         ApplicationArguments args = new DefaultApplicationArguments("--license", this.getClass().getResource("dummy-license.lic").getPath());
         TransformerConfiguration configuration = new TransformerConfiguration(args);
         SaxonTransformerBuilder b = new SaxonTransformerBuilder();

@@ -16,7 +16,7 @@ public abstract class SaxonActorBuilder {
     private Map<String, String> serializationParameters = new HashMap<>();
     private Map<QName, XdmValue> parameters = new HashMap<>();
     private Processor processor;
-    private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
+    private final SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
 
     public abstract Class<? extends SaxonActor> getActorClass();
 
@@ -52,9 +52,7 @@ public abstract class SaxonActorBuilder {
 
     public SaxonActorBuilder setParameters(Map<String, String> parameters) {
         Map<QName, XdmValue> qNameParams = new HashMap<>();
-        parameters.forEach((k, v) -> {
-            qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v));
-        });
+        parameters.forEach((k, v) -> qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v)));
         this.parameters = qNameParams;
         return this;
     }

@@ -43,9 +43,7 @@ class SaxonActorBuilderTest {
 
     @Test
     void wrongConfigFile() {
-        Assertions.assertThrows(TransformationException.class, () -> {
-            new TransformerConfiguration("--config", "unknown").getProcessor();
-        });
+        Assertions.assertThrows(TransformationException.class, () -> new TransformerConfiguration("--config", "unknown").getProcessor());
     }
 
     @Test

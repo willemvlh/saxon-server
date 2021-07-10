@@ -10,16 +10,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-
-public class SecurityTests extends TestClass {
+class SecurityTests extends TestClass {
 
     @Test
-    public void resultDocument() throws Exception {
+    void resultDocument() throws Exception {
         transformWithError("dummy.xml", "test-result-document.xsl", null);
     }
 
     @Test
-    public void resolveUrl() throws Exception {
+    void resolveUrl() throws Exception {
         transform("dummy.xml", "test-uri-resolver.xsl")
                 .andExpect(jsonPath("$.fn:json-doc").value("err:FOUT1170"))
                 .andExpect(jsonPath("$.fn:doc").value("err:FODC0002"))
@@ -27,27 +26,27 @@ public class SecurityTests extends TestClass {
     }
 
     @Test
-    public void docType() throws  Exception {
+    void docType() throws Exception {
         transformWithError("dummy.xml", "test-dtd.xsl", null);
     }
 
     @Test
-    public void documentFn() throws  Exception {
+    void documentFn() throws Exception {
         transformWithError("dummy.xml", "test-document-fn", null);
     }
 
     @Test
-    public void serverHeader() throws Exception{
+    void serverHeader() throws Exception {
         transformDummy("test-1.xsl").andExpect(header().doesNotExist("Server"));
     }
 
     @Test
-    public void wrongURL() throws Exception {
+    void wrongURL() throws Exception {
         mvc.perform(MockMvcRequestBuilders.request("GET", new URI("bla"))).andExpect(status().isNotFound());
     }
 
     @Test
-    public void systemProperties() throws Exception{
+    void systemProperties() throws Exception {
         transform("dummy.xml", "test-system-properties.xsl")
                 .andExpect(xpath("//environment-variables/var").nodeCount(0))
                 .andExpect(xpath("//system-properties/prop[matches(@name, 'xsl:|file:|archive:|bin:') => not()]").nodeCount(0)

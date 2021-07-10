@@ -10,10 +10,10 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TimeoutTest {
+class TimeoutTest {
 
     @Test
-    public void timeout() {
+    void timeout() {
         SaxonActor tf = new SaxonXQueryPerformerBuilder().setTimeout(1).build();
         String input = "for $i in 1 to 5000 \n" + "return (for $y in $i to 5000 return $y mod 4)";
         try {
@@ -26,7 +26,7 @@ public class TimeoutTest {
     }
 
     @Test
-    public void minusOneTimeout() {
+    void minusOneTimeout() {
         SaxonActor tf = new SaxonXQueryPerformerBuilder()
                 .setTimeout(-1)
                 .build();
@@ -39,7 +39,7 @@ public class TimeoutTest {
     }
 
     @Test
-    public void negativeTimeout() {
+    void negativeTimeout() {
         assertThrows(Exception.class, () -> new SaxonXQueryPerformerBuilder().setTimeout(-1000).build());
     }
 }

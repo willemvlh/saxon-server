@@ -6,12 +6,12 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 public class TestHelpers {
-    public static String WellFormedXml = "<root/>";
-    public static String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template match=\"/\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
-    public static String WellformedXslWithInitialTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template name=\"xsl:initial-template\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
-    public static String message = "abc";
-    public static String MessageInvokingXsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"yes\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
-    public static String MalformedXml = "noXml";
+    public static final String WellFormedXml = "<root/>";
+    public static final String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template match=\"/\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
+    private static final String WellformedXslWithInitialTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template name=\"xsl:initial-template\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
+    public static final String message = "abc";
+    public static final String MessageInvokingXsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"yes\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
+    public static final String MalformedXml = "noXml";
     public static String IncorrectXsl = WellFormedXsl.replaceAll("stylesheet", "wrongTag");
 
     public static InputStream WellFormedXslWithInitialTemplateStream() {

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ZippedStreamReaderTest {
     @Test
-    public void unzip() throws IOException {
+    void unzip() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GZIPOutputStream os = new GZIPOutputStream(bos);
         os.write(new byte[]{65, 66, 67});

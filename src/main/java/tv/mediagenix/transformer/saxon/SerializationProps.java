@@ -1,8 +1,8 @@
 package tv.mediagenix.transformer.saxon;
 
 public class SerializationProps {
-    private String encoding;
-    private String mime;
+    private final String encoding;
+    private final String mime;
 
     public String getEncoding() {
         return encoding == null ? "utf-8" : encoding;

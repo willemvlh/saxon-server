@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ParameterParserTest {
     @Test
-    public void parse() {
+    void parse() {
         ParameterParser p = new ParameterParser();
         Map<String, String> result = p.parseString("koe=kalf;varken=big");
         assertEquals("kalf", result.get("koe"));
@@ -21,7 +21,7 @@ class ParameterParserTest {
     }
 
     @Test
-    public void parseEscape() {
+    void parseEscape() {
         ParameterParser p = new ParameterParser();
         Map<String, String> result = p.parseString("param=nee\\;soms");
         assertEquals(1, result.size());
@@ -30,7 +30,7 @@ class ParameterParserTest {
     }
 
     @Test
-    public void parseNoEscape() {
+    void parseNoEscape() {
         ParameterParser p = new ParameterParser();
         Map<String, String> result = p.parseString("param=nee\\soms");
         assertEquals(1, result.size());
@@ -38,13 +38,13 @@ class ParameterParserTest {
     }
 
     @Test
-    public void parseWithEqualsSign() {
+    void parseWithEqualsSign() {
         ParameterParser p = new ParameterParser();
         assertEquals("1=2", p.parseString("input=1=2").get("input"));
     }
 
     @Test
-    public void parseStream() throws IOException {
+    void parseStream() throws IOException {
         ParameterParser p = new ParameterParser();
         String s = "koe=kalf;varken=big";
         Map<String, String> result = p.parseStream(new ByteArrayInputStream(s.getBytes()), s.length());

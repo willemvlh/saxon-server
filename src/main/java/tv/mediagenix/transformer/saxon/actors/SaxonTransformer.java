@@ -15,7 +15,7 @@ import java.util.List;
 
 public class SaxonTransformer extends SaxonActor {
 
-    private ArrayList<StaticError> errorList = new ArrayList<>();
+    private final ArrayList<StaticError> errorList = new ArrayList<>();
     private Xslt30Transformer transformer;
 
     public List<StaticError> getErrorList() {

@@ -16,7 +16,7 @@ import java.io.StringWriter;
 @ControllerAdvice
 class GlobalControllerExceptionHandler {
 
-    private Log logger = LogFactory.getLog(this.getClass());
+    private final Log logger = LogFactory.getLog(this.getClass());
 
     private void log(Exception e) {
         e.printStackTrace();
