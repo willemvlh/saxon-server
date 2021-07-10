@@ -2,12 +2,10 @@ package tv.mediagenix.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import org.apache.commons.logging.LogFactory;
 import tv.mediagenix.transformer.saxon.SaxonMessageListener;
 import tv.mediagenix.transformer.saxon.SerializationProps;
 import tv.mediagenix.transformer.saxon.TransformationException;
 
-import javax.xml.transform.Source;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class SaxonTransformer extends SaxonActor {
 
     @Override
     public SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        transformer = newTransformer(newSAXSource(stylesheet));
+        transformer = newTransformer((stylesheet));
         Serializer s = newSerializer(output);
         try {
             transformer.setStylesheetParameters(this.getParameters());
@@ -40,8 +38,7 @@ public class SaxonTransformer extends SaxonActor {
         } catch (SaxonApiException e) {
             SaxonMessageListener listener = (SaxonMessageListener) transformer.getMessageListener2();
             String msg = listener.errorString != null ? listener.errorString : e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-            LogFactory.getLog(this.getClass()).error(msg);
-            throw new TransformationException(msg);
+            throw new TransformationException(msg, e);
         }
     }
 
@@ -54,12 +51,12 @@ public class SaxonTransformer extends SaxonActor {
         return s;
     }
 
-    private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
+    private Xslt30Transformer newTransformer(InputStream stylesheet) throws TransformationException {
         Processor p = getProcessor();
         XsltCompiler c = p.newXsltCompiler();
         c.setErrorList(this.getErrorList());
         try {
-            XsltExecutable e = c.compile(stylesheet);
+            XsltExecutable e = c.compile(newSAXSource(stylesheet));
             Xslt30Transformer xf = e.load30();
             xf.setMessageListener(new SaxonMessageListener());
             return xf;
@@ -78,7 +75,8 @@ public class SaxonTransformer extends SaxonActor {
                 }
                 throw new TransformationException("Compilation error: " + message);
             }
-            throw new TransformationException(e);
+            throw new TransformationException(e.getMessage());
         }
     }
+
 }

@@ -2,6 +2,7 @@ package tv.mediagenix.transformer.app;
 
 import net.sf.saxon.s9api.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +39,13 @@ class TransformController {
         this.options = options;
     }
 
+    private RequestContext requestContext;
+
+    @Bean
+    public RequestContext getRequestContext() {
+        return requestContext;
+    }
+
     @PostMapping(path = {"/query", "/transform"})
     public ResponseEntity<byte[]> doTransform(
             @RequestPart(name = "xml", required = false) Part xml, //use Part instead of MultipartFile so that we can also send strings
@@ -49,7 +57,7 @@ class TransformController {
 
         Map<String, String> params = new ParameterParser().parseString(parameters);
         Map<String, String> serParams = new ParameterParser().parseString(output);
-
+        this.requestContext = new RequestContext(xml, xsl);
         SaxonActorBuilder builder = getBuilder(request.getRequestURI());
         SaxonActor tf = builder
                 .setProcessor(processor)

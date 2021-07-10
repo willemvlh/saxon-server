@@ -1,8 +1,8 @@
 package tv.mediagenix.transformer.app;
 
 public class ErrorMessage {
-    private int statusCode;
-    private String exceptionType;
+    private final int statusCode;
+    private final String exceptionType;
     private String message;
 
     public ErrorMessage(Throwable e, int statusCode) {
@@ -11,24 +11,12 @@ public class ErrorMessage {
         this.exceptionType = e.getClass().getSimpleName();
     }
 
-    public ErrorMessage(){
-
-    }
-
     public int getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
     public String getExceptionType() {
         return exceptionType;
-    }
-
-    public void setExceptionType(String exceptionType) {
-        this.exceptionType = exceptionType;
     }
 
     public String getMessage() {

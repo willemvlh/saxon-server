@@ -46,7 +46,7 @@ public class TransformerConfiguration {
             }
             return new Processor(config);
         } catch (Exception e) {
-            throw new TransformationException(e);
+            throw new TransformationException(e.getMessage());
         }
     }
 

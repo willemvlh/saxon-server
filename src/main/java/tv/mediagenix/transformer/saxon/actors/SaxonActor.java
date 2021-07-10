@@ -3,6 +3,7 @@ package tv.mediagenix.transformer.saxon.actors;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
+import tv.mediagenix.transformer.saxon.Convert;
 import tv.mediagenix.transformer.saxon.JsonToXmlTransformer;
 import tv.mediagenix.transformer.saxon.SerializationProps;
 import tv.mediagenix.transformer.saxon.TransformationException;
@@ -11,7 +12,9 @@ import tv.mediagenix.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import tv.mediagenix.transformer.saxon.config.SaxonSecureConfigurationFactory;
 
 import javax.xml.transform.sax.SAXSource;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -28,33 +31,19 @@ public abstract class SaxonActor {
     protected SaxonActor() {
     }
 
-    private String inputStreamToString(InputStream input) throws TransformationException {
-        StringBuilder builder = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        try {
-            int c;
-            while ((c = reader.read()) != -1) {
-                builder.append((char) c);
-            }
-            return builder.toString();
-        } catch (IOException e) {
-            throw new TransformationException(e);
-        }
-    }
-
     public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
         XdmItem context;
         try {
             if (isJsonStream(input)) {
                 JsonToXmlTransformer xf = new JsonToXmlTransformer();
-                context = xf.transform(inputStreamToString(input), getProcessor());
+                context = xf.transform(Convert.toString(input), getProcessor());
             } else {
                 DocumentBuilder b = getProcessor().newDocumentBuilder();
                 context = b.build(newSAXSource(input));
             }
             return actWithTimeout(context, stylesheet, output);
-        } catch (SaxonApiException e) {
-            throw new TransformationException(e);
+        } catch (SaxonApiException | IOException e) {
+            throw new TransformationException(e.getMessage());
         }
     }
 
@@ -73,6 +62,9 @@ public abstract class SaxonActor {
         } catch (TimeoutException | InterruptedException e) {
             throw new TransformationException(String.format("Timeout exceeded (%s ms)", timeout), e);
         } catch (ExecutionException e) {
+            if (e.getCause() instanceof TransformationException) {
+                throw (TransformationException) e.getCause();
+            }
             throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
         } finally {
             service.shutdown();
@@ -100,7 +92,7 @@ public abstract class SaxonActor {
             stream.reset();
             return c != '<';
         } catch (IOException e) {
-            throw new TransformationException(e);
+            throw new TransformationException(e.getMessage());
         }
     }
 

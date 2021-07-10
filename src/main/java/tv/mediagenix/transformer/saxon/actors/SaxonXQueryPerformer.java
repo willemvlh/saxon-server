@@ -2,7 +2,6 @@ package tv.mediagenix.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import org.apache.commons.logging.LogFactory;
 import tv.mediagenix.transformer.saxon.SerializationProps;
 import tv.mediagenix.transformer.saxon.TransformationException;
 
@@ -12,7 +11,7 @@ import java.io.OutputStream;
 public class SaxonXQueryPerformer extends SaxonActor {
     private XQueryExecutable executable;
 
-    private XQueryEvaluator newEvaluatorOnQuery(InputStream query) throws SaxonApiException {
+    private XQueryEvaluator newEvaluator(InputStream query) throws SaxonApiException {
         this.executable = this.getProcessor().newXQueryCompiler().compile(query);
         XQueryEvaluator evaluator = this.executable.load();
         this.getParameters().forEach(evaluator::setExternalVariable);
@@ -21,15 +20,15 @@ public class SaxonXQueryPerformer extends SaxonActor {
 
     @Override
     public SerializationProps act(XdmValue input, InputStream query, OutputStream output) throws TransformationException {
+
         try {
-            XQueryEvaluator e = newEvaluatorOnQuery(query);
+            XQueryEvaluator e = newEvaluator(query);
             if (!input.isEmpty()) {
                 e.setContextItem(input.itemAt(0));
             }
             return evaluate(e, output);
         } catch (SaxonApiException e) {
-            LogFactory.getLog(this.getClass()).error(e.getMessage());
-            throw new TransformationException(e.getMessage(), e);
+            throw new TransformationException(e.getMessage());
         }
     }
 
