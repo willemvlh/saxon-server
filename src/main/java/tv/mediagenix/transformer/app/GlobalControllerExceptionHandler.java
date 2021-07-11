@@ -3,6 +3,7 @@ package tv.mediagenix.transformer.app;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
+import java.util.Arrays;
 
 @ControllerAdvice
 class GlobalControllerExceptionHandler {
@@ -29,7 +30,6 @@ class GlobalControllerExceptionHandler {
     @ExceptionHandler(InvalidRequestException.class)
     @ResponseBody
     public ErrorMessage handleBadRequest(Exception e) {
-        log(e);
         return new ErrorMessage(e, 400);
     }
 
@@ -44,37 +44,44 @@ class GlobalControllerExceptionHandler {
     @ExceptionHandler(TransformationException.class)
     @ResponseBody
     public ErrorMessage handleBadRequest(HttpServletRequest req, TransformationException e) {
-        //TODO make it prettier
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("Transformation exception: ").append(e.getMessage()).append('\n')
+                .append("Received following input: ").append('\n');
         try {
             req.getParts().forEach(p -> {
-                logger.error(p.getName());
+                sb.append(p.getName()).append(": \n");
                 try {
-                    logger.error(Convert.toString(p.getInputStream()));
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                    sb
+                            .append(trimFile(Convert.toString(p.getInputStream()))).append("\n\n");
+                } catch (IOException err) {
+                    sb.append("Could not print file contents: ").append(err.getMessage()).append("\n\n");
                 }
             });
-        } catch (IOException | ServletException ioException) {
-            ioException.printStackTrace();
+            logger.error(sb.toString());
+        } catch (IOException | ServletException err) {
+            err.printStackTrace();
         }
         return new ErrorMessage(e, 400);
     }
 
     private String trimFile(String f) {
         StringWriter writer = new StringWriter();
-        writer.append("Input: \n");
         String[] lines = f.split("\r\n?|\n");
-        if (lines.length < 10) {
+        if (lines.length <= 10) {
             return f;
         }
-        for (int i = 0; i < 5; i++) {
-            writer.append(lines[i]).append("\n");
-        }
-        writer.append("...\n");
-        for (int i = lines.length - 5; i < lines.length; i++) {
-            writer.append(lines[i]).append("\n");
-        }
+        Arrays.stream(lines).limit(5).forEach(l -> writer.append(l).append('\n'));
+        writer.append(String.format("... (%s lines omitted)\n", lines.length - 10));
+        Arrays.stream(lines).skip(lines.length - 5).forEach(l -> writer.append(l).append('\n'));
         return writer.toString();
+    }
+
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseBody
+    public ErrorMessage handleUnsupportedMethodException(Exception e) {
+        return new ErrorMessage(new InvalidRequestException(e), HttpStatus.METHOD_NOT_ALLOWED.value());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

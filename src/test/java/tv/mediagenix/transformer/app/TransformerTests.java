@@ -10,8 +10,7 @@ import org.springframework.mock.web.MockPart;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(args = {"--port", "3000"})
@@ -26,6 +25,13 @@ class TransformerTests extends TestClass {
     @Test
     void badURL() throws Exception {
         mvc.perform(post("/abc")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void badMethod() throws Exception {
+        mvc.perform(get("/query"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.message").value("Request method 'GET' not supported"));
     }
 
     @Test
