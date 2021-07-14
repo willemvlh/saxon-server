@@ -6,7 +6,7 @@ public class ErrorMessage {
     private String message;
 
     public ErrorMessage(Throwable e, int statusCode) {
-        this.message = e.getCause() == null ? e.getMessage() : e.getCause().getMessage();
+        this.message = e.getMessage();
         this.statusCode = statusCode;
         this.exceptionType = e.getClass().getSimpleName();
     }

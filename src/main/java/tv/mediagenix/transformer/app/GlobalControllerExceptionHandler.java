@@ -1,13 +1,16 @@
 package tv.mediagenix.transformer.app;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.annotation.RequestScope;
 import tv.mediagenix.transformer.saxon.Convert;
 import tv.mediagenix.transformer.saxon.TransformationException;
 
@@ -21,23 +24,24 @@ import java.util.Arrays;
 @ControllerAdvice
 class GlobalControllerExceptionHandler {
 
-    private final Log logger = LogFactory.getLog(this.getClass());
+    private final Logger logger;
 
-    public GlobalControllerExceptionHandler() {
+    public GlobalControllerExceptionHandler(Logger logger) {
+        this.logger = logger;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidRequestException.class)
     @ResponseBody
-    public ErrorMessage handleBadRequest(Exception e) {
+    public ErrorMessage handleBadRequest(InvalidRequestException e) {
         return new ErrorMessage(e, 400);
     }
 
     private void log(Exception e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        StringWriter w = new StringWriter();
+        PrintWriter pw = new PrintWriter(w);
         e.printStackTrace(pw);
-        logger.error(sw.toString());
+        logger.error(w.toString());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -81,7 +85,7 @@ class GlobalControllerExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
     public ErrorMessage handleUnsupportedMethodException(Exception e) {
-        return new ErrorMessage(new InvalidRequestException(e), HttpStatus.METHOD_NOT_ALLOWED.value());
+        return new ErrorMessage(new InvalidRequestException(e.getMessage()), HttpStatus.METHOD_NOT_ALLOWED.value());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -90,5 +94,14 @@ class GlobalControllerExceptionHandler {
     public ErrorMessage handleServerError(Exception e) {
         log(e);
         return new ErrorMessage(e, 500);
+    }
+}
+
+@Configuration
+class ExceptionHandlerConfiguration {
+    @RequestScope
+    @Bean
+    Logger getLogger() {
+        return LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
     }
 }

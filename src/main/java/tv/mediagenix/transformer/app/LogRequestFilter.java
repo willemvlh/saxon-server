@@ -1,7 +1,7 @@
 package tv.mediagenix.transformer.app;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
@@ -16,7 +16,7 @@ import java.io.IOException;
 @Component
 class LogRequestFilter extends HttpFilter {
 
-    private final Log logger = LogFactory.getLog(LogRequestFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(LogRequestFilter.class);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

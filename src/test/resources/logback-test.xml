@@ -1,0 +1,6 @@
+<configuration>
+    <appender name="STDOUT" class="tv.mediagenix.transformer.app.TestAppender"/>
+    <logger name="test">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+</configuration>
