@@ -1,4 +1,4 @@
-This application exposes a REST API to perform XSLT and XQuery transformations using the Saxon processor.
+This application exposes an HTTP API to perform XSLT and XQuery transformations using the Saxon processor.
 
 ## Running
 
@@ -29,10 +29,15 @@ An example call (using cURL) may look as follows:
 
 `$ curl http://localhost:5000/transform -F xml=@input.xml -F xsl=@stylesheet.xsl`
 
+The response body contains the result of the transformation. The character set of the response is the one specified in
+the output parameters of the stylesheet, which defaults to UTF-8. The value of the `Content-Type` header can be
+controlled by setting the `media-type` output parameter.
+
 ## JSON
 
 Next to XML, the application also supports sending JSON as an input format. No additional parameters must be set as JSON
-can easily be distinguished from XML. Note that JSON input is automatically transformed to XML using the `json-to-xml`
+is automatically distinguished from XML. Note that JSON input is automatically transformed to XML using
+the `json-to-xml`
 function and set as the global context item.
 
     $ curl http://localhost:5000/query -F xsl=. -F xml="[1,2,3]" -F output="indent=yes"
@@ -55,6 +60,8 @@ When you do want to allow this, you can either pass the `--insecure` command lin
 configuration file using the `--config` parameter. Note that this alone is not enough to protect against attackers. It
 is recommended to place a proxy server in front of this application to take care of IP whitelisting, rate limiting, etc.
 
+The amount of time that a transformation is allowed to run is 10 seconds by default. This can be configured with
+the `--timeout` parameter, which takes a number in milliseconds. Use `-1` to disable timeouts.
 ## Compression
 
 The input be gzip encoded in order to avoid having to send large files over the network. In this case, you must set
@@ -98,7 +105,7 @@ For example, to return the result as JSON:
 ## Saxon-EE
 
 It is possible to include a path to a Saxon-EE license file using the `-l, --license` startup parameter. This allows
-using enterprise features that are not found in the open-source edition such as streaming XML input or Saxon extension
+using enterprise features that are not found in the open-source edition such as streaming XML input or using extension
 functions.
 
 ## Error handling
@@ -109,7 +116,8 @@ There are different types of errors that can occur:
 * Runtime errors (for example, type errors or inaccessible filepaths)
 * User-invoked errors using the `xsl:message` element or the `error` function
 
-These errors are all caught and then returned in the reponse . The response code in this case is `400`.
+These errors are all caught and then returned in the reponse. Where possible, the line number and column inside the
+stylesheet where the error was encountered is passed along. The response code in this case is always `400`.
 
 ```
 {
@@ -120,6 +128,11 @@ These errors are all caught and then returned in the reponse . The response code
 ```
 
 Note that `xsl:message` elements without the `terminate=yes` attribute are ignored.
+
+## Performance
+
+Throughput and latency depend on the size of the payload and the complexity of the stylesheet. With small, relatively
+simple stylesheets, the application can easily handle hundreds of requests per second.
 
 ## Developing
 
