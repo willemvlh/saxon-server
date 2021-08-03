@@ -34,7 +34,7 @@ class SaxonActorBuilderTest {
 
     @Test
     void parseConfigFile() throws Exception {
-        TransformerConfiguration config = new TransformerConfiguration("--config", this.getClass().getResource("/io/github/willemvlh/harley/app/saxon-config.xml").getPath());
+        TransformerConfiguration config = new TransformerConfiguration("--config", this.getClass().getResource("saxon-config.xml").getPath());
         SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().setProcessor(config.getProcessor()).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
@@ -48,7 +48,7 @@ class SaxonActorBuilderTest {
 
     @Test
     void disallowExternalFunction() throws ParseException, TransformationException {
-        TransformerConfiguration config = new TransformerConfiguration("--config", this.getClass().getResource("/io/github/willemvlh/harley/app/saxon-config-no-external-fn.xml").getPath());
+        TransformerConfiguration config = new TransformerConfiguration("--config", this.getClass().getResource("saxon-config-no-external-fn.xml").getPath());
         SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().setProcessor(config.getProcessor()).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);

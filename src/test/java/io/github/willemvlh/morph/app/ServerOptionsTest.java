@@ -17,7 +17,7 @@ class ServerOptionsTest {
 
     @Test
     void setOptionsFromArguments() throws ParseException, URISyntaxException {
-        String configFilePath = new File(this.getClass().getResource("/io/github/willemvlh/harley/app/saxon-config.xml").toURI()).getPath();
+        String configFilePath = new File(this.getClass().getResource("saxon-config.xml").toURI()).getPath();
         String[] args = {"-port", "3000", "-config", configFilePath};
         ServerOptions opts = ServerOptions.fromArgs(args);
         assertEquals(3000, opts.getPort());
