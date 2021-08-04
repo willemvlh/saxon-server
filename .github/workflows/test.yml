@@ -1,0 +1,16 @@
+on:
+  push:
+  workflow_dispatch:
+
+name: Run tests
+
+jobs:
+  build:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          mvn -B clean && mvn -B package

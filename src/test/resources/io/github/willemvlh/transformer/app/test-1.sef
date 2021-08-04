@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns='http://ns.saxonica.com/xslt/export' xmlns:fn='http://www.w3.org/2005/xpath-functions' xmlns:java-type='http://saxon.sf.net/java-type' xmlns:vv='http://saxon.sf.net/generated-variable' xmlns:xs='http://www.w3.org/2001/XMLSchema' when='2020-09-26T12:38:17.828+02:00' id='0' version='30' packageVersion='1' saxonProduct='SAXON-EE' saxonVersion='10.0' buildDateTime='2020-09-26T12:38:17.829+02:00' target='HE' targetVersion='1' relocatable='false' implicit='true'>
+ <co id='0' binds=''>
+  <mode onNo='TC' flags='dW' patternSlots='0'>
+   <templateRule prec='0' prio='-0.5' seq='0' rank='0' minImp='0' slots='0' matches='ND' flags='s' line='4' module='file:/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-1.xsl'>
+    <p.nodeTest role='match' test='ND'/>
+    <valueOf role='action' baseUri='file:/C:/Users/willem.van.lishout/Documents/Repositories/saxon-servlet/src/test/resources/tv/mediagenix/xslt/transformer/test-1.xsl' ns='xsl=~ xml=~' line='-1' flags='S'>
+     <str val='abc'/>
+    </valueOf>
+   </templateRule>
+  </mode>
+ </co>
+ <overridden/>
+ <output>
+  <property name='encoding' value='UTF-8'/>
+  <property name='Q{http://saxon.sf.net/}stylesheet-version' value='30'/>
+  <property name='method' value='text'/>
+ </output>
+ <decimalFormat/>
+</package>
+<?Σ 8c416d29?>
