@@ -1,5 +1,5 @@
 <configuration>
-    <appender name="STDOUT" class="io.github.willemvlh.morph.app.TestAppender"/>
+    <appender name="STDOUT" class="io.github.willemvlh.transformer.app.TestAppender"/>
     <logger name="test">
         <appender-ref ref="STDOUT"/>
     </logger>
