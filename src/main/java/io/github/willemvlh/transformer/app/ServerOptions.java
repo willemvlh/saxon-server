@@ -6,10 +6,13 @@ import org.apache.commons.cli.*;
 import java.io.File;
 
 public class ServerOptions {
-    private int port = 5000;
+    private final int DEFAULT_PORT = 5000;
+    private final int DEFAULT_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
+    private int port = DEFAULT_PORT;
     private File configFile;
     private boolean insecure = false;
-    private long transformationTimeoutMs = 10000;
+    private long transformationTimeoutMs = DEFAULT_TIMEOUT_MS;
     private String logFilePath;
     private String licenseFilepath;
 
