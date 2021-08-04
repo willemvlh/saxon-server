@@ -1,4 +1,4 @@
-FROM java:8-jdk-alpine
-ADD ./target/saxon-1.1.jar saxon.jar
+FROM openjdk:8-jdk-alpine
+ADD ./target/*.jar saxon.jar
 EXPOSE 5000
 CMD java -jar saxon.jar
