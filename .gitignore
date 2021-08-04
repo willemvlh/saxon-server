@@ -9,7 +9,9 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 *.jar
+!lib/*.jar
 *.zip
 /.idea
 keystore/
 deploy.bat
+*.log
