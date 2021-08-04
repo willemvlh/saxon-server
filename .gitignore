@@ -15,4 +15,3 @@ buildNumber.properties
 keystore/
 deploy.bat
 *.log
-*.gz
