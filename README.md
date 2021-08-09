@@ -1,5 +1,12 @@
 This application exposes an HTTP API to perform XSLT and XQuery transformations using the Saxon processor.
 
+## Installing
+
+There are two ways of installing the application:
+
+* Download the JAR file from the Releases section on GitHub.
+* By using Docker: `$ docker pull ghcr.io/willemvlh/saxon-server:latest`
+
 ## Running
 
 Start the server by running `java -jar saxon-2.x.jar`.
@@ -64,7 +71,7 @@ The amount of time that a transformation is allowed to run is 10 seconds by defa
 the `--timeout` parameter, which takes a number in milliseconds. Use `-1` to disable timeouts.
 ## Compression
 
-The input be gzip encoded in order to avoid having to send large files over the network. In this case, you must set
+The input can be gzip encoded in order to avoid having to send large files over the network. In this case, you must set
 the `Content-Type` of the individual parts as `application/gzip`. In all other cases, no encoding is assumed.
 
 To receive a compressed response, make sure to pass `Accept-Encoding: gzip` in the headers.
