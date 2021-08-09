@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.DefaultApplicationArguments;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URISyntaxException;
 
@@ -16,14 +17,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class ServerOptionsTest {
 
     @Test
-    void setOptionsFromArguments() throws ParseException, URISyntaxException {
-        String configFilePath = new File(this.getClass().getResource("saxon-config.xml").toURI()).getPath();
-        String[] args = {"-port", "3000", "-config", configFilePath};
-        ServerOptions opts = ServerOptions.fromArgs(args);
+    void port() throws ParseException {
+        ServerOptions opts = ServerOptions.fromArgs("--port", "3000");
         assertEquals(3000, opts.getPort());
-        assertThrows(RuntimeException.class, () -> ServerOptions.fromArgs(new String[]{"-config", configFilePath, "-insecure"}));
-        assertTrue(ServerOptions.fromArgs("-insecure").isInsecure());
+    }
+
+    @Test
+    void configFile() throws ParseException, URISyntaxException {
+        String configFilePath = new File(this.getClass().getResource("saxon-config.xml").toURI()).getPath();
+        ServerOptions opts = ServerOptions.fromArgs("-config", configFilePath);
         assertEquals(configFilePath, opts.getConfigFile().getPath());
+    }
+
+    @Test
+    void insecure() throws ParseException {
+        assertTrue(ServerOptions.fromArgs("-insecure").isInsecure());
+    }
+
+    @Test
+    void insecureAndConfigFileAreMutuallyExclusive() throws URISyntaxException {
+        String configFilePath = new File(this.getClass().getResource("saxon-config.xml").toURI()).getPath();
+        assertThrows(RuntimeException.class, () -> ServerOptions.fromArgs(new String[]{"-config", configFilePath, "-insecure"}));
     }
 
     @Test
@@ -34,13 +48,35 @@ class ServerOptionsTest {
     }
 
     @Test
-    void license() throws Exception {
+    void license() throws ParseException {
         ApplicationArguments args = new DefaultApplicationArguments("--license", this.getClass().getResource("dummy-license.lic").getPath());
         TransformerConfiguration configuration = new TransformerConfiguration(args);
-        SaxonTransformerBuilder b = new SaxonTransformerBuilder();
         assertThrows(TransformationException.class, configuration::getProcessor);
     }
 
+    @Test
+    void help() throws Exception {
+        ApplicationArguments args = new DefaultApplicationArguments("--help");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ServerOptions.fromArgs(os, false, args.getSourceArgs());
+        System.out.println(os.toString());
+        assertFalse(os.toString().isEmpty());
+    }
+
+    @Test
+    void info() throws Exception {
+        ApplicationArguments args = new DefaultApplicationArguments("--version");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ServerOptions.fromArgs(os, false, args.getSourceArgs());
+        System.out.println(os.toString());
+        assertTrue(os.toString().trim().matches("Saxon HE [\\d.]*"));
+    }
+
+    @Test
+    void output() throws Exception {
+        ServerOptions opts = ServerOptions.fromArgs("--output", "c:\\temp\\log.log");
+        assertEquals("c:\\temp\\log.log", opts.getLogFilePath());
+    }
 
 }
 

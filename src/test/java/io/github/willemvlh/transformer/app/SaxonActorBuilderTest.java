@@ -12,6 +12,8 @@ import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
 
 import java.io.ByteArrayOutputStream;
 
@@ -34,7 +36,8 @@ class SaxonActorBuilderTest {
 
     @Test
     void parseConfigFile() throws Exception {
-        TransformerConfiguration config = new TransformerConfiguration("--config", this.getClass().getResource("saxon-config.xml").getPath());
+        ApplicationArguments args = new DefaultApplicationArguments("--config", this.getClass().getResource("saxon-config.xml").getPath());
+        TransformerConfiguration config = new TransformerConfiguration(args);
         SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().setProcessor(config.getProcessor()).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
@@ -43,12 +46,14 @@ class SaxonActorBuilderTest {
 
     @Test
     void wrongConfigFile() {
-        Assertions.assertThrows(TransformationException.class, () -> new TransformerConfiguration("--config", "unknown").getProcessor());
+        ApplicationArguments args = new DefaultApplicationArguments("--config", "unknown");
+        Assertions.assertThrows(RuntimeException.class, () -> new TransformerConfiguration(args));
     }
 
     @Test
     void disallowExternalFunction() throws ParseException, TransformationException {
-        TransformerConfiguration config = new TransformerConfiguration("--config", this.getClass().getResource("saxon-config-no-external-fn.xml").getPath());
+        ApplicationArguments args = new DefaultApplicationArguments("--config", this.getClass().getResource("saxon-config-no-external-fn.xml").getPath());
+        TransformerConfiguration config = new TransformerConfiguration(args);
         SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().setProcessor(config.getProcessor()).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);

@@ -4,6 +4,8 @@ import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 public class ServerOptions {
     private final int DEFAULT_PORT = 5000;
@@ -57,6 +59,10 @@ public class ServerOptions {
     }
 
     public static ServerOptions fromArgs(String... args) throws ParseException {
+        return fromArgs(System.out, true, args);
+    }
+
+    public static ServerOptions fromArgs(OutputStream out, boolean quitAfterMessage, String... args) throws ParseException {
         ServerOptions serverOptions = new ServerOptions();
         Options options = new Options();
         options.addOption("p", "port", true, "Port on which the server runs");
@@ -70,12 +76,12 @@ public class ServerOptions {
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
-            printHelp(options);
-            System.exit(0);
+            printHelp(out, options);
+            if (quitAfterMessage) System.exit(0);
         }
         if (cmd.hasOption("version")) {
-            printInformation();
-            System.exit(0);
+            printInformation(out);
+            if (quitAfterMessage) System.exit(0);
         }
         if (cmd.hasOption("port")) {
             try {
@@ -89,7 +95,11 @@ public class ServerOptions {
             if (cmd.hasOption("insecure")) {
                 throw new RuntimeException("Options 'config' and 'insecure' are mutually exclusive.");
             }
-            serverOptions.setConfigFile(new File(cmd.getOptionValue("config")));
+            File config = new File(cmd.getOptionValue("config"));
+            if (!config.exists()) {
+                throw new RuntimeException("Configuration file could not be found.");
+            }
+            serverOptions.setConfigFile(config);
         }
 
         if (cmd.hasOption("insecure")) {
@@ -111,17 +121,21 @@ public class ServerOptions {
         return serverOptions;
     }
 
-    private static void printHelp(Options options) {
+    private static void printHelp(OutputStream out, Options options) {
+        PrintWriter writer = new PrintWriter(out);
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(String.format("java -jar saxon-server-%s.jar", Utils.getVersionNumber()), options);
+        String cmdLine = String.format("java -jar saxon-server-%s.jar", Utils.getVersionNumber());
+        formatter.printHelp(writer, formatter.getWidth(), cmdLine, null, options, formatter.getLeftPadding(), formatter.getDescPadding(), null);
+        writer.flush();
     }
 
-    private static void printInformation() {
+    private static void printInformation(OutputStream out) {
         Processor p = new Processor(false);
         String version = p.getSaxonProductVersion();
         String edition = p.getSaxonEdition();
-        System.out.printf("Saxon %s %s%n", edition, version);
-
+        PrintWriter writer = new PrintWriter(out);
+        writer.printf("Saxon %s %s%n", edition, version);
+        writer.flush();
     }
 
     public String getLogFilePath() {

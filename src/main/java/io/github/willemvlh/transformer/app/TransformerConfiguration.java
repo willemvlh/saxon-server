@@ -25,11 +25,6 @@ public class TransformerConfiguration {
         this.options = ServerOptions.fromArgs(args.getSourceArgs());
     }
 
-    public TransformerConfiguration(String... args) throws ParseException {
-        this.options = ServerOptions.fromArgs(args);
-    }
-
-
     @Bean
     @Scope("singleton")
     public Processor getProcessor() throws TransformationException {
