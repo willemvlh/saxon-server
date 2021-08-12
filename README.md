@@ -15,7 +15,7 @@ Following command-line options are available:
 
 * `-c`, `--config`: Location to Saxon configuration XML file
 * `-h`, `--help`: Display help
-* `-i`, `--insecure`: Run with default (insecure) configuration.*
+* `-i`, `--insecure`: Run with default (insecure) configuration.
 * `-l`, `--license`: Path to license file
 * `-o`, `--output <arg>`: Write console output to the specified file
 * `-p`, `--port <arg>`: Port on which the server runs
