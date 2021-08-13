@@ -42,14 +42,6 @@ public class ServerOptions {
         this.configFile = configFile;
     }
 
-    public String getLicenseFilepath() {
-        return licenseFilepath;
-    }
-
-    private void setLicenseFilepath(String filepath) {
-        this.licenseFilepath = filepath;
-    }
-
     public boolean isInsecure() {
         return insecure;
     }
@@ -72,7 +64,6 @@ public class ServerOptions {
         options.addOption("i", "insecure", false, "Run with Saxon's default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
         options.addOption("o", "output", true, "Write console output to the specified file");
-        options.addOption("l", "license", true, "Path to license file");
         CommandLineParser p = new DefaultParser();
         CommandLine cmd = p.parse(options, args);
         if (cmd.hasOption("help")) {
@@ -112,10 +103,6 @@ public class ServerOptions {
 
         if (cmd.hasOption("output")) {
             serverOptions.setLogFilePath(cmd.getOptionValue("output"));
-        }
-
-        if (cmd.hasOption("license")) {
-            serverOptions.setLicenseFilepath(cmd.getOptionValue("license"));
         }
 
         return serverOptions;

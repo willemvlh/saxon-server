@@ -109,12 +109,6 @@ For example, to return the result as JSON:
     $ curl http://localhost:5000/query -F xsl="map{'numbers': array{1,2,3}}" -F output="method=json"
     {"numbers":[1,2,3]}
 
-## Saxon-EE
-
-It is possible to include a path to a Saxon-EE license file using the `-l, --license` startup parameter. This allows
-using enterprise features that are not found in the open-source edition such as streaming XML input or using extension
-functions.
-
 ## Error handling
 
 There are different types of errors that can occur:

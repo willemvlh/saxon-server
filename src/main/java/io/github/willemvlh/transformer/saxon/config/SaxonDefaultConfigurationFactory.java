@@ -1,6 +1,5 @@
 package io.github.willemvlh.transformer.saxon.config;
 
-import com.saxonica.config.EnterpriseConfiguration;
 import net.sf.saxon.Configuration;
 import org.xml.sax.InputSource;
 
@@ -11,7 +10,7 @@ public class SaxonDefaultConfigurationFactory extends SaxonConfigurationFactory 
 
     @Override
     public Configuration newConfiguration() {
-        return new EnterpriseConfiguration();
+        return new Configuration();
     }
 
     @Override

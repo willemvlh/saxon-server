@@ -5,7 +5,6 @@ import io.github.willemvlh.transformer.saxon.config.SaxonConfigurationFactory;
 import io.github.willemvlh.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import io.github.willemvlh.transformer.saxon.config.SaxonSecureConfigurationFactory;
 import net.sf.saxon.Configuration;
-import net.sf.saxon.lib.Feature;
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +33,9 @@ public class TransformerConfiguration {
                     ? new SaxonDefaultConfigurationFactory()
                     : new SaxonSecureConfigurationFactory();
             config = factory.newConfiguration();
-            if (options.getLicenseFilepath() != null) {
-                config.setConfigurationProperty(Feature.LICENSE_FILE_LOCATION, options.getLicenseFilepath());
-            } else if (options.getConfigFile() != null) {
-                config = Configuration.readConfiguration(new StreamSource(options.getConfigFile()));
-            }
+           if (options.getConfigFile() != null) {
+               config = Configuration.readConfiguration(new StreamSource(options.getConfigFile()));
+           }
             return new Processor(config);
         } catch (Exception e) {
             throw new TransformationException(e.getMessage());

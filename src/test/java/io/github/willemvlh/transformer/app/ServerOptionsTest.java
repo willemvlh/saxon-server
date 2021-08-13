@@ -1,6 +1,5 @@
 package io.github.willemvlh.transformer.app;
 
-import io.github.willemvlh.transformer.saxon.TransformationException;
 import io.github.willemvlh.transformer.saxon.actors.SaxonActor;
 import io.github.willemvlh.transformer.saxon.actors.SaxonTransformerBuilder;
 import org.apache.commons.cli.ParseException;
@@ -45,13 +44,6 @@ class ServerOptionsTest {
         ServerOptions opts = ServerOptions.fromArgs("--timeout", "100");
         SaxonActor actor = new SaxonTransformerBuilder().setTimeout(opts.getTransformationTimeoutMs()).build();
         assertEquals(100, actor.getTimeout());
-    }
-
-    @Test
-    void license() throws ParseException {
-        ApplicationArguments args = new DefaultApplicationArguments("--license", this.getClass().getResource("dummy-license.lic").getPath());
-        TransformerConfiguration configuration = new TransformerConfiguration(args);
-        assertThrows(TransformationException.class, configuration::getProcessor);
     }
 
     @Test
