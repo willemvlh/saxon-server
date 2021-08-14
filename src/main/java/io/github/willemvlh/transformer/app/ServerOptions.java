@@ -16,7 +16,6 @@ public class ServerOptions {
     private boolean insecure = false;
     private long transformationTimeoutMs = DEFAULT_TIMEOUT_MS;
     private String logFilePath;
-    private String licenseFilepath;
 
     public int getPort() {
         return port;
@@ -77,9 +76,12 @@ public class ServerOptions {
         if (cmd.hasOption("port")) {
             try {
                 int portAsInt = Integer.parseInt(cmd.getOptionValue("port"));
+                if (portAsInt < 0 || portAsInt > 65535) {
+                    throw new NumberFormatException();
+                }
                 serverOptions.setPort(portAsInt);
             } catch (NumberFormatException e) {
-                throw new ParseException(e.getMessage());
+                throw new ParseException("Illegal value for port. Must be a positive integer between 0 and 65535");
             }
         }
         if (cmd.hasOption("config")) {
@@ -98,7 +100,12 @@ public class ServerOptions {
         }
 
         if (cmd.hasOption("timeout")) {
-            serverOptions.setTransformationTimeoutMs(Long.parseLong(cmd.getOptionValue("timeout")));
+            try {
+                long timeout = Long.parseUnsignedLong(cmd.getOptionValue("timeout"));
+                serverOptions.setTransformationTimeoutMs(timeout);
+            } catch (NumberFormatException e) {
+                throw new ParseException(String.format("Illegal value for timeout parameter. Must be a positive integer between 0 and %d", Long.MAX_VALUE));
+            }
         }
 
         if (cmd.hasOption("output")) {

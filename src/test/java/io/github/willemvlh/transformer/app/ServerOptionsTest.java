@@ -40,6 +40,18 @@ class ServerOptionsTest {
     }
 
     @Test
+    void invalidPort() {
+        assertThrows(ParseException.class, () -> ServerOptions.fromArgs("--port", "-111"));
+    }
+
+    @Test
+    void invalidTimeout() {
+        assertThrows(ParseException.class, () -> ServerOptions.fromArgs("--timeout", "-111"));
+        assertThrows(ParseException.class, () -> ServerOptions.fromArgs("--timeout", "10000000000000000000000000000000"));
+
+    }
+
+    @Test
     void timeout() throws ParseException {
         ServerOptions opts = ServerOptions.fromArgs("--timeout", "100");
         SaxonActor actor = new SaxonTransformerBuilder().setTimeout(opts.getTransformationTimeoutMs()).build();
