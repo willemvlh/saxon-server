@@ -48,7 +48,7 @@ class ServerOptionsTest {
     void invalidTimeout() {
         assertThrows(ParseException.class, () -> ServerOptions.fromArgs("--timeout", "-111"));
         assertThrows(ParseException.class, () -> ServerOptions.fromArgs("--timeout", "10000000000000000000000000000000"));
-
+        assertDoesNotThrow(() -> ServerOptions.fromArgs("--timeout", "-1"));
     }
 
     @Test

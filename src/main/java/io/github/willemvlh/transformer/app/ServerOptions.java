@@ -101,10 +101,13 @@ public class ServerOptions {
 
         if (cmd.hasOption("timeout")) {
             try {
-                long timeout = Long.parseUnsignedLong(cmd.getOptionValue("timeout"));
+                long timeout = Long.parseLong(cmd.getOptionValue("timeout"));
+                if (timeout < -1) {
+                    throw new NumberFormatException();
+                }
                 serverOptions.setTransformationTimeoutMs(timeout);
             } catch (NumberFormatException e) {
-                throw new ParseException(String.format("Illegal value for timeout parameter. Must be a positive integer between 0 and %d", Long.MAX_VALUE));
+                throw new ParseException(String.format("Illegal value for timeout parameter. Must be an integer between -1 and %d", Long.MAX_VALUE));
             }
         }
 
