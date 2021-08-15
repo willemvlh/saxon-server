@@ -4,6 +4,7 @@ import io.github.willemvlh.transformer.saxon.SerializationProps;
 import io.github.willemvlh.transformer.saxon.actors.ActorType;
 import io.github.willemvlh.transformer.saxon.actors.SaxonActor;
 import io.github.willemvlh.transformer.saxon.actors.SaxonActorBuilder;
+import io.github.willemvlh.transformer.saxon.json.JsonTransformationSetting;
 import net.sf.saxon.s9api.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +45,7 @@ class TransformController {
             @RequestPart(name = "xsl", required = false) Part xsl,
             @RequestParam(name = "output", required = false) String output,
             @RequestParam(name = "parameters", required = false) String parameters,
+            @RequestParam(name = "jsonTransformation", required = false) String jsonTransformation,
             HttpServletRequest request)
             throws Exception {
 
@@ -55,6 +57,7 @@ class TransformController {
                 .setTimeout(options.getTransformationTimeoutMs())
                 .setParameters(params)
                 .setSerializationProperties(serParams)
+                .setJsonTransformationSetting(getJsonTransformationSetting(jsonTransformation))
                 .build();
 
         Optional<InputStream> xmlStr = Optional.ofNullable(xml).flatMap(this::getInputStream);
@@ -67,6 +70,13 @@ class TransformController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf(props.getContentType()));
         return new ResponseEntity<>(os.toByteArray(), headers, HttpStatus.OK);
+    }
+
+    private JsonTransformationSetting getJsonTransformationSetting(String jsonTransformation) {
+        if ("xdm".equalsIgnoreCase(jsonTransformation)) {
+            return JsonTransformationSetting.XDMVALUE;
+        }
+        return JsonTransformationSetting.XMLDOCUMENT;
     }
 
     private Optional<InputStream> getInputStream(Part p) {

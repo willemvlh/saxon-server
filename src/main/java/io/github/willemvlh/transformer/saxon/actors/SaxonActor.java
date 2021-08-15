@@ -1,12 +1,13 @@
 package io.github.willemvlh.transformer.saxon.actors;
 
 import io.github.willemvlh.transformer.saxon.Convert;
-import io.github.willemvlh.transformer.saxon.JsonToXmlTransformer;
 import io.github.willemvlh.transformer.saxon.SerializationProps;
 import io.github.willemvlh.transformer.saxon.TransformationException;
 import io.github.willemvlh.transformer.saxon.config.SaxonConfigurationFactory;
 import io.github.willemvlh.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import io.github.willemvlh.transformer.saxon.config.SaxonSecureConfigurationFactory;
+import io.github.willemvlh.transformer.saxon.json.JsonTransformationSetting;
+import io.github.willemvlh.transformer.saxon.json.JsonTransformer;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
@@ -15,7 +16,6 @@ import javax.xml.transform.sax.SAXSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -24,18 +24,19 @@ public abstract class SaxonActor {
     private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
     private Configuration configuration;
     private Processor processor;
-    private Map<String, String> serializationParameters = new HashMap<>();
-    private Map<QName, XdmValue> parameters = new HashMap<>();
-    private long timeout = 10000;
+    private Map<String, String> serializationParameters;
+    private Map<QName, XdmValue> parameters;
+    private long timeout;
+    private JsonTransformationSetting jsonTransformationSetting;
 
     protected SaxonActor() {
     }
 
     public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        XdmItem context;
+        XdmValue context;
         try {
             if (isJsonStream(input)) {
-                JsonToXmlTransformer xf = new JsonToXmlTransformer();
+                JsonTransformer xf = this.jsonTransformationSetting.getTransformer();
                 context = xf.transform(Convert.toString(input), getProcessor());
             } else {
                 DocumentBuilder b = getProcessor().newDocumentBuilder();
@@ -53,7 +54,7 @@ public abstract class SaxonActor {
 
     protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException;
 
-    protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
+    private SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
         ExecutorService service = new ForkJoinPool();
         try {
             FutureTask<SerializationProps> task = new FutureTask<>(() -> act(input, stylesheet, output));
@@ -171,4 +172,11 @@ public abstract class SaxonActor {
         this.processor = processor;
     }
 
+    public JsonTransformationSetting getJsonTransformationSetting() {
+        return jsonTransformationSetting;
+    }
+
+    public void setJsonTransformationSetting(JsonTransformationSetting jsonTransformationSetting) {
+        this.jsonTransformationSetting = jsonTransformationSetting;
+    }
 }

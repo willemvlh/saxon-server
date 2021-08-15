@@ -1,4 +1,4 @@
-package io.github.willemvlh.transformer.saxon;
+package io.github.willemvlh.transformer.saxon.json;
 
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -19,7 +19,7 @@ class JsonToXmlTransformerTest {
     @Test
     void transform() throws TransformerException, SaxonApiException {
         JsonToXmlTransformer tf = new JsonToXmlTransformer();
-        XdmNode resultNode = tf.transform("{}", new Processor(false));
+        XdmNode resultNode = (XdmNode) tf.transform("{}", new Processor(false));
         DOMResult res = new DOMResult();
         Transformer xf = TransformerFactory.newInstance().newTransformer();
         Source resultSource = resultNode.asSource();

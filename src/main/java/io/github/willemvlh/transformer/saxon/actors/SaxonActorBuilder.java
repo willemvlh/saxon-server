@@ -2,6 +2,7 @@ package io.github.willemvlh.transformer.saxon.actors;
 
 import io.github.willemvlh.transformer.saxon.config.SaxonConfigurationFactory;
 import io.github.willemvlh.transformer.saxon.config.SaxonSecureConfigurationFactory;
+import io.github.willemvlh.transformer.saxon.json.JsonTransformationSetting;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
@@ -17,6 +18,7 @@ public abstract class SaxonActorBuilder {
     private Map<QName, XdmValue> parameters = new HashMap<>();
     private Processor processor;
     private final SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
+    private JsonTransformationSetting jsonTransformationSetting = JsonTransformationSetting.XMLDOCUMENT;
 
     public abstract Class<? extends SaxonActor> getActorClass();
 
@@ -37,6 +39,7 @@ public abstract class SaxonActorBuilder {
             instance.setTimeout(timeOut);
             instance.setParameters(parameters);
             instance.setSerializationParameters(serializationParameters);
+            instance.setJsonTransformationSetting(jsonTransformationSetting);
             return instance;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -54,6 +57,11 @@ public abstract class SaxonActorBuilder {
         Map<QName, XdmValue> qNameParams = new HashMap<>();
         parameters.forEach((k, v) -> qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v)));
         this.parameters = qNameParams;
+        return this;
+    }
+
+    public SaxonActorBuilder setJsonTransformationSetting(JsonTransformationSetting setting) {
+        this.jsonTransformationSetting = setting;
         return this;
     }
 

@@ -60,7 +60,7 @@ class TransformerTests extends TestClass {
                         .part(xmlPart)
                         .part(xslPart))
                 .andExpect(status().isOk())
-               .andExpect(content().string("abc"));
+                .andExpect(content().string("abc"));
     }
 
     @Test
@@ -185,6 +185,14 @@ class TransformerTests extends TestClass {
         mvc.perform(multipart("/transform")).andExpect(status().isBadRequest());
     }
 
-
-
+    @Test
+    void jsonTransformationSetting() throws Exception {
+        mvc.perform(multipart("/query")
+                .part(new MockPart("xsl", ".".getBytes()))
+                .part(new MockPart("xml", "[1,2,3]".getBytes()))
+                .part(new MockPart("output", "method=json".getBytes()))
+                .part(new MockPart("jsonTransformation", "xdm".getBytes())))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[1,2,3]"));
+    }
 }
