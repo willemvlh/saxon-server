@@ -10,7 +10,9 @@ import io.github.willemvlh.transformer.saxon.config.SaxonSecureConfigurationFact
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.sax.SAXSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +45,7 @@ public abstract class SaxonActor {
             }
             return actWithTimeout(context, stylesheet, output);
         } catch (SaxonApiException | IOException e) {
-            throw new TransformationException(e.getMessage());
+            throw new TransformationException(e);
         }
     }
 
@@ -71,8 +73,12 @@ public abstract class SaxonActor {
         }
     }
 
-    protected SAXSource newSAXSource(InputStream stream) {
-        return this.configurationFactory.newSAXSource(stream);
+    protected SAXSource newSAXSource(InputStream stream) throws TransformationException {
+        try {
+            return this.configurationFactory.newSAXSource(stream);
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new TransformationException(e.getMessage());
+        }
     }
 
     private boolean isJsonStream(InputStream stream) throws TransformationException {

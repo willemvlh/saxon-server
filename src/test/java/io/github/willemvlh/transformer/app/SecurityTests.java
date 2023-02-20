@@ -21,7 +21,7 @@ class SecurityTests extends TestClass {
     void resolveUrl() throws Exception {
         transform("dummy.xml", "test-uri-resolver.xsl")
                 .andExpect(jsonPath("$.fn:json-doc").value("err:FOUT1170"))
-                .andExpect(jsonPath("$.fn:doc").value("err:FODC0002"))
+                .andExpect(jsonPath("$.fn:doc").value("err:FODC0005"))
                 .andExpect(jsonPath("$.fn:unparsed-text").value("err:FOUT1170"));
     }
 

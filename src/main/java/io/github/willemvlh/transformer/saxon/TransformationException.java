@@ -10,4 +10,8 @@ public class TransformationException extends Exception {
         super(msg);
     }
 
+    public TransformationException(Exception e) {
+        super(e);
+    }
+
 }

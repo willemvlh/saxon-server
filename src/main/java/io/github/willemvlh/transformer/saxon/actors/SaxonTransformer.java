@@ -13,10 +13,10 @@ import java.util.List;
 
 public class SaxonTransformer extends SaxonActor {
 
-    private final ArrayList<StaticError> errorList = new ArrayList<>();
+    private final ArrayList<XmlProcessingError> errorList = new ArrayList<>();
     private Xslt30Transformer transformer;
 
-    public List<StaticError> getErrorList() {
+    public List<XmlProcessingError> getErrorList() {
         return errorList;
     }
 
@@ -62,17 +62,10 @@ public class SaxonTransformer extends SaxonActor {
             return xf;
         } catch (SaxonApiException e) {
             if (this.getErrorList().size() > 0) {
-                StaticError error = this.getErrorList().get(0);
-                String message;
-                if (error instanceof XmlProcessingError && ((XmlProcessingError) error).getCause() != null) {
-                    message = ((XmlProcessingError) error).getCause().getMessage();
-                    //will usually contain a parsing error
-                } else {
-                    message = error.getMessage();
-                }
-                if (error.getLocation() != null) {
-                    message = message + " (line " + error.getLineNumber() + ", col " + error.getColumnNumber() + ")";
-                }
+                XmlProcessingError error = this.getErrorList().get(0);
+                var location = error.getLocation();
+                String message = error.getMessage() + " (line " + location.getLineNumber() + ", col " + location.getColumnNumber() + ")";
+
                 throw new TransformationException("Compilation error: " + message);
             }
             throw new TransformationException(e.getMessage());
