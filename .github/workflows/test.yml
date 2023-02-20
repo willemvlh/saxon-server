@@ -9,6 +9,11 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.10.0
+        with:
+            distribution: 'temurin'
+            java-version: 17
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run tests
