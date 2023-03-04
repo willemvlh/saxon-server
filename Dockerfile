@@ -1,4 +1,5 @@
-FROM openjdk:8-jdk-alpine
-ADD ./target/*.jar saxon.jar
+FROM eclipse-temurin:17
+RUN mkdir opt/app
+ADD ./target/*.jar opt/app/saxon.jar
 EXPOSE 5000
-CMD java -jar saxon.jar
+CMD java $JAVA_OPTS -jar  opt/app/saxon.jar

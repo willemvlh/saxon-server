@@ -9,7 +9,11 @@ There are two ways of installing the application:
 
 ## Running
 
-Start the server by running `java -jar saxon-2.x.jar`.
+If you use Docker, use following command:
+
+`docker run -p 5000:5000 --name saxon-server -e JAVA_OPTS="-Xmx1g" -d saxon-server`
+
+Otherwise, start the server by running `java -jar saxon-2.x.jar`.
 
 Following command-line options are available:
 
@@ -133,8 +137,3 @@ Note that `xsl:message` elements without the `terminate=yes` attribute are ignor
 
 Throughput and latency depend on the size of the payload and the complexity of the stylesheet. With small, relatively
 simple stylesheets, the application can easily handle hundreds of requests per second.
-
-## Developing
-
-To start developing, you must first clone this repository and then run `mvn clean` (which amongst other things installs
-the included Saxon library in your local repository).
