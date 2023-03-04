@@ -7,6 +7,15 @@ There are two ways of installing the application:
 * Download the JAR file from the Releases section on GitHub.
 * By using Docker: `$ docker pull ghcr.io/willemvlh/saxon-server:latest`
 
+## Demo
+
+A live server is accessible at https://transform.bezdomny.net/. 
+For example, you can run following cURL command to get the current time of the server:
+
+`curl https://transform.bezdomny.net/query -X POST -F xsl="current-dateTime()" -F output="method=text"`
+
+Do not send sensitive information.
+
 ## Running
 
 If you use Docker, use following command:
