@@ -1,5 +1,7 @@
 package io.github.willemvlh.transformer.app;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +15,8 @@ class TransformerApplication {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(TransformerApplication.class);
         try {
+            Logger logger = LoggerFactory.getLogger(TransformerApplication.class);
+            logger.debug("Options: {}", String.join(", ", args));
             ServerOptions options = ServerOptions.fromArgs(args);
             Map<String, Object> optionsMap = new HashMap<>();
             optionsMap.put("server.port", options.getPort());
