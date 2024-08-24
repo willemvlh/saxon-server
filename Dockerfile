@@ -1,5 +1,8 @@
 FROM eclipse-temurin:25-jre-alpine
-COPY target/saxon-server-*.jar app.jar
+RUN mkdir opt/app
+ADD ./target/*.jar opt/app/saxon.jar
+COPY ./docker/entrypoint.sh /opt/app/entrypoint.sh
+RUN chmod +x /opt/app/entrypoint.sh
 EXPOSE 5000
-ENV JAVA_OPTS=""
-CMD java $JAVA_OPTS -jar app.jar
+ENTRYPOINT ["/opt/app/entrypoint.sh"]
+
