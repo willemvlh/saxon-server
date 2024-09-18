@@ -1,31 +1,38 @@
 package tv.mediagenix.xslt.transformer.saxon.config;
 
-import com.sun.org.apache.xerces.internal.parsers.SAXParser;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.lib.Feature;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXSource;
 import java.io.InputStream;
 
 public class SaxonSecureConfigurationFactory extends SaxonConfigurationFactory {
-
-    @Override
     public Configuration newConfiguration() {
         Configuration config = new Configuration();
-        config.setAllowedUriTest(uri -> false);
+        config.setConfigurationProperty(Feature.ALLOWED_PROTOCOLS, "");
         config.setConfigurationProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS, false);
         return config;
     }
 
     @Override
-    public SAXSource newSAXSource(InputStream stream) {
-        SAXParser p = new SAXParser();
+    public SAXSource newSAXSource(InputStream stream) throws TransformationException {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
         try {
-            p.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            SAXParser parser = spf.newSAXParser();
+            parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            return new SAXSource(parser.getXMLReader(), new InputSource(stream));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TransformationException(e);
         }
-        return new SAXSource(p, new InputSource(stream));
     }
+
 }

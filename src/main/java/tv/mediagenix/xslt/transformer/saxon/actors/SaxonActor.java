@@ -3,6 +3,7 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
+import org.xml.sax.SAXException;
 import tv.mediagenix.xslt.transformer.saxon.JsonToXmlTransformer;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
@@ -10,6 +11,7 @@ import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.util.HashMap;
@@ -79,7 +81,7 @@ public abstract class SaxonActor {
         }
     }
 
-    protected SAXSource newSAXSource(InputStream stream) {
+    protected SAXSource newSAXSource(InputStream stream) throws TransformationException{
         return this.configurationFactory.newSAXSource(stream);
     }
 

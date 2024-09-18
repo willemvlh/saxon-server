@@ -75,7 +75,7 @@ public class ServerOptionsTest {
         SaxonActor actor = new SaxonTransformerBuilder().setInsecure(true).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        Assertions.assertNotEquals(os.size(), 0);
+        Assertions.assertNotEquals(os.size(), new Integer(12));
         Assertions.assertDoesNotThrow(() -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
     }
 
