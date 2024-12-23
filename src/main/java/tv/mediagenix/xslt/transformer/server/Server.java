@@ -1,11 +1,9 @@
 package tv.mediagenix.xslt.transformer.server;
 
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
-import spark.Spark;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
@@ -15,7 +13,6 @@ import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,49 +22,45 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.Level;
+
 import static spark.Spark.*;
 
 public class Server {
 
-    private final Logger logger = LoggerFactory.getLogger(Server.class);
-    private ServerOptions options;
-    private HttpServletRequest request;
+    private static final Logger logger = (Logger) LoggerFactory.getLogger(Server.class);
+    private static ServerOptions options;
 
     public static void main(String[] args) {
         try {
-            ServerOptions options = ServerOptions.fromArgs(args);
-            Server.newServer(options);
+            options = ServerOptions.fromArgs(args);
+            setUp();
         } catch (ParseException e) {
             System.err.println(e.getMessage());
             System.exit(-1);
         }
     }
 
-    private Server(ServerOptions options) {
-        if (options == null) {
-            this.options = new ServerOptions();
-        } else {
-            this.options = options;
-        }
+    public static void setUp() {
+        configureLogger();
+        configureKeystore();
+        configureRoutes();
+        configureExceptions();
+        configureFilters();
     }
 
-    public static Server newServer(ServerOptions options) {
-        Server s = new Server(options);
-        s.configureKeystore();
-        s.configureRoutes();
-        s.configureExceptions();
-        s.configureFilters();
-        return s;
+    private static void configureLogger() {
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Level.INFO); //avoid verbose Jetty messages
+        Logger ourLogger = (Logger) LoggerFactory.getLogger("tv.mediagenix");
+        ourLogger.setLevel(options.isDebuggingEnabled() ? Level.DEBUG : Level.INFO);
+        logger.debug("Options: {}", options);
     }
 
-    private void configureFilters() {
+    private static void configureFilters() {
         before("/*", (req, res) -> {
-            if (!isAuthenticated()) {
-                halt(401);
-            }
-        });
-        before("/*", (req, res) -> {
-            RateLimiter rl = this.options.getRateLimiter();
+            RateLimiter rl = options.getRateLimiter();
             String ip = req.ip();
             if (rl.canRequest(ip)) {
                 rl.registerRequest(ip);
@@ -76,15 +69,11 @@ public class Server {
                 halt(403, "Rate limit exceeded - wait " + seconds + " seconds.");
             }
         });
-        before("/*", (req, res) -> this.request = req.raw());
+        before("/*", (req, res) -> logger.info("Received request from {} (session-id = {}, content-length={})", req.ip(),req.session().id(), req.contentLength()));
         before("/*", (req, res) -> res.raw().setHeader("Server", "/"));
     }
 
-    private boolean isAuthenticated() {
-        return true;
-    }
-
-    private void configureExceptions() {
+    private static void configureExceptions() {
         exception(InvalidRequestException.class, (e, req, res) -> Server.handleException(e, res, 400));
         exception(TransformationException.class, (e, req, res) -> Server.handleException(e, res, 400));
         exception(Exception.class, (e, req, res) -> Server.handleException(e, res, 500));
@@ -95,7 +84,7 @@ public class Server {
         });
     }
 
-    private void configureKeystore() {
+    private static void configureKeystore() {
         String keyStoreProp = System.getProperty("keystore");
         if (keyStoreProp != null) {
             String keyStorePassw = System.getProperty("keystorePassword");
@@ -104,46 +93,54 @@ public class Server {
         }
     }
 
-    private void configureRoutes() {
+    private static void configureRoutes() {
         port(options.getPort());
-        post("/transform", this::handleXsltRequest);
-        post("/query", this::handleXQueryRequest);
+        post("/transform", Server::handleXsltRequest);
+        post("/query", Server::handleXQueryRequest);
     }
 
-    private Object handleXQueryRequest(Request req, Response res) throws Exception {
-        return handleRequest(req, res, ActorType.QUERY);
+    private static Object handleXQueryRequest(Request req, Response res) throws Exception {
+        handleRequest(req, res, ActorType.QUERY);
+        return 0;
     }
 
-    private Object handleXsltRequest(Request req, Response res) throws Exception {
-        return handleRequest(req, res, ActorType.TRANSFORM);
+    private static Object handleXsltRequest(Request req, Response res) throws Exception {
+        handleRequest(req, res, ActorType.TRANSFORM);
+        return 0;
     }
 
-    private Object handleRequest(Request req, Response res, ActorType actorType) throws Exception {
+    private static void handleRequest(Request req, Response res, ActorType actorType) throws Exception {
         long startTime = System.currentTimeMillis();
         req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
         Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
         try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl").orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
-            SaxonActor actor = getActorFromBuilder(SaxonActorBuilder.newBuilder(actorType));
+            SaxonActor actor = getActorFromBuilder(SaxonActorBuilder.newBuilder(actorType), getParameters(req.raw().getPart("output")), getParameters(req.raw().getPart("parameters")));
             ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
             SerializationProps props = input.isPresent() ? actor.act(input.get(), stylesheet, writeStream) : actor.act(stylesheet, writeStream);
             res.header("Content-Type", props.getContentType());
             writeStream.writeTo(res.raw().getOutputStream());
             res.raw().getOutputStream().close();
-            return res;
         } finally {
-            logger.info(String.format("Finished request in %s milliseconds", System.currentTimeMillis() - startTime));
+            logger.info("Finished request {} in {} milliseconds", req.session().id(), System.currentTimeMillis() - startTime);
         }
     }
 
-    private SaxonActor getActorFromBuilder(SaxonActorBuilder builder) {
+    private static SaxonActor getActorFromBuilder(SaxonActorBuilder builder, Map<String, String> parameters, Map<String, String> outputParameters) {
         try {
-            return builder.setInsecure(this.options.isInsecure()).setConfigurationFile(options.getConfigFile()).setSerializationProperties(getParameters(request.getPart("output"))).setTimeout(this.options.getTransformationTimeoutMs()).setParameters(getParameters(request.getPart("parameters"))).build();
+            return builder
+                    .setInsecure(options.isInsecure())
+                    .setConfigurationFile(options.getConfigFile())
+                    .setTimeout(options.getTransformationTimeoutMs())
+                    .setSerializationProperties(outputParameters)
+                    .setParameters(parameters)
+                    .build();
         } catch (Exception e) {
+            logger.error("Error: ", e);
             throw new InvalidRequestException(e);
         }
     }
 
-    private Map<String, String> getParameters(Part part) {
+    private static Map<String, String> getParameters(Part part) {
         if (part == null) return new HashMap<>();
         try {
             InputStream s = part.getInputStream();
@@ -153,25 +150,29 @@ public class Server {
         }
     }
 
-    private Optional<InputStream> getStreamFromRequestByKey(Request req, String key) throws IOException {
+    private static Optional<InputStream> getStreamFromRequestByKey(Request req, String key) throws IOException {
         try {
             Part part = req.raw().getPart(key);
-            return part == null ? Optional.empty() : getStreamFromPart(part);
+            if (part == null) {
+                logger.debug("No part found named {} in request {}", key, req.session().id());
+                return Optional.empty();
+            }
+            return getStreamFromPart(part);
         } catch (ServletException e) {
             throw new InvalidRequestException(String.format("Could not read parts for key \"%s\" - did you forget to attach a file? (%s)", key, e.getMessage()));
         }
     }
 
-    private Optional<InputStream> getStreamFromPart(Part part) throws IOException {
+    private static Optional<InputStream> getStreamFromPart(Part part) throws IOException {
         String contentType = part.getContentType();
-        if (contentType != null && "application/gzip".equals(contentType.toLowerCase())) {
+        if ("application/gzip".equalsIgnoreCase(contentType)) {
             return Optional.of(getZippedStreamFromPart(part.getInputStream()));
         }
         return Optional.ofNullable(part.getInputStream());
     }
 
 
-    private InputStream getZippedStreamFromPart(InputStream input) {
+    private static InputStream getZippedStreamFromPart(InputStream input) {
         try {
             GZIPInputStream s = new GZIPInputStream(input);
             ZippedStreamReader r = new ZippedStreamReader();
@@ -181,16 +182,14 @@ public class Server {
         }
     }
 
-    private static Response handleException(Throwable e, Response res, int status) {
+    private static void handleException(Throwable e, Response res, int status) {
+        logger.error("Error: {}", status, e);
         ErrorMessage err = new ErrorMessage(e, status);
         res.status(status);
         res.type("application/json;charset=utf-8");
-        res.body(new JsonTransformer().render(err));
-        return res;
-    }
-
-    public void stop() {
-        Spark.stop();
+        String body = new JsonTransformer().render(err);
+        logger.info(body);
+        res.body(body);
     }
 }
 
