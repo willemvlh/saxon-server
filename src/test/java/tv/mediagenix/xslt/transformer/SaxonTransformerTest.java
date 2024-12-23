@@ -8,6 +8,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +38,11 @@ public class SaxonTransformerTest {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         tf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
         assertEquals("hello", os.toString());
+    }
+
+    @Test
+    public void messageNoTerminate() throws TransformationException {
+        transformWithStrings("<abc/>", TestHelpers.MessageInvokingXslNoTerminate);
     }
 
     @Test
@@ -80,7 +86,7 @@ public class SaxonTransformerTest {
     public void insecureTest() {
         SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
         xf.setInsecure(true);
-        assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
+        assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), Files.newInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI()).toPath()), new ByteArrayOutputStream()));
     }
 
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {

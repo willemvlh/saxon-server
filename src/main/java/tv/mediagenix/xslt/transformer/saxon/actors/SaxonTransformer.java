@@ -30,6 +30,7 @@ public class SaxonTransformer extends SaxonActor {
             transformer.setStylesheetParameters(this.getParameters());
             if (input.isEmpty()) {
                 //no input, use default template "xsl:initial-template"
+                logger.debug("No XML input: defaulting to the default template");
                 transformer.callTemplate(null, s);
             } else {
                 //apply templates on context item
@@ -40,7 +41,6 @@ public class SaxonTransformer extends SaxonActor {
         } catch (SaxonApiException e) {
             SaxonMessageListener listener = (SaxonMessageListener) transformer.getMessageListener2();
             String msg = listener.errorString != null ? listener.errorString : e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-            LoggerFactory.getLogger(this.getClass()).error(msg);
             throw new TransformationException(msg);
         }
     }

@@ -3,6 +3,8 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import tv.mediagenix.xslt.transformer.saxon.JsonToXmlTransformer;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
@@ -26,6 +28,7 @@ public abstract class SaxonActor {
     private Map<QName, XdmValue> parameters = new HashMap<>();
     private Configuration configuration;
     private long timeout = 10000;
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected SaxonActor() {
     }
@@ -48,6 +51,7 @@ public abstract class SaxonActor {
         XdmItem context;
         try {
             if (isJsonStream(input)) {
+                logger.debug("Detected JSON input");
                 JsonToXmlTransformer xf = new JsonToXmlTransformer();
                 context = xf.transform(inputStreamToString(input), getProcessor());
             } else {
@@ -73,6 +77,7 @@ public abstract class SaxonActor {
             service.submit(task);
             return task.get(this.timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | InterruptedException e) {
+            logger.debug("Timeout limit ({} ms)was reached", timeout);
             throw new TransformationException(e);
         } catch (ExecutionException e) {
             throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);

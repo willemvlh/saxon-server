@@ -1,14 +1,19 @@
 package tv.mediagenix.xslt.transformer;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.trans.XPathException;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.xslt.transformer.server.Server;
 import tv.mediagenix.xslt.transformer.server.ServerOptions;
 import tv.mediagenix.xslt.transformer.server.ratelimiter.NoRateLimiter;
 import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
@@ -19,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,8 +81,18 @@ public class ServerOptionsTest {
         SaxonActor actor = new SaxonTransformerBuilder().setInsecure(true).build();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        Assertions.assertNotEquals(os.size(), new Integer(12));
+        Assertions.assertNotEquals(os.size(), 12);
         Assertions.assertDoesNotThrow(() -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
+    }
+
+    @Test
+    public void LoggingTestCase() throws ParseException {
+        ServerOptions opts = ServerOptions.fromArgs(new String[]{"-debug"});
+        assertTrue(opts.isDebuggingEnabled());
+        opts = ServerOptions.fromArgs(new String[]{"-d"});
+        assertTrue(opts.isDebuggingEnabled());
+        Logger l = (Logger) LoggerFactory.getLogger(this.getClass());
+        l.debug("huh?");
     }
 
     @Test
