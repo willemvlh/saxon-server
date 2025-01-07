@@ -35,6 +35,7 @@ For example:
 Following command-line options are available:
 
 * `-c`, `--config`: Location to Saxon configuration XML file
+* `-d`, `--debug`: Enable debug logging statements
 * `-h,--help`: Display help
 * `-i, --insecure`: Run with default (insecure) configuration.*
 * `-p, --port <arg>`: Port on which the server runs
