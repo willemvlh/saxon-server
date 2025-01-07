@@ -4,6 +4,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
+import spark.Spark;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
@@ -17,6 +18,7 @@ import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -74,7 +76,10 @@ public class Server {
     }
 
     private static void configureExceptions() {
-        exception(InvalidRequestException.class, (e, req, res) -> Server.handleException(e, res, 400));
+        exception(InvalidRequestException.class, (e, req, res) -> {
+            Server.handleException(e, res, 400);
+            logRequest(req);
+        });
         exception(TransformationException.class, (e, req, res) -> Server.handleException(e, res, 400));
         exception(Exception.class, (e, req, res) -> Server.handleException(e, res, 500));
         notFound((req, res) -> {
@@ -82,6 +87,21 @@ public class Server {
             res.status(404);
             return ("\"404 Not Found\"");
         });
+    }
+
+    private static void logRequest(Request req) {
+        logger.debug("Invalid request:");
+        logger.debug("IP: {}", req.ip());
+        logger.debug("Content-Type: {}", req.contentType());
+        try {
+            Collection<Part> parts = req.raw().getParts();
+            parts.forEach(part -> {
+                logger.debug("Part: type={}, name={}, size={}", part.getContentType(), part.getName(), part.getSize());
+            });
+        } catch (Exception e) {
+            logger.debug("Could not read parts: {}", e.getMessage());
+        }
+
     }
 
     private static void configureKeystore() {
@@ -120,12 +140,13 @@ public class Server {
             res.header("Content-Type", props.getContentType());
             writeStream.writeTo(res.raw().getOutputStream());
             res.raw().getOutputStream().close();
-        } finally {
+        }
+        finally {
             logger.info("Finished request {} in {} milliseconds", req.session().id(), System.currentTimeMillis() - startTime);
         }
     }
 
-    private static SaxonActor getActorFromBuilder(SaxonActorBuilder builder, Map<String, String> parameters, Map<String, String> outputParameters) {
+    private static SaxonActor getActorFromBuilder(SaxonActorBuilder builder, Map<String, String> outputParameters, Map<String, String> parameters) {
         try {
             return builder
                     .setInsecure(options.isInsecure())
@@ -145,7 +166,8 @@ public class Server {
         try {
             InputStream s = part.getInputStream();
             return new ParameterParser().parseStream(s, (int) part.getSize());
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
+            logger.debug("Could not read parameters.", e);
             throw new InvalidRequestException(e.getMessage());
         }
     }
@@ -166,6 +188,7 @@ public class Server {
     private static Optional<InputStream> getStreamFromPart(Part part) throws IOException {
         String contentType = part.getContentType();
         if ("application/gzip".equalsIgnoreCase(contentType)) {
+            logger.debug("Payload is zipped, attempting to  unzip...");
             return Optional.of(getZippedStreamFromPart(part.getInputStream()));
         }
         return Optional.ofNullable(part.getInputStream());
@@ -190,6 +213,10 @@ public class Server {
         String body = new JsonTransformer().render(err);
         logger.info(body);
         res.body(body);
+    }
+
+    public static void stop(){
+        Spark.stop();
     }
 }
 

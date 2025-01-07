@@ -6,8 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ParameterParserTest {
     @Test
@@ -40,6 +39,12 @@ class ParameterParserTest {
     public void testParseWithEqualsSign() {
         ParameterParser p = new ParameterParser();
         assertEquals("1=2", p.parseString("input=1=2").get("input"));
+    }
+
+    @Test
+    public void invalidString(){
+        ParameterParser p = new ParameterParser();
+        assertThrows(IllegalArgumentException.class,() -> p.parseString("eh?"));
     }
 
     @Test

@@ -5,6 +5,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.trans.XPathException;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,7 @@ import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiterSettings;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -91,8 +95,6 @@ public class ServerOptionsTest {
         assertTrue(opts.isDebuggingEnabled());
         opts = ServerOptions.fromArgs(new String[]{"-d"});
         assertTrue(opts.isDebuggingEnabled());
-        Logger l = (Logger) LoggerFactory.getLogger(this.getClass());
-        l.debug("huh?");
     }
 
     @Test

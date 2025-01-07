@@ -1,5 +1,10 @@
 package tv.mediagenix.xslt.transformer;
 
+import okhttp3.*;
+import org.slf4j.LoggerFactory;
+import spark.Spark;
+import tv.mediagenix.xslt.transformer.server.Server;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
@@ -13,6 +18,7 @@ public class TestHelpers {
     public static String MessageInvokingXsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"yes\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
     public static String MessageInvokingXslNoTerminate = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"no\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
     public static String MalformedXml = "noXml";
+    public static String XslWithParameters = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "<xsl:param name=\"myParam\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"$myParam\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>";
 
     public static InputStream WellFormedXslWithInitialTemplateStream() {
         return getInputStreamFromUtf8String(WellformedXslWithInitialTemplate);
@@ -51,6 +57,40 @@ public class TestHelpers {
     }
 
     public static InputStream xslWithParameters() {
-        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "<xsl:param name=\"myParam\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"$myParam\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
+        return getInputStreamFromUtf8String(XslWithParameters);
+    }
+
+    public static void runServer(String[] args, Runnable fn) {
+        runServer(args, () -> {
+            fn.run();
+            return null;
+        });
+    }
+
+    public static <T> T runServer(String[] args, Action<T> fn) {
+        Server.main(args);
+        Spark.awaitInitialization();
+        LoggerFactory.getLogger(TestHelpers.class).debug("Started server.");
+        T result = fn.run();
+        Spark.stop();
+        Spark.awaitStop();
+        LoggerFactory.getLogger(TestHelpers.class).debug("Stopped server.");
+        return result;
+    }
+
+    public static <T> T runServer(Action<T> fn) {
+        return runServer(new String[]{}, fn);
+    }
+
+    public static void runServer(Runnable fn) {
+        runServer(new String[]{}, fn);
+    }
+
+    public static Response request(String xml, String xsl) {
+        return new TestRequest().addXML(xml)
+                .addXSL(xsl)
+                .execute();
     }
 }
+
+
