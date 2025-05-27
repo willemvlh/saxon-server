@@ -81,7 +81,7 @@ class SaxonTransformerTest {
     @Test
     void transformBomEncoded() throws UnsupportedEncodingException, TransformationException {
         ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedBomXml, TestHelpers.WellFormedXsl);
-        assertEquals(output.toString("utf-8"), "hello", "The output should be 'hello'");
+        assertEquals("hello", output.toString(StandardCharsets.UTF_8), "The output should be 'hello'");
     }
 
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
