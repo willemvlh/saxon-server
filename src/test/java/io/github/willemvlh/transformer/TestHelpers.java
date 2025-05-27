@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 public class TestHelpers {
     public static final String WellFormedXml = "<root/>";
+    public static final String WellFormedBomXml = "\uFEFF<root/>";
     public static final String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template match=\"/\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
     private static final String WellformedXslWithInitialTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template name=\"xsl:initial-template\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
     public static final String message = "abc";
