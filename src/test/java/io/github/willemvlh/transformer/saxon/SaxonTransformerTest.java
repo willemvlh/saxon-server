@@ -78,6 +78,12 @@ class SaxonTransformerTest {
         assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), new FileInputStream(new File(this.getClass().getResource("test-dtd.xsl").toURI())), new ByteArrayOutputStream()));
     }
 
+    @Test
+    void transformBomEncoded() throws UnsupportedEncodingException, TransformationException {
+        ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedBomXml, TestHelpers.WellFormedXsl);
+        assertEquals(output.toString("utf-8"), "hello", "The output should be 'hello'");
+    }
+
     private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
