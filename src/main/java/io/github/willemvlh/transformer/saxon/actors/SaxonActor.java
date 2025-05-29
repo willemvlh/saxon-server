@@ -82,37 +82,26 @@ public abstract class SaxonActor {
     }
 
     private boolean isJsonStream(InputStream stream) throws TransformationException {
+        if(!stream.markSupported()){
+           return false;
+        }
         try {
-            removeBomPrefixIfItExists(stream);
             stream.mark(10);
-            int readCount = 0;
-            char c;
-            c = (char) stream.read();
-            if (c == '\uFFFF') {
-                //eof
+            int b = stream.read();
+            if (b == -1 /*EOF*/ || b > 0x7B /*Byte order mark, or garbage*/){
+                stream.reset();
                 return false;
             }
-            while (Character.isWhitespace(c) && readCount < 10) {
+            int readCount = 0;
+            while (Character.isWhitespace(b) && readCount < 10) {
                 readCount++;
-                c = (char) stream.read();
+                b = stream.read();
             }
             stream.reset();
-            return c != '<';
+            return b != '<';
         } catch (IOException e) {
             throw new TransformationException(e.getMessage());
         }
-    }
-
-    private static void removeBomPrefixIfItExists(InputStream stream) throws IOException {
-        stream.mark(3);
-        int first = stream.read();
-        int second = stream.read();
-        int third = stream.read();
-
-        if (first == 0xEF && second == 0xBB && third == 0xBF) {
-            return;
-        }
-        stream.reset();
     }
 
     protected Serializer newSerializer(OutputStream os) {
