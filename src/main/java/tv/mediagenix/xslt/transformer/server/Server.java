@@ -10,8 +10,6 @@ import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
-
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
@@ -46,7 +44,6 @@ public class Server {
 
     public static void setUp() {
         configureLogger();
-        configureKeystore();
         configureRoutes();
         configureExceptions();
         configureFilters();
@@ -61,16 +58,6 @@ public class Server {
     }
 
     private static void configureFilters() {
-        before("/*", (req, res) -> {
-            RateLimiter rl = options.getRateLimiter();
-            String ip = req.ip();
-            if (rl.canRequest(ip)) {
-                rl.registerRequest(ip);
-            } else {
-                long seconds = rl.timeToAllowed(ip).getSeconds();
-                halt(403, "Rate limit exceeded - wait " + seconds + " seconds.");
-            }
-        });
         before("/*", (req, res) -> logger.info("Received request from {} (session-id = {}, content-length={})", req.ip(),req.session().id(), req.contentLength()));
         before("/*", (req, res) -> res.raw().setHeader("Server", "/"));
     }
@@ -102,15 +89,6 @@ public class Server {
             logger.debug("Could not read parts: {}", e.getMessage());
         }
 
-    }
-
-    private static void configureKeystore() {
-        String keyStoreProp = System.getProperty("keystore");
-        if (keyStoreProp != null) {
-            String keyStorePassw = System.getProperty("keystorePassword");
-            if (keyStorePassw == null) keyStorePassw = "";
-            secure(keyStoreProp, keyStorePassw, null, null);
-        }
     }
 
     private static void configureRoutes() {

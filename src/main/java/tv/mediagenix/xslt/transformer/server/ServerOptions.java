@@ -2,10 +2,6 @@ package tv.mediagenix.xslt.transformer.server;
 
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.NoRateLimiter;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiter;
-import tv.mediagenix.xslt.transformer.server.ratelimiter.RateLimiterImpl;
-
 import java.io.File;
 
 public class ServerOptions {
@@ -13,7 +9,6 @@ public class ServerOptions {
     private File configFile;
     private boolean insecure = false;
     private long transformationTimeoutMs = 10000;
-    private RateLimiter rateLimiter = new NoRateLimiter();
     private boolean debug = false;
 
     public Integer getPort() {
@@ -83,9 +78,6 @@ public class ServerOptions {
         if (cmd.hasOption("timeout")) {
             serverOptions.setTransformationTimeoutMs(Long.parseLong(cmd.getOptionValue("timeout")));
         }
-        if (cmd.hasOption("rate-limit")) {
-            serverOptions.setRateLimiter(createRateLimiter(cmd.getOptionValue("rate-limit")));
-        }
         if (cmd.hasOption("debug")) {
             serverOptions.setDebug(true);
         }
@@ -100,26 +92,8 @@ public class ServerOptions {
         options.addOption("h", "help", false, "Display help");
         options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
-        options.addOption("r", "rate-limit", true, "Set up rate limiting (none | light | heavy)");
         options.addOption("d", "debug", false, "Enable debug logging statements");
         return options;
-    }
-
-    private static RateLimiter createRateLimiter(String option) {
-        switch (option) {
-            case "none":
-                return new NoRateLimiter();
-            case "light":
-                return new RateLimiterImpl(60, 120);
-            case "heavy":
-                return new RateLimiterImpl(60, 60);
-            default:
-                throw new IllegalArgumentException("Unknown option: " + option);
-        }
-    }
-
-    public void setRateLimiter(RateLimiter rl) {
-        this.rateLimiter = rl;
     }
 
     private static void printInformation() {
@@ -127,10 +101,6 @@ public class ServerOptions {
         String version = p.getSaxonProductVersion();
         String edition = p.getSaxonEdition();
         System.out.printf("Saxon %s %s%n", edition, version);
-    }
-
-    public RateLimiter getRateLimiter() {
-        return rateLimiter;
     }
 
     public boolean isDebuggingEnabled() {
@@ -144,7 +114,6 @@ public class ServerOptions {
     public String toString() {
         return String.format("Debug: %s\n", isDebuggingEnabled()) +
                 String.format("Port: %s\n", port) +
-                String.format("Rate limiter: %s\n", rateLimiter.getClass().getSimpleName()) +
                 String.format("Insecure: %s\n", insecure) +
                 String.format("Config: %s \n", configFile == null ? "none" : configFile.getAbsolutePath());
     }
