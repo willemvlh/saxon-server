@@ -13,7 +13,6 @@ import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFactory;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.util.HashMap;

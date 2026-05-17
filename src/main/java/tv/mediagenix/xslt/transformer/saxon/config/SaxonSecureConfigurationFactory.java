@@ -3,14 +3,11 @@ package tv.mediagenix.xslt.transformer.saxon.config;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.lib.Feature;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXSource;
 import java.io.InputStream;
 

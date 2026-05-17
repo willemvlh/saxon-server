@@ -65,7 +65,7 @@ public class Server {
     private static void configureExceptions() {
         exception(InvalidRequestException.class, (e, req, res) -> {
             Server.handleException(e, res, 400);
-            logRequest(req);
+            logInvalidRequest(req);
         });
         exception(TransformationException.class, (e, req, res) -> Server.handleException(e, res, 400));
         exception(Exception.class, (e, req, res) -> Server.handleException(e, res, 500));
@@ -76,7 +76,7 @@ public class Server {
         });
     }
 
-    private static void logRequest(Request req) {
+    private static void logInvalidRequest(Request req) {
         logger.debug("Invalid request:");
         logger.debug("IP: {}", req.ip());
         logger.debug("Content-Type: {}", req.contentType());
@@ -95,6 +95,9 @@ public class Server {
         port(options.getPort());
         post("/transform", Server::handleXsltRequest);
         post("/query", Server::handleXQueryRequest);
+        get("/info", (Request req, Response res) -> {
+          return ServerInfo.getInstance().load();
+        }, new JsonTransformer());
     }
 
     private static Object handleXQueryRequest(Request req, Response res) throws Exception {
@@ -106,6 +109,7 @@ public class Server {
         handleRequest(req, res, ActorType.TRANSFORM);
         return 0;
     }
+
 
     private static void handleRequest(Request req, Response res, ActorType actorType) throws Exception {
         long startTime = System.currentTimeMillis();

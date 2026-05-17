@@ -151,4 +151,14 @@ public class ServerTests {
         var res = runServer(req::execute);
         assertEquals(404, res.code());
     }
+
+    @Test
+    public void getInfo() throws IOException {
+        TestRequest req = new TestRequest();
+        req.setPath("info");
+        req.setIsGetRequest();
+        var res = runServer(req::execute);
+        assertEquals(200, res.code());
+        System.out.println(res.body().string());
+    }
 }

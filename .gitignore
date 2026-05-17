@@ -13,3 +13,6 @@ buildNumber.properties
 /.idea
 keystore/
 deploy.bat
+.classpath
+.project
+.settings/

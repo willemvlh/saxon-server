@@ -16,7 +16,7 @@ public class JsonTransformer implements ResponseTransformer {
         gsonBuilder.setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                return fieldAttributes.hasModifier(Modifier.PRIVATE);
+                return false;
             }
 
             @Override
