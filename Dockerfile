@@ -1,4 +1,5 @@
-FROM java:8-jdk-alpine
-ADD ./target/saxon-1.1.jar saxon.jar
+FROM eclipse-temurin:25-jre-alpine
+COPY target/saxon-server-*.jar app.jar
 EXPOSE 5000
-CMD java -jar saxon.jar
+ENV JAVA_OPTS=""
+CMD java $JAVA_OPTS -jar app.jar
