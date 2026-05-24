@@ -3,7 +3,6 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
 import org.slf4j.LoggerFactory;
-import tv.mediagenix.xslt.transformer.saxon.SaxonMessageListener;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
@@ -17,6 +16,7 @@ public class SaxonTransformer extends SaxonActor {
 
     private ArrayList<XmlProcessingError> errorList = new ArrayList<>();
     private Xslt30Transformer transformer;
+    private String terminateMessage;
 
     public List<XmlProcessingError> getErrorList() {
         return errorList;
@@ -28,7 +28,7 @@ public class SaxonTransformer extends SaxonActor {
         Serializer s = newSerializer(output);
         try {
             transformer.setStylesheetParameters(this.getParameters());
-            if (input.isEmpty()) {
+            if (input.isEmptySequence()) {
                 //no input, use default template "xsl:initial-template"
                 logger.debug("No XML input: defaulting to the default template");
                 transformer.callTemplate(null, s);
@@ -39,8 +39,7 @@ public class SaxonTransformer extends SaxonActor {
             }
             return getSerializationProperties(s);
         } catch (SaxonApiException e) {
-            SaxonMessageListener listener = (SaxonMessageListener) transformer.getMessageListener2();
-            String msg = listener.errorString != null ? listener.errorString : e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+            String msg = terminateMessage != null ? terminateMessage : e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
             throw new TransformationException(msg);
         }
     }
@@ -61,7 +60,14 @@ public class SaxonTransformer extends SaxonActor {
         try {
             XsltExecutable e = c.compile(stylesheet);
             Xslt30Transformer xf = e.load30();
-            xf.setMessageListener(new SaxonMessageListener());
+            xf.setMessageHandler(msg -> {
+                if (msg.isTerminate()) {
+                    terminateMessage = msg.getContent().getStringValue();
+                } else {
+                    logger.info("Message received. Line: {}, column: {}", msg.getLocation().getLineNumber(), msg.getLocation().getColumnNumber());
+                    logger.info("Message: {}", msg.getStringValue());
+                }
+            });
             return xf;
         } catch (SaxonApiException e) {
             if (!this.getErrorList().isEmpty()) {

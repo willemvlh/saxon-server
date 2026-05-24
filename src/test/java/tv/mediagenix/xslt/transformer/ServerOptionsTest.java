@@ -30,79 +30,92 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ServerOptionsTest {
 
-    SaxonActor actor = new SaxonTransformerBuilder().build();
+  SaxonActor actor = new SaxonTransformerBuilder().build();
 
-    @Test
-    public void ParseTest() throws URISyntaxException, TransformationException, XPathException {
-        File configFile = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI());
-        actor.setConfiguration(Configuration.readConfiguration(new StreamSource(configFile)));
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        Assertions.assertNotEquals(os.size(), 0);
+  private File configFile(String location) {
+    try {
+      File file = new File(this.getClass().getResource(location).toURI());
+      assertTrue(file.exists());
+      return file;
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Test
-    public void NoOptionsParseTest() throws TransformationException {
-        SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().build();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os);
-        Assertions.assertNotEquals(os.size(), 0);
-    }
+  @Test
+  public void ParseTest() throws URISyntaxException, TransformationException, XPathException {
+    File configFile = configFile("saxon-config/saxon-config.xml");
+    actor.setConfiguration(Configuration.readConfiguration(new StreamSource(configFile)));
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+    Assertions.assertNotEquals(os.size(), 0);
+  }
 
-    @Test
-    public void WrongConfigFileTest() {
-        Assertions.assertThrows(TransformationException.class, () -> {
-            new SaxonTransformerBuilder().setConfigurationFile(new File("unknown")).build();
-        });
-    }
+  @Test
+  public void NoOptionsParseTest() throws TransformationException {
+    SaxonTransformer actor = (SaxonTransformer) new SaxonTransformerBuilder().build();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.WellFormedXslStream(), os);
+    Assertions.assertNotEquals(os.size(), 0);
+  }
 
-    @Test
-    public void DisallowExternalFunctionTest() throws URISyntaxException, TransformationException {
-        //enabling the disallow-external-functions makes it impossible to access java system properties.
-        File f = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config-no-external-fn.xml").toURI());
-        SaxonActor actor = new SaxonTransformerBuilder().setConfigurationFile(f).build();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        assertEquals(os.size(), 0);
-    }
+  @Test
+  public void WrongConfigFileTest() {
+    Assertions.assertThrows(TransformationException.class, () -> {
+      new SaxonTransformerBuilder().setConfigurationFile(new File("unknown")).build();
+    });
+  }
 
-    @Test
-    public void SecureConfigurationTest() throws TransformationException {
-        SaxonActor actor = new SaxonTransformerBuilder().setInsecure(false).build();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        assertEquals(os.size(), 0);
-        Assertions.assertThrows(TransformationException.class, () -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
-    }
+  @Test
+  public void DisallowExternalFunctionTest() throws URISyntaxException, TransformationException {
+    // enabling the disallow-external-functions makes it impossible to access java
+    // system properties.
+    File configFile = configFile("saxon-config/saxon-config-no-external-fn.xml");
+    SaxonActor actor = new SaxonTransformerBuilder().setConfigurationFile(configFile).build();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+    assertEquals(os.size(), 0);
+  }
 
-    @Test
-    public void InsecureConfigurationTest() throws TransformationException {
-        SaxonActor actor = new SaxonTransformerBuilder().setInsecure(true).build();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
-        Assertions.assertNotEquals(os.size(), 12);
-        Assertions.assertDoesNotThrow(() -> actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.xslWithDocAtURI(this.getClass().getResource("dummy.xml").toURI()), new ByteArrayOutputStream()));
-    }
+  @Test
+  public void SecureConfigurationTest() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder().setInsecure(false).build();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+    assertEquals(os.size(), 0);
+    Assertions.assertThrows(TransformationException.class, () -> actor.act(TestHelpers.WellFormedXmlStream(),
+        TestHelpers.XslWithDocFunctionStream(), new ByteArrayOutputStream()));
+  }
 
-    @Test
-    public void LoggingTestCase() throws ParseException {
-        ServerOptions opts = ServerOptions.fromArgs(new String[]{"-debug"});
-        assertTrue(opts.isDebuggingEnabled());
-        opts = ServerOptions.fromArgs(new String[]{"-d"});
-        assertTrue(opts.isDebuggingEnabled());
-    }
+  @Test
+  public void InsecureConfigurationTest() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder().setInsecure(true).build();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
+    Assertions.assertNotEquals(os.size(), 12);
+    Assertions.assertDoesNotThrow(() -> actor.act(TestHelpers.WellFormedXmlStream(),
+        TestHelpers.XslWithDocFunctionStream(), new ByteArrayOutputStream()));
+  }
 
-    @Test
-    public void SetOptionsFromArgumentsTest() throws ParseException, URISyntaxException {
-        String configFilePath = new File(this.getClass().getResource("/tv/mediagenix/xslt/transformer/saxon-config.xml").toURI()).getPath();
-        String[] args = {"-port", "3000", "-config", configFilePath};
-        ServerOptions opts = ServerOptions.fromArgs(args);
-        assertEquals(3000, (int) opts.getPort());
-        Assertions.assertThrows(RuntimeException.class, () -> ServerOptions.fromArgs(new String[]{"-config", configFilePath, "-insecure"}));
-        assertTrue(ServerOptions.fromArgs(new String[]{"-insecure"}).isInsecure());
-        assertEquals(configFilePath, opts.getConfigFile().getPath());
+  @Test
+  public void LoggingTestCase() throws ParseException {
+    ServerOptions opts = ServerOptions.fromArgs(new String[] { "-debug" });
+    assertTrue(opts.isDebuggingEnabled());
+    opts = ServerOptions.fromArgs(new String[] { "-d" });
+    assertTrue(opts.isDebuggingEnabled());
+  }
 
-    }
+  @Test
+  public void SetOptionsFromArgumentsTest() throws ParseException, URISyntaxException {
+    String configFilePath = configFile("saxon-config/saxon-config.xml").getPath();
+    String[] args = { "-port", "3000", "-config", configFilePath };
+    ServerOptions opts = ServerOptions.fromArgs(args);
+    assertEquals(3000, (int) opts.getPort());
+    Assertions.assertThrows(RuntimeException.class,
+        () -> ServerOptions.fromArgs(new String[] { "-config", configFilePath, "-insecure" }));
+    assertTrue(ServerOptions.fromArgs(new String[] { "-insecure" }).isInsecure());
+    assertEquals(configFilePath, opts.getConfigFile().getPath());
+
+  }
 
 }
-

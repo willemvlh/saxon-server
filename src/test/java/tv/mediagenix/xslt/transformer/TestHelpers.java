@@ -6,58 +6,74 @@ import spark.Spark;
 import tv.mediagenix.xslt.transformer.server.Server;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class TestHelpers {
-    public static String WellFormedXml = "<root/>";
-    public static String WellFormedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template match=\"/\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
-    public static String WellformedXslWithInitialTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "    <xsl:output method=\"text\"/>\n" + "    <xsl:template name=\"xsl:initial-template\">\n" + "        <xsl:text>hello</xsl:text>\n" + "    </xsl:template>\n" + "</xsl:stylesheet>";
+    public static String WellFormedXml = readResource("xml/dummy.xml");
+    public static String WellFormedXsl = readResource("xsl/test-1.xsl");
+    public static String WellformedXslWithInitialTemplate = readResource("xsl/test-initial-template.xsl");
     public static String message = "abc";
-    public static String MessageInvokingXsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"yes\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
-    public static String MessageInvokingXslNoTerminate = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\"><xsl:template match=\"/\"><xsl:message terminate=\"no\">" + message + "</xsl:message></xsl:template></xsl:stylesheet>";
-    public static String MalformedXml = "noXml";
-    public static String XslWithParameters = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "<xsl:param name=\"myParam\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"$myParam\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>";
+    public static String MessageInvokingXsl = readResource("xsl/test-message.xsl");
+    public static String MessageInvokingXslNoTerminate = readResource("xsl/test-message-no-terminate.xsl");
+    public static String MalformedXml = readResource("xml/malformed.xml");
+    public static String XslWithParameters = readResource("xsl/test-parameters.xsl");
 
     public static InputStream WellFormedXslWithInitialTemplateStream() {
-        return getInputStreamFromUtf8String(WellformedXslWithInitialTemplate);
+        return resourceStream("xsl/test-initial-template.xsl");
     }
 
     public static InputStream WellFormedXmlStream() {
-        return getInputStreamFromUtf8String(WellFormedXml);
+        return resourceStream("xml/dummy.xml");
     }
 
     public static InputStream WellFormedXslStream() {
-        return getInputStreamFromUtf8String(WellFormedXsl);
+        return resourceStream("xsl/test-1.xsl");
     }
 
     public static InputStream WellFormedXQueryStream() {
-        return getInputStreamFromUtf8String("declare option saxon:output 'method=text';'abc'");
+        return resourceStream("xq/abc.xquery");
     }
 
     public static InputStream XQueryStreamApplicationJsonMime() {
-        return getInputStreamFromUtf8String("declare option saxon:output 'media-type=application/json';  declare option saxon:output 'method=json'; map{'a':'b'}");
+        return resourceStream("xq/hof.xquery");
     }
 
     public static InputStream IncorrectXQueryStream() {
-        return getInputStreamFromUtf8String("let $x = \"abc\";\n" + "return $x;");
+        return resourceStream("xq/syntax-error.xquery");
     }
 
     public static InputStream SystemPropertyInvokingXslStream() {
-        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"system-property('java.home')\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
+        return resourceStream("xsl/test-system-properties.xsl");
     }
 
-    private static InputStream getInputStreamFromUtf8String(String s) {
-        return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+    public static InputStream resourceStream(String name) {
+        try (InputStream is = TestHelpers.class.getResourceAsStream(name)) {
+            return new ByteArrayInputStream(is.readAllBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static InputStream xslWithDocAtURI(URI uri) {
-        return getInputStreamFromUtf8String("<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">\n" + "\t<xsl:output method=\"text\"/>\n" + "\t<xsl:template match=\"/\">\n" + "\t\t<xsl:value-of select=\"doc('" + uri.toString() + "')\"/>\n" + "\t</xsl:template>\n" + "</xsl:stylesheet>");
+    private static String readResource(String name) {
+        try (InputStream is = resourceStream(name)) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static InputStream XslWithDocFunctionStream() {
+        URL url = TestHelpers.class.getResource("xml/dummy.xml");
+        String xsl = readResource("xsl/test-doc-fn.xsl").replace("{URI}", url.toString());
+        return new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8));
     }
 
     public static InputStream xslWithParameters() {
-        return getInputStreamFromUtf8String(XslWithParameters);
+        return resourceStream("xsl/test-parameters.xsl");
     }
 
     public static void runServer(String[] args, Runnable fn) {
