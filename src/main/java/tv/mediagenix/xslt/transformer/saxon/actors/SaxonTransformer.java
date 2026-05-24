@@ -2,7 +2,6 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import org.slf4j.LoggerFactory;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
@@ -64,8 +63,7 @@ public class SaxonTransformer extends SaxonActor {
                 if (msg.isTerminate()) {
                     terminateMessage = msg.getContent().getStringValue();
                 } else {
-                    logger.info("Message received. Line: {}, column: {}", msg.getLocation().getLineNumber(), msg.getLocation().getColumnNumber());
-                    logger.info("Message: {}", msg.getStringValue());
+                    logger.info("Message received: \"{}\". Line: {}, column: {}", msg.getStringValue(), msg.getLocation().getLineNumber(), msg.getLocation().getColumnNumber());
                 }
             });
             return xf;
