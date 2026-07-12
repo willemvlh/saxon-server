@@ -10,6 +10,15 @@ public class ServerOptions {
     private boolean insecure = false;
     private long transformationTimeoutMs = 2 * 60 * 1000;
     private boolean debug = false;
+    private boolean disableFrontend = false;
+
+    public boolean isDisableFrontend() {
+      return disableFrontend;
+    }
+
+    public void setDisableFrontend(boolean disableFrontend) {
+      this.disableFrontend = disableFrontend;
+    }
 
     public Integer getPort() {
         return port;
@@ -81,6 +90,10 @@ public class ServerOptions {
         if (cmd.hasOption("debug")) {
             serverOptions.setDebug(true);
         }
+        if (cmd.hasOption("disable-frontend")) {
+            serverOptions.setDisableFrontend(true);
+        }
+
         return serverOptions;
     }
 
@@ -93,6 +106,7 @@ public class ServerOptions {
         options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
         options.addOption("d", "debug", false, "Enable debug logging statements");
+        options.addOption("df", "disable-frontend", false, "Disable the frontend (HTML) interface");
         return options;
     }
 

@@ -159,6 +159,25 @@ public class ServerTests {
         req.setIsGetRequest();
         var res = runServer(req::execute);
         assertEquals(200, res.code());
-        System.out.println(res.body().string());
+    }
+
+    @Test
+    public void getWebPage() throws IOException {
+        TestRequest req = new TestRequest();
+        req.setPath("/");
+        req.setIsGetRequest();
+        var res = runServer(req::execute);
+        assertEquals(200, res.code());
+        assertEquals("text/html", res.header("Content-Type").toLowerCase().split(";")[0]);
+        assertEquals("<!DOCTYPE html>", res.body().string().substring(0, 15));
+    }
+    @Test
+
+    public void getWebPageWhenDisabled() throws IOException {
+        TestRequest req = new TestRequest();
+        req.setPath("/");
+        req.setIsGetRequest();
+        var res = runServer(new String[] {"--disable-frontend"}, req::execute);
+        assertEquals(404, res.code());
     }
 }

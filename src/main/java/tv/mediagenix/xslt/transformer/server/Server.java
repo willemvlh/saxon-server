@@ -43,6 +43,11 @@ public class Server {
     }
 
     public static void setUp() {
+        if(options.isDisableFrontend()) {
+            logger.info("Frontend is disabled.");
+        } else {
+            staticFiles.location("/web");
+        }
         configureLogger();
         configureRoutes();
         configureExceptions();

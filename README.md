@@ -26,6 +26,7 @@ Following command-line options are available:
 * `-p`, `--port <arg>`: Port on which the server runs
 * `-t`, `--timeout <arg>`: The maximum time a transformation is allowed to run in milliseconds. Defaults to 2 minutes.
 * `-v`, `--version`: Display Saxon version info
+* `-df`, `--disable-frontend`: Disable the frontend HTML interface 
 
 Transformations can then be invoked by sending an HTTP POST call to the server at the `/transform` or `/query` endpoint,
 depending on whether you want to use XSLT or XQuery. The default port is `5000`, but this can be configured (see above).
@@ -44,6 +45,8 @@ An example call (using cURL) may look as follows:
 The response body contains the result of the transformation. The character set of the response is the one specified in
 the output parameters of the stylesheet, which defaults to UTF-8. The value of the `Content-Type` header can be
 controlled by setting the `media-type` output parameter.
+
+Additionally, an HTML interface is available at the root endpoint (`/`) which allows you to perform transformations directly from your browser for testing purposes. This interface can be disabled by passing the `--disable-frontend` command line parameter.
 
 ## JSON
 

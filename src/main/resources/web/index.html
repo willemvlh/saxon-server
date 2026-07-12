@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Transformation</title>
+    <style>
+      :root {
+        --accent: #2563eb;
+        --border: #d1d5db;
+        --bg: #f9fafb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        background: var(--bg);
+        font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #111827;
+      }
+
+      main {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        width: 100%;
+        max-width: 90%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      label {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+
+      textarea {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+        min-height: 0;
+        padding: 0.6rem;
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        resize: none;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+
+      button {
+        display: block;
+        margin: 1.5rem auto 0;
+        padding: 0.6rem 2rem;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.15s ease-in-out;
+      }
+
+      button:hover {
+        background: #1d4ed8;
+      }
+
+      @media (max-width: 700px) {
+        .fields {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <form id="transformForm" action="/transform" method="post" enctype="multipart/form-data">
+        <div class="fields">
+          <div class="field">
+            <label for="xml">XML</label>
+            <textarea id="xml" name="xml" rows="10" cols="50">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;greeting&gt;
+  &lt;message&gt;Hello, World!&lt;/message&gt;
+&lt;/greeting&gt;
+</textarea>
+          </div>
+          <div class="field">
+            <label for="xsl">XSLT</label>
+            <textarea id="xsl" name="xsl" rows="10" cols="50">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt;
+  &lt;xsl:output method="html" media-type="text/html" indent="yes"/&gt;
+
+  &lt;xsl:template match="/greeting"&gt;
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;h1&gt;&lt;xsl:value-of select="message"/&gt;&lt;/h1&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</textarea>
+          </div>
+        </div>
+        <button type="submit">Transform</button>
+      </form>
+    </main>
+  </body>
+</html>
