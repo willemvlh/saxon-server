@@ -5,7 +5,6 @@ import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 import tv.mediagenix.xslt.transformer.saxon.JsonToXmlTransformer;
 import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
