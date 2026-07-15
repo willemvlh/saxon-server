@@ -11,6 +11,15 @@ public class ServerOptions {
     private long transformationTimeoutMs = 2 * 60 * 1000;
     private boolean debug = false;
     private boolean disableFrontend = false;
+    private String baseURI = null;
+
+    public String getBaseURI() {
+      return baseURI;
+    }
+
+    public void setBaseURI(String baseURI) {
+      this.baseURI = baseURI;
+    }
 
     public boolean isDisableFrontend() {
       return disableFrontend;
@@ -93,6 +102,9 @@ public class ServerOptions {
         if (cmd.hasOption("disable-frontend")) {
             serverOptions.setDisableFrontend(true);
         }
+        if (cmd.hasOption("base-uri")) {
+            serverOptions.setBaseURI(cmd.getOptionValue("base-uri"));
+        }
 
         return serverOptions;
     }
@@ -106,6 +118,7 @@ public class ServerOptions {
         options.addOption("i", "insecure", false, "Run with default (insecure) configuration");
         options.addOption("t", "timeout", true, "The maximum time a transformation is allowed to run in milliseconds.");
         options.addOption("d", "debug", false, "Enable debug logging statements");
+        options.addOption("b", "base-uri", true, "Base URI for resolving relative URIs");
         options.addOption("df", "disable-frontend", false, "Disable the frontend (HTML) interface");
         return options;
     }

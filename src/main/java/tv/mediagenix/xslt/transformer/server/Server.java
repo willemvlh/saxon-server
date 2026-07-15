@@ -150,6 +150,7 @@ public class Server {
     try {
       return builder
           .setInsecure(options.isInsecure())
+          .setBaseURI(options.getBaseURI())
           .setConfigurationFile(options.getConfigFile())
           .setTimeout(options.getTransformationTimeoutMs())
           .setSerializationProperties(outputParameters)
