@@ -66,6 +66,15 @@ class SaxonXQueryPerformerTest {
         assertTrue(os.toString("utf-8").startsWith("{"));
     }
 
+    @Test
+    void setBaseURI() throws TransformationException, UnsupportedEncodingException {
+        SaxonXQueryPerformer p = new SaxonXQueryPerformer();
+        p.setBaseURI("file:///tmp/");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        p.act(getStream("resolve-uri('test.xml')"), os);
+        assertTrue( os.toString("UTF-8").contains("/tmp/test.xml"));
+    }
+
     private InputStream getStream(String s) {
         return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
     }

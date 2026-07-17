@@ -23,7 +23,11 @@ public class SaxonTransformer extends SaxonActor {
 
     @Override
     public SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        transformer = newTransformer(newSAXSource(stylesheet));
+        Source source = saxSourceFactory.newSAXSource(stylesheet);
+        if(getBaseURI() != null){
+            source.setSystemId(getBaseURI());
+        }
+        transformer = newTransformer(source);
         Serializer s = newSerializer(output);
         try {
             transformer.setStylesheetParameters(this.getParameters());

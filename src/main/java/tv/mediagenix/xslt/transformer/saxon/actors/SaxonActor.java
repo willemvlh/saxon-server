@@ -10,9 +10,12 @@ import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFactory;
+import tv.mediagenix.xslt.transformer.saxon.config.SaxonFixedConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFactory;
+import tv.mediagenix.xslt.transformer.saxon.config.sax.DefaultSAXSourceFactory;
+import tv.mediagenix.xslt.transformer.saxon.config.sax.SAXSourceFactory;
+import tv.mediagenix.xslt.transformer.saxon.config.sax.SecureSAXSourceFactory;
 
-import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,15 +23,24 @@ import java.util.concurrent.*;
 
 public abstract class SaxonActor {
 
-    private SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
-    private Processor processor = new Processor(this.configurationFactory.newConfiguration());
+    protected SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
+    protected SAXSourceFactory saxSourceFactory = new SecureSAXSourceFactory();
+    private Processor processor = null;
     private Map<String, String> serializationParameters = new HashMap<>();
     private Map<QName, XdmValue> parameters = new HashMap<>();
-    private Configuration configuration;
     private long timeout = 10000;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
+    private String baseURI = null;
 
     protected SaxonActor() {
+    }
+
+    private Configuration newConfiguration(){
+        return this.configurationFactory.newConfiguration();
+    }
+
+    public void setConfiguration(Configuration config){
+       this.configurationFactory = new SaxonFixedConfigurationFactory(config);
     }
 
     private String inputStreamToString(InputStream input) throws TransformationException {
@@ -54,7 +66,7 @@ public abstract class SaxonActor {
                 context = xf.transform(inputStreamToString(input), getProcessor());
             } else {
                 DocumentBuilder b = getProcessor().newDocumentBuilder();
-                context = b.build(newSAXSource(input));
+                context = b.build(saxSourceFactory.newSAXSource(input));
             }
             return actWithTimeout(context, stylesheet, output);
         } catch (SaxonApiException e) {
@@ -82,10 +94,6 @@ public abstract class SaxonActor {
         } finally {
             service.shutdown();
         }
-    }
-
-    protected SAXSource newSAXSource(InputStream stream) throws TransformationException{
-        return this.configurationFactory.newSAXSource(stream);
     }
 
     private boolean isJsonStream(InputStream stream) throws TransformationException {
@@ -117,6 +125,9 @@ public abstract class SaxonActor {
     }
 
     Processor getProcessor() {
+        if(processor == null){
+            processor = new Processor(newConfiguration());
+        }
         return processor;
     }
 
@@ -136,25 +147,15 @@ public abstract class SaxonActor {
         this.serializationParameters = serializationParameters;
     }
 
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-        this.setProcessor(new Processor(configuration));
-    }
-
-    public Configuration getConfiguration() {
-        if (configuration == null) {
-            configuration = configurationFactory.newConfiguration();
-        }
-        return configuration;
-    }
-
     public void setInsecure(boolean insecure) {
         if (insecure) {
             this.configurationFactory = new SaxonDefaultConfigurationFactory();
+            this.saxSourceFactory = new DefaultSAXSourceFactory();
         } else {
             this.configurationFactory = new SaxonSecureConfigurationFactory();
+            this.saxSourceFactory = new SecureSAXSourceFactory();
         }
-        this.setProcessor(new Processor(this.configurationFactory.newConfiguration()));
+        this.setProcessor(new Processor(newConfiguration()));
     }
 
 
@@ -168,5 +169,13 @@ public abstract class SaxonActor {
 
     public void setParameters(Map<QName, XdmValue> parameters) {
         this.parameters = parameters;
+    }
+
+    public String getBaseURI() {
+        return baseURI;
+    }
+
+    public void setBaseURI(String baseURI) {
+        this.baseURI = baseURI;
     }
 }

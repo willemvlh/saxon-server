@@ -1,22 +1,16 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.Configuration;
-import net.sf.saxon.lib.ChainedResourceResolver;
-import net.sf.saxon.lib.ResourceResolver;
-import net.sf.saxon.lib.ResourceResolverWrappingURIResolver;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import javax.xml.transform.stream.StreamSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,18 +73,9 @@ public abstract class SaxonActorBuilder {
   }
 
   public SaxonActorBuilder setBaseURI(String baseURI) {
-    if(baseURI == null || baseURI.isEmpty()) {
-      return this;
+    if(!(baseURI == null) && !(baseURI.isEmpty())) {
+      instance.setBaseURI(baseURI);
     }
-    this.instance.getConfiguration().setResourceResolver(r -> {
-      try {
-        var uri = new URI(baseURI).resolve(r.relativeUri).toString();
-        logger.debug("Resolving {} to {}", r.relativeUri, uri);
-        return new StreamSource(uri);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    });
     return this;
   }
 

@@ -91,6 +91,20 @@ public class SaxonTransformerTest {
     }
 
     @Test
+    public void setBaseURI() throws TransformationException {
+        SaxonActor actor = new SaxonTransformerBuilder().setBaseURI("file:///tmp/").build();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
+                "<xsl:output method=\"text\"/>" +
+                "<xsl:template name=\"xsl:initial-template\">" +
+                "<xsl:value-of select=\"resolve-uri('test.xml')\"/>" +
+                "</xsl:template>" +
+                "</xsl:stylesheet>";
+        actor.act(getStream(xsl), os);
+        assertEquals("file:/tmp/test.xml", os.toString());
+    }
+
+    @Test
     public void insecureTest() {
         SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
         xf.setInsecure(true);
