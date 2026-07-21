@@ -32,6 +32,11 @@ public class TestRequest {
     return this;
   }
 
+  public TestRequest addPart(MultipartBody.Part part) {
+    parts.add(part);
+    return this;
+  }
+
   public Response execute() {
     try {
       OkHttpClient client = new OkHttpClient();

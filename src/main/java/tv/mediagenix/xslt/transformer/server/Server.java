@@ -178,6 +178,7 @@ public class Server {
           .setTimeout(options.getTransformationTimeoutMs())
           .setSerializationProperties(outputParameters)
           .setParameters(parameters)
+          .setFiles(files)
           .build();
     } catch (Exception e) {
       logger.error("Error: ", e);
