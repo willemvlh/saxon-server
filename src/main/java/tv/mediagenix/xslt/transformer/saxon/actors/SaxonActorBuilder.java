@@ -11,6 +11,7 @@ import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,6 +86,18 @@ public abstract class SaxonActorBuilder {
       qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v));
     });
     instance.setParameters(qNameParams);
+    return this;
+  }
+
+  public SaxonActorBuilder setFiles(Map<String, InputStream> files) {
+    instance.setResourceResolver(r -> {
+       if(r.relativeUri != null) {
+         if(files.containsKey(r.relativeUri)){
+          return new StreamSource(files.get(r.relativeUri));
+         }
+       }
+       return null;
+    });
     return this;
   }
 
