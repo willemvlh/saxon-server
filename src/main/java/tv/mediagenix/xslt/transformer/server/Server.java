@@ -18,8 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import ch.qos.logback.classic.Logger;
@@ -69,7 +71,8 @@ public class Server {
   }
 
   private static void logParts(Request req) {
-    if (!logger.isDebugEnabled()) return;
+    if (!logger.isDebugEnabled())
+      return;
     try {
       Collection<Part> parts = req.raw().getParts();
       parts.forEach(part -> {
@@ -127,26 +130,46 @@ public class Server {
 
   private static void handleRequest(Request req, Response res, ActorType actorType) throws Exception {
     long startTime = System.currentTimeMillis();
-    req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("saxon"));
+    req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/tmp/"));
     logParts(req);
     Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
     try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl")
         .orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
+      var files = getAdditionalFiles(req);
       SaxonActor actor = getActorFromBuilder(SaxonActorBuilder.newBuilder(actorType),
-          getParameters(req.raw().getPart("output")), getParameters(req.raw().getPart("parameters")));
+          getParameters(req.raw().getPart("output")), getParameters(req.raw().getPart("parameters")), files);
       ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
-      SerializationProps props = input.isPresent() ? actor.act(input.get(), stylesheet, writeStream)
+      SerializationProps props = input.isPresent()
+          ? actor.act(input.get(), stylesheet, writeStream)
           : actor.act(stylesheet, writeStream);
       res.header("Content-Type", props.getContentType());
-      writeStream.writeTo(res.raw().getOutputStream());
-      res.raw().getOutputStream().close();
+      var outputStream = res.raw().getOutputStream();
+      writeStream.writeTo(outputStream);
+      outputStream.close();
     } finally {
       logger.info("Finished request {} in {} milliseconds", req.session().id(), System.currentTimeMillis() - startTime);
     }
   }
 
+  private static Map<String, InputStream> getAdditionalFiles(Request req) {
+    try {
+      Collection<Part> parts = req.raw().getParts();
+      return parts.stream()
+          .filter(part -> part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0)
+          .collect(Collectors.toMap(part -> part.getSubmittedFileName(), part -> {
+            try {
+              return part.getInputStream();
+            } catch (IOException e) {
+              throw new InvalidRequestException(e);
+            }
+          }));
+    } catch (ServletException | IOException e) {
+      throw new InvalidRequestException(e);
+    }
+  }
+
   private static SaxonActor getActorFromBuilder(SaxonActorBuilder builder, Map<String, String> outputParameters,
-      Map<String, String> parameters) {
+      Map<String, String> parameters, Map<String, InputStream> files) {
     try {
       return builder
           .setInsecure(options.isInsecure())

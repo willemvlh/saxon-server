@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.ResourceResolver;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
 import org.slf4j.Logger;
@@ -31,6 +32,15 @@ public abstract class SaxonActor {
     private long timeout = 10000;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private String baseURI = null;
+    private ResourceResolver resourceResolver = null;
+
+    public ResourceResolver getResourceResolver() {
+      return resourceResolver;
+    }
+
+    public void setResourceResolver(ResourceResolver resourceResolver) {
+      this.resourceResolver = resourceResolver;
+    }
 
     protected SaxonActor() {
     }
