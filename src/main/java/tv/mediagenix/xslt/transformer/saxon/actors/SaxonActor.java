@@ -18,6 +18,7 @@ import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.*;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -31,8 +32,8 @@ public abstract class SaxonActor {
     private Map<QName, XdmValue> parameters = new HashMap<>();
     private long timeout = 10000;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
-    private String baseURI = null;
-    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration().getResourceResolver());;
+    private URI baseURI = null;
+    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration());;
 
     public SaxonResourceResolver getResourceResolver() {
       return resourceResolver;
@@ -183,11 +184,14 @@ public abstract class SaxonActor {
         this.parameters = parameters;
     }
 
-    public String getBaseURI() {
+    public URI getBaseURI() {
         return baseURI;
     }
 
-    public void setBaseURI(String baseURI) {
+    public void setBaseURI(URI baseURI) {
         this.baseURI = baseURI;
+        if(baseURI != null) {
+          this.resourceResolver.setBaseURI(baseURI);
+        }
     }
 }

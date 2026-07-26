@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
@@ -74,7 +75,7 @@ class SaxonXQueryPerformerTest {
   @Test
   void setBaseURI() throws TransformationException, UnsupportedEncodingException {
     SaxonXQueryPerformer p = new SaxonXQueryPerformer();
-    p.setBaseURI("file:///tmp/");
+    p.setBaseURI(URI.create("file:///tmp/"));
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     p.act(getStream("resolve-uri('test.xml')"), os);
     assertTrue(os.toString("UTF-8").contains("/tmp/test.xml"));
