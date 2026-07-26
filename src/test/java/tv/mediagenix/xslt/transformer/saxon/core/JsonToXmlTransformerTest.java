@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer.saxon;
+package tv.mediagenix.xslt.transformer.saxon.core;
 
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;

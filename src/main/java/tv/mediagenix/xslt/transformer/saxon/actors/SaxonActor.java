@@ -1,14 +1,12 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
+import tv.mediagenix.xslt.transformer.saxon.core.SaxonResourceResolver;
 import net.sf.saxon.Configuration;
-import net.sf.saxon.lib.ResourceResolver;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tv.mediagenix.xslt.transformer.saxon.JsonToXmlTransformer;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.JsonToXmlTransformer;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonDefaultConfigurationFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.SaxonFixedConfigurationFactory;
@@ -16,6 +14,8 @@ import tv.mediagenix.xslt.transformer.saxon.config.SaxonSecureConfigurationFacto
 import tv.mediagenix.xslt.transformer.saxon.config.sax.DefaultSAXSourceFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.sax.SAXSourceFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.sax.SecureSAXSourceFactory;
+import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.*;
 import java.util.HashMap;
@@ -32,13 +32,13 @@ public abstract class SaxonActor {
     private long timeout = 10000;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private String baseURI = null;
-    private ResourceResolver resourceResolver = null;
+    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration().getResourceResolver());;
 
-    public ResourceResolver getResourceResolver() {
+    public SaxonResourceResolver getResourceResolver() {
       return resourceResolver;
     }
 
-    public void setResourceResolver(ResourceResolver resourceResolver) {
+    public void setResourceResolver(SaxonResourceResolver resourceResolver) {
       this.resourceResolver = resourceResolver;
     }
 
@@ -161,9 +161,11 @@ public abstract class SaxonActor {
         if (insecure) {
             this.configurationFactory = new SaxonDefaultConfigurationFactory();
             this.saxSourceFactory = new DefaultSAXSourceFactory();
+            this.resourceResolver.setAllowExternalResources(true);
         } else {
             this.configurationFactory = new SaxonSecureConfigurationFactory();
             this.saxSourceFactory = new SecureSAXSourceFactory();
+            this.resourceResolver.setAllowExternalResources(false);
         }
         this.setProcessor(new Processor(newConfiguration()));
     }

@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

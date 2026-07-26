@@ -2,8 +2,8 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import javax.xml.transform.Source;
 import java.io.InputStream;
@@ -66,9 +66,7 @@ public class SaxonTransformer extends SaxonActor {
     try {
       XsltExecutable e = c.compile(stylesheet);
       Xslt30Transformer xf = e.load30();
-      if (this.getResourceResolver() != null) {
-        xf.setResourceResolver(this.getResourceResolver());
-      }
+      xf.setResourceResolver(this.getResourceResolver());
       xf.setMessageHandler(newMessageHandler());
       return xf;
     } catch (SaxonApiException e) {

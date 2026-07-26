@@ -140,16 +140,25 @@ public class ServerTests {
   }
 
   @Test
-
   public void files() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.xml",
         RequestBody.create("<abc>test</abc>", MediaType.get("application/xml"))));
     req.addXML(WellFormedXml).addXSL(XslWithFile);
-    var res = runServer(req::execute, "--insecure");
+    var res = runServer(req::execute);
     assertEquals(200, res.code());
     assertEquals("test", res.body().string());
+  }
 
+  @Test
+  public void wronglyNamedFile() throws IOException {
+    TestRequest req = new TestRequest();
+    req.addPart(MultipartBody.Part.createFormData("file", "wrong_name_whatever.xml",
+        RequestBody.create("<abc>test</abc>", MediaType.get("application/xml"))));
+    req.addXML(WellFormedXml).addXSL(XslWithFile);
+    var res = runServer(req::execute, "--insecure");
+    logger.info("Response: {}", res.body().string());
+    assertEquals(400, res.code());
   }
 
   @Test

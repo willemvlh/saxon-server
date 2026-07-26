@@ -5,13 +5,15 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,14 +92,7 @@ public abstract class SaxonActorBuilder {
   }
 
   public SaxonActorBuilder setFiles(Map<String, InputStream> files) {
-    instance.setResourceResolver(r -> {
-       if(r.relativeUri != null) {
-         if(files.containsKey(r.relativeUri)){
-          return new StreamSource(files.get(r.relativeUri));
-         }
-       }
-       return null;
-    });
+    instance.getResourceResolver().setFiles(files);
     return this;
   }
 

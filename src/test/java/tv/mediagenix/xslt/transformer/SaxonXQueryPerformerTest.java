@@ -1,11 +1,12 @@
 package tv.mediagenix.xslt.transformer;
 
 import org.junit.jupiter.api.Test;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
+import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

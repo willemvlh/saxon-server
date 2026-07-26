@@ -2,8 +2,8 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,9 +18,7 @@ public class SaxonXQueryPerformer extends SaxonActor {
     compiler.getUnderlyingStaticContext().setBaseURI(baseUri);
     this.executable = compiler.compile(query);
     XQueryEvaluator evaluator = this.executable.load();
-    if (this.getResourceResolver() != null) {
-      evaluator.setResourceResolver(this.getResourceResolver());
-    }
+    evaluator.setResourceResolver(this.getResourceResolver());
     this.getParameters().forEach(evaluator::setExternalVariable);
     return evaluator;
   }

@@ -1,7 +1,8 @@
 package tv.mediagenix.xslt.transformer.saxon.config.sax;
 
 import org.xml.sax.InputSource;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
+
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
