@@ -13,13 +13,14 @@ import org.slf4j.LoggerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class SaxonActorBuilder {
-  private final SaxonActor instance;
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final SaxonActor instance = this.createNewInstance();
+
+  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
   public static SaxonActorBuilder newBuilder(ActorType type) {
     switch (type) {
       case TRANSFORM:
@@ -31,15 +32,7 @@ public abstract class SaxonActorBuilder {
     }
   }
 
-  protected SaxonActorBuilder() {
-    try {
-      this.instance = this.getActorClass().newInstance();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public abstract Class<? extends SaxonActor> getActorClass();
+  protected abstract SaxonActor createNewInstance();
 
   public SaxonActorBuilder setSerializationProperties(Map<String, String> parameters) {
     instance.setSerializationParameters(parameters);
