@@ -2,8 +2,9 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 
 public class SaxonTransformerBuilder extends SaxonActorBuilder {
 
-    @Override
-    public Class<? extends SaxonActor> getActorClass() {
-        return SaxonTransformer.class;
-    }
+  @Override
+  protected SaxonActor createNewInstance() {
+    return new SaxonTransformer();
+  }
+
 }

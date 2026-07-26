@@ -5,9 +5,10 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
@@ -19,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,9 +66,11 @@ public class Server {
   }
 
   private static void configureFilters() {
-    before("/*", (req, res) -> logger.info("Received request from {} (session-id = {}, content-length={})", req.ip(),
-        req.session().id(), req.contentLength()));
-    before("/*", (req, res) -> res.raw().setHeader("Server", "/"));
+    before("/*", (req, res) -> {
+      logger.info("Received request from {} (session-id = {}, content-length={})", req.ip(),
+          req.session().id(), req.contentLength());
+      res.raw().setHeader("Server", "/");
+    });
   }
 
   private static void logParts(Request req) {
@@ -77,7 +79,8 @@ public class Server {
     try {
       Collection<Part> parts = req.raw().getParts();
       parts.forEach(part -> {
-        logger.debug("Part: type={}, name={}, filename={}, size={}", part.getContentType(), part.getName(), part.getSubmittedFileName(), part.getSize());
+        logger.debug("Part: type={}, name={}, filename={}, size={}", part.getContentType(), part.getName(),
+            part.getSubmittedFileName(), part.getSize());
         try {
           logger.debug(new String(part.getInputStream().readAllBytes()));
         } catch (IOException e) {
@@ -107,7 +110,6 @@ public class Server {
     logger.debug("Invalid request:");
     logger.debug("IP: {}", req.ip());
     logger.debug("Content-Type: {}", req.contentType());
-
   }
 
   private static void configureRoutes() {
@@ -120,16 +122,16 @@ public class Server {
   }
 
   private static Object handleXQueryRequest(Request req, Response res) throws Exception {
-    handleRequest(req, res, ActorType.QUERY);
+    handleRequest(req, res, new SaxonXQueryPerformerBuilder());
     return 0;
   }
 
   private static Object handleXsltRequest(Request req, Response res) throws Exception {
-    handleRequest(req, res, ActorType.TRANSFORM);
+    handleRequest(req, res, new SaxonTransformerBuilder());
     return 0;
   }
 
-  private static void handleRequest(Request req, Response res, ActorType actorType) throws Exception {
+  private static void handleRequest(Request req, Response res, SaxonActorBuilder builder) throws Exception {
     long startTime = System.currentTimeMillis();
     req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/tmp/"));
     logParts(req);
@@ -137,7 +139,7 @@ public class Server {
     try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl")
         .orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
       var files = getAdditionalFiles(req);
-      SaxonActor actor = getActorFromBuilder(SaxonActorBuilder.newBuilder(actorType),
+      SaxonActor actor = getActorFromBuilder(builder,
           getParameters(req.raw().getPart("output")), getParameters(req.raw().getPart("parameters")), files);
       ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
       SerializationProps props = input.isPresent()
@@ -182,7 +184,7 @@ public class Server {
           .setFiles(files)
           .build();
     } catch (Exception e) {
-      logger.error("Error: ", e);
+      logger.error("Error during actor construction: ", e);
       throw new InvalidRequestException(e);
     }
   }
@@ -194,7 +196,7 @@ public class Server {
       InputStream s = part.getInputStream();
       return new ParameterParser().parseStream(s, (int) part.getSize());
     } catch (IOException | IllegalArgumentException e) {
-      logger.debug("Could not read parameters.", e);
+      logger.error("Could not read parameters.", e);
       throw new InvalidRequestException(e.getMessage());
     }
   }
