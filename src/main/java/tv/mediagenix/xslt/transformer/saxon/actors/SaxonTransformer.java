@@ -27,7 +27,7 @@ public class SaxonTransformer extends SaxonActor {
       throws TransformationException {
     Source source = saxSourceFactory.newSAXSource(stylesheet);
     if (getBaseURI() != null) {
-      source.setSystemId(getBaseURI());
+      source.setSystemId(getBaseURI().toString());
     }
     transformer = newTransformer(source);
     Serializer s = newSerializer(output);
@@ -67,6 +67,7 @@ public class SaxonTransformer extends SaxonActor {
       XsltExecutable e = c.compile(stylesheet);
       Xslt30Transformer xf = e.load30();
       xf.setResourceResolver(this.getResourceResolver());
+      xf.setUnparsedTextResolver(this.getResourceResolver());
       xf.setMessageHandler(newMessageHandler());
       return xf;
     } catch (SaxonApiException e) {

@@ -11,6 +11,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
@@ -95,7 +96,7 @@ public class SaxonTransformerTest {
 
   @Test
   public void setBaseURI() throws TransformationException {
-    SaxonActor actor = new SaxonTransformerBuilder().setBaseURI("file:///tmp/").build();
+    SaxonActor actor = new SaxonTransformerBuilder().setBaseURI(URI.create("file:///tmp/")).build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
         "<xsl:output method=\"text\"/>" +

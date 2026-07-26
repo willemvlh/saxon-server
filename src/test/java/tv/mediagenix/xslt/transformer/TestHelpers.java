@@ -1,7 +1,11 @@
 package tv.mediagenix.xslt.transformer;
 
 import okhttp3.*;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 import spark.Spark;
 import tv.mediagenix.xslt.transformer.server.Server;
 
@@ -21,6 +25,8 @@ public class TestHelpers {
   public static String MalformedXml = readResource("xml/malformed.xml");
   public static String XslWithParameters = readResource("xsl/test-parameters.xsl");
   public static String XslWithFile = readResource("xsl/test-file.xsl");
+  public static String XslWithUnparsedTextFn = readResource("xsl/test-unparsed-text-fn.xsl");
+  public static String XslWithJsonDocFn = readResource("xsl/test-json-doc-fn.xsl");
 
   public static InputStream WellFormedXslWithInitialTemplateStream() {
     return resourceStream("xsl/test-initial-template.xsl");

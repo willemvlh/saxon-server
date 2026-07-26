@@ -3,6 +3,7 @@ package tv.mediagenix.xslt.transformer.server;
 import net.sf.saxon.s9api.Processor;
 import org.apache.commons.cli.*;
 import java.io.File;
+import java.net.URI;
 
 public class ServerOptions {
     private Integer port = 5000;
@@ -11,13 +12,13 @@ public class ServerOptions {
     private long transformationTimeoutMs = 2 * 60 * 1000;
     private boolean debug = false;
     private boolean disableFrontend = false;
-    private String baseURI = null;
+    private URI baseURI = null;
 
-    public String getBaseURI() {
+    public URI getBaseURI() {
       return baseURI;
     }
 
-    public void setBaseURI(String baseURI) {
+    public void setBaseURI(URI baseURI) {
       this.baseURI = baseURI;
     }
 
@@ -103,7 +104,8 @@ public class ServerOptions {
             serverOptions.setDisableFrontend(true);
         }
         if (cmd.hasOption("base-uri")) {
-            serverOptions.setBaseURI(cmd.getOptionValue("base-uri"));
+            URI baseUri = URI.create(cmd.getOptionValue("base-uri"));
+            serverOptions.setBaseURI(baseUri);
         }
 
         return serverOptions;

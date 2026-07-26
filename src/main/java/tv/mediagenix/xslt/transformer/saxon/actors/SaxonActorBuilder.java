@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,17 +21,6 @@ public abstract class SaxonActorBuilder {
   private final SaxonActor instance = this.createNewInstance();
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-  public static SaxonActorBuilder newBuilder(ActorType type) {
-    switch (type) {
-      case TRANSFORM:
-        return new SaxonTransformerBuilder();
-      case QUERY:
-        return new SaxonXQueryPerformerBuilder();
-      default:
-        throw new IllegalStateException("Unexpected value: " + type);
-    }
-  }
 
   protected abstract SaxonActor createNewInstance();
 
@@ -68,10 +58,8 @@ public abstract class SaxonActorBuilder {
     return instance;
   }
 
-  public SaxonActorBuilder setBaseURI(String baseURI) {
-    if(!(baseURI == null) && !(baseURI.isEmpty())) {
-      instance.setBaseURI(baseURI);
-    }
+  public SaxonActorBuilder setBaseURI(URI baseURI) {
+    instance.setBaseURI(baseURI);
     return this;
   }
 

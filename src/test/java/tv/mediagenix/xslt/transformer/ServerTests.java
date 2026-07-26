@@ -2,7 +2,10 @@ package tv.mediagenix.xslt.transformer;
 
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -148,6 +151,39 @@ public class ServerTests {
     var res = runServer(req::execute);
     assertEquals(200, res.code());
     assertEquals("test", res.body().string());
+  }
+
+  @Test
+  public void filesUnparsedText() throws IOException {
+    TestRequest req = new TestRequest();
+    req.addPart(MultipartBody.Part.createFormData("file", "test.txt",
+        RequestBody.create("test", MediaType.get("application/text"))));
+    req.addXML(WellFormedXml).addXSL(XslWithUnparsedTextFn);
+    var res = runServer(req::execute);
+    assertEquals(200, res.code());
+    assertEquals("test", res.body().string());
+  }
+
+  @Test
+  public void filesUnparsedTextWithModifiedBaseUri() throws IOException {
+    TestRequest req = new TestRequest();
+    req.addPart(MultipartBody.Part.createFormData("file", "test.txt",
+        RequestBody.create("test", MediaType.get("application/text"))));
+    req.addXML(WellFormedXml).addXSL(XslWithUnparsedTextFn);
+    var res = runServer(req::execute, "--debug", "--base-uri", "http://localhost:5000/files/");
+    assertEquals(200, res.code());
+    assertEquals("test", res.body().string());
+  }
+
+  @Test
+  public void filesJsonDoc() throws IOException {
+    TestRequest req = new TestRequest();
+    req.addPart(MultipartBody.Part.createFormData("file", "test.json",
+        RequestBody.create("{\"key\": \"value\"}", MediaType.get("application/json"))));
+    req.addXML(WellFormedXml).addXSL(XslWithJsonDocFn);
+    var res = runServer(req::execute);
+    assertEquals(200, res.code());
+    assertEquals("value", res.body().string());
   }
 
   @Test
