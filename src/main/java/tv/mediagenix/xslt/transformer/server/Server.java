@@ -5,11 +5,12 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-import tv.mediagenix.xslt.transformer.saxon.SerializationProps;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.ActorType;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
+import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
@@ -76,7 +77,7 @@ public class Server {
     try {
       Collection<Part> parts = req.raw().getParts();
       parts.forEach(part -> {
-        logger.debug("Part: type={}, name={}, size={}", part.getContentType(), part.getName(), part.getSize());
+        logger.debug("Part: type={}, name={}, filename={}, size={}", part.getContentType(), part.getName(), part.getSubmittedFileName(), part.getSize());
         try {
           logger.debug(new String(part.getInputStream().readAllBytes()));
         } catch (IOException e) {

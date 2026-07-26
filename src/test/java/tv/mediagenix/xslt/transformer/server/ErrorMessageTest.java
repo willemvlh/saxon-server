@@ -2,8 +2,8 @@ package tv.mediagenix.xslt.transformer.server;
 
 import org.junit.jupiter.api.Test;
 import tv.mediagenix.xslt.transformer.TestHelpers;
-import tv.mediagenix.xslt.transformer.saxon.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

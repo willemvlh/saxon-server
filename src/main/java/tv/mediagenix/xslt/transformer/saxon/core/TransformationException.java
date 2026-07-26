@@ -1,4 +1,4 @@
-package tv.mediagenix.xslt.transformer.saxon;
+package tv.mediagenix.xslt.transformer.saxon.core;
 
 public class TransformationException extends Exception {
     public TransformationException(Throwable e) {
