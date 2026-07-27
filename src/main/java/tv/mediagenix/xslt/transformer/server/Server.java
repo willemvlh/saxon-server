@@ -83,8 +83,8 @@ public class Server {
         logger.debug("Part: type={}, name={}, filename={}, size={}", part.getContentType(), part.getName(),
             part.getSubmittedFileName(), part.getSize());
         try {
-          var stream = getStreamFromPart(part);
-
+          var buffer = getStreamFromPart(part).readAllBytes();
+          logger.debug("Contents: {}", new String(buffer));
         } catch (IOException e) {
           logger.debug("Could not read part {}: {}", part.getName(), e.getMessage());
         }
