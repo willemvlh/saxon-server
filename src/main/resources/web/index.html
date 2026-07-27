@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Transformation</title>
+    <title>Saxon server</title>
     <style>
       :root {
         --accent: #2563eb;
@@ -139,7 +139,10 @@
 </textarea>
           </div>
         </div>
-        <input type="file" id="fileInput" name="fileInput" />
+        <div id="file" style="margin: 10px 0;">
+          <label for="fileInput">Additional files</label>  
+          <input type="file" id="fileInput" name="fileInput">  
+        </div>
         <button type="submit">Transform</button>
       </form>
     </main>

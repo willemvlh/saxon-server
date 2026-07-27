@@ -20,9 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SaxonTransformerTest {
   SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
 
-  public SaxonTransformerTest() throws TransformationException {
-  }
-
   @Test
   public void transformTest() throws UnsupportedEncodingException, TransformationException {
     ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedXml, TestHelpers.WellFormedXsl);
@@ -129,6 +126,17 @@ public class SaxonTransformerTest {
     SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
     xf.setInsecure(true);
     assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-dtd.xsl"),
+        new ByteArrayOutputStream()));
+  }
+
+  @Test
+  public void collectionTest(){
+    SaxonTransformer xf = new SaxonTransformer();
+    xf.setInsecure(false);
+    assertThrows(TransformationException.class, () -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
+        new ByteArrayOutputStream()));
+    xf.setInsecure(true);
+    assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
         new ByteArrayOutputStream()));
   }
 
