@@ -33,7 +33,7 @@ public abstract class SaxonActor {
     private long timeout = 10000;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private URI baseURI = null;
-    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration());;
+    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration());
 
     public SaxonResourceResolver getResourceResolver() {
       return resourceResolver;

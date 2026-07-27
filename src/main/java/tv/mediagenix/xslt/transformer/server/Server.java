@@ -162,7 +162,7 @@ public class Server {
     try {
       Collection<Part> parts = req.raw().getParts();
       return parts.stream()
-          .filter(part -> part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0)
+          .filter(part -> part.getSubmittedFileName() != null && !part.getSubmittedFileName().isEmpty())
           .collect(Collectors.toMap(part -> part.getSubmittedFileName(), part -> {
             try {
               return getStreamFromPart(part);
