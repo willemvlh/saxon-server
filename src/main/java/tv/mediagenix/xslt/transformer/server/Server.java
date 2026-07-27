@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipException;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
@@ -82,7 +83,8 @@ public class Server {
         logger.debug("Part: type={}, name={}, filename={}, size={}", part.getContentType(), part.getName(),
             part.getSubmittedFileName(), part.getSize());
         try {
-          logger.debug(new String(part.getInputStream().readAllBytes()));
+          var stream = getStreamFromPart(part);
+
         } catch (IOException e) {
           logger.debug("Could not read part {}: {}", part.getName(), e.getMessage());
         }
@@ -138,9 +140,11 @@ public class Server {
     Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
     try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl")
         .orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
-      var files = getAdditionalFiles(req);
-      SaxonActor actor = getActorFromBuilder(builder,
-          getParameters(req.raw().getPart("output")), getParameters(req.raw().getPart("parameters")), files);
+      SaxonActor actor = getActorFromBuilder(
+          builder,
+          getParameters(req.raw().getPart("output")),
+          getParameters(req.raw().getPart("parameters")),
+          getAdditionalFiles(req));
       ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
       SerializationProps props = input.isPresent()
           ? actor.act(input.get(), stylesheet, writeStream)
@@ -161,7 +165,7 @@ public class Server {
           .filter(part -> part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0)
           .collect(Collectors.toMap(part -> part.getSubmittedFileName(), part -> {
             try {
-              return part.getInputStream();
+              return getStreamFromPart(part);
             } catch (IOException e) {
               throw new InvalidRequestException(e);
             }
@@ -208,30 +212,25 @@ public class Server {
         logger.debug("No part found named {} in request {}", key, req.session().id());
         return Optional.empty();
       }
-      return getStreamFromPart(part);
+      return Optional.ofNullable(getStreamFromPart(part));
     } catch (ServletException e) {
       throw new InvalidRequestException(String
           .format("Could not read parts for key \"%s\" - did you forget to attach a file? (%s)", key, e.getMessage()));
     }
   }
 
-  private static Optional<InputStream> getStreamFromPart(Part part) throws IOException {
+  private static InputStream getStreamFromPart(Part part) throws IOException {
     String contentType = part.getContentType();
     if ("application/gzip".equalsIgnoreCase(contentType)) {
-      logger.debug("Payload is zipped, attempting to  unzip...");
-      return Optional.of(getZippedStreamFromPart(part.getInputStream()));
+      logger.debug("Payload is zipped");
+      try {
+        return new GZIPInputStream(part.getInputStream());
+      } catch (ZipException e) {
+        logger.error("Could not unzip payload: {}", e.getMessage());
+        throw new InvalidRequestException("Could not unzip payload: " + e.getMessage());
+      }
     }
-    return Optional.ofNullable(part.getInputStream());
-  }
-
-  private static InputStream getZippedStreamFromPart(InputStream input) {
-    try {
-      GZIPInputStream s = new GZIPInputStream(input);
-      ZippedStreamReader r = new ZippedStreamReader();
-      return r.unzipStream(s);
-    } catch (IOException e) {
-      throw new InvalidRequestException(e);
-    }
+    return part.getInputStream();
   }
 
   private static void handleException(Throwable e, Response res, int status) {
