@@ -187,6 +187,21 @@ public class ServerTests {
   }
 
   @Test
+  public void filesGzipped() throws IOException {
+    var byteStream = new ByteArrayOutputStream();
+    GZIPOutputStream out = new GZIPOutputStream(byteStream);
+    out.write("<abc>test</abc>".getBytes(StandardCharsets.UTF_8));
+    out.close();
+    TestRequest req = new TestRequest();
+    req.addPart(MultipartBody.Part.createFormData("file", "test.xml",
+        RequestBody.create( byteStream.toByteArray(), MediaType.get("application/gzip"))));
+    req.addXML(WellFormedXml).addXSL(XslWithFile);
+    var res = runServer(req::execute);
+    assertEquals(200, res.code());
+    assertEquals("test", res.body().string());
+  }
+
+  @Test
   public void wronglyNamedFile() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "wrong_name_whatever.xml",
