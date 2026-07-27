@@ -93,16 +93,16 @@ public class SaxonTransformerTest {
 
   @Test
   public void setBaseURI() throws TransformationException {
-    SaxonActor actor = new SaxonTransformerBuilder().setBaseURI(URI.create("file:///tmp/")).build();
+    SaxonActor actor = new SaxonTransformerBuilder().setBaseURI(URI.create("http://www.google.com")).build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
         "<xsl:output method=\"text\"/>" +
         "<xsl:template name=\"xsl:initial-template\">" +
-        "<xsl:value-of select=\"resolve-uri('test.xml')\"/>" +
+        "<xsl:value-of select=\"resolve-uri('test.xml') || '_' || static-base-uri()\"/>" +
         "</xsl:template>" +
         "</xsl:stylesheet>";
     actor.act(getStream(xsl), os);
-    assertEquals("file:/tmp/test.xml", os.toString());
+    assertEquals("http://www.google.com/test.xml_http://www.google.com", os.toString());
   }
 
   @Test
