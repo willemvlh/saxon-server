@@ -63,27 +63,26 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
   public Source resolve(ResourceRequest request) throws XPathException {
     logger.debug("Resolving resource -> Relative URI: {}, Base URI: {}, URI: {}, Nature: {}", request.relativeUri,
         request.baseUri, request.uri, request.nature);
-    if (request.relativeUri != null) {
-      if (files.containsKey(request.relativeUri)) {
-        logger.debug("Resource found in files map: {}", request.relativeUri);
-        return new StreamSource(files.get(request.relativeUri));
-      }
+    if (request.relativeUri != null && files.containsKey(request.relativeUri)) {
+      logger.debug("Resource found in files map: {}", request.relativeUri);
+      return new StreamSource(files.get(request.relativeUri));
     }
-    if (allowExternalResources()) {
-      return defaultResourceResolver.resolve(request);
-    } else {
+    if (!allowExternalResources()) {
       throw new XPathException("External resource access is not allowed: " + request.relativeUri);
     }
+    return defaultResourceResolver.resolve(request);
   }
 
   @Override
   public Reader resolve(URI absoluteURI, String encoding, Configuration config) throws XPathException {
-    logger.debug("Resolving unparsed text URI -> Base URI: {}, Absolute URI: {}, Encoding: {}", baseURI, absoluteURI, encoding);
+    logger.debug("Resolving unparsed text URI -> Base URI: {}, Absolute URI: {}, Encoding: {}", baseURI, absoluteURI,
+        encoding);
     /*
-     * Unfortunately, we only get an absolute URI, which makes it hard to tell how to resolve the request 
-     * against any files supplied in the HTTP request. 
+     * Unfortunately, we only get an absolute URI, which makes it hard to tell how
+     * to resolve the request against any files supplied in the HTTP request.
      * To work around this, we subtract the base URI set by the application from the absoluteURI parameter.
      */
+
     var relativeURI = baseURI.relativize(absoluteURI);
     if (files.containsKey(relativeURI.toString())) {
       logger.debug("Resource found in files map: {}", relativeURI);
