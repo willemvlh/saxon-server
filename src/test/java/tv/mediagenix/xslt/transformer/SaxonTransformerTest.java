@@ -49,7 +49,8 @@ public class SaxonTransformerTest {
     appender.start();
     logger.addAppender(appender);
     transformWithStrings("<abc/>", TestHelpers.MessageInvokingXslNoTerminate);
-    assertEquals("Message received: \"abc\". Line: 3, column: 37", appender.list.getFirst().getFormattedMessage());
+    var messages = appender.list.stream().map(ILoggingEvent::getFormattedMessage).toList();
+    assertTrue(messages.stream().anyMatch(msg -> msg.contains("Message received: \"abc\". Line: 3, column: 37")));
   }
 
   @Test

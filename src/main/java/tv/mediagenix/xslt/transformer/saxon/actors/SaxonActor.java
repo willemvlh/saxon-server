@@ -33,7 +33,7 @@ public abstract class SaxonActor {
     private long timeout = 10000;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private URI baseURI = null;
-    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration());
+    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration(), false);
 
     public SaxonResourceResolver getResourceResolver() {
       return resourceResolver;
@@ -162,11 +162,11 @@ public abstract class SaxonActor {
         if (insecure) {
             this.configurationFactory = new SaxonDefaultConfigurationFactory();
             this.saxSourceFactory = new DefaultSAXSourceFactory();
-            this.resourceResolver.setAllowExternalResources(true);
+            this.setResourceResolver(new SaxonResourceResolver(newConfiguration(), true));
         } else {
             this.configurationFactory = new SaxonSecureConfigurationFactory();
             this.saxSourceFactory = new SecureSAXSourceFactory();
-            this.resourceResolver.setAllowExternalResources(false);
+            this.setResourceResolver(new SaxonResourceResolver(newConfiguration(), false));
         }
         this.setProcessor(new Processor(newConfiguration()));
     }

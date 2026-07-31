@@ -18,6 +18,7 @@ import static tv.mediagenix.xslt.transformer.TestHelpers.*;
 
 public class ServerTests {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(ServerTests.class);
+
   @Test
   public void transformation() {
     runServer(() -> {
@@ -75,7 +76,7 @@ public class ServerTests {
     MultipartBody.Builder builder = new MultipartBody.Builder();
     builder.setType(MultipartBody.FORM);
     var part = MultipartBody.Part.createFormData("xsl", "xsl.xsl",
-        RequestBody.create(MediaType.get("application/gzip"), byteStream.toByteArray()));
+        RequestBody.create(byteStream.toByteArray(), MediaType.get("application/gzip")));
     builder.addPart(part);
     var request = new Request.Builder().url("http://localhost:5000/transform").post(builder.build()).build();
     runServer(() -> {
@@ -194,7 +195,7 @@ public class ServerTests {
     out.close();
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.xml",
-        RequestBody.create( byteStream.toByteArray(), MediaType.get("application/gzip"))));
+        RequestBody.create(byteStream.toByteArray(), MediaType.get("application/gzip"))));
     req.addXML(WellFormedXml).addXSL(XslWithFile);
     var res = runServer(req::execute);
     assertEquals(200, res.code());
@@ -249,12 +250,29 @@ public class ServerTests {
   }
 
   @Test
-
   public void getWebPageWhenDisabled() throws IOException {
     TestRequest req = new TestRequest();
     req.setPath("/");
     req.setIsGetRequest();
     var res = runServer(req::execute, "--disable-frontend");
     assertEquals(404, res.code());
+  }
+
+  @Test
+  public void httpRequestInsecure() throws IOException {
+    TestRequest req = new TestRequest();
+    req.addXSL(XslWithHttpRequest)
+      .addXML("<abc/>");
+    var res = runServer(req::execute, "--insecure");
+    assertEquals(200, res.code());
+  }
+
+  @Test
+  public void httpRequestSecure() throws IOException {
+    TestRequest req = new TestRequest();
+    req.addXSL(XslWithHttpRequest)
+      .addXML("<abc/>");
+    var res = runServer(req::execute);
+    assertEquals(400, res.code());
   }
 }

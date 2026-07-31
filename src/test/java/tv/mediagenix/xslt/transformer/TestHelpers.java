@@ -27,6 +27,7 @@ public class TestHelpers {
   public static String XslWithFile = readResource("xsl/test-file.xsl");
   public static String XslWithUnparsedTextFn = readResource("xsl/test-unparsed-text-fn.xsl");
   public static String XslWithJsonDocFn = readResource("xsl/test-json-doc-fn.xsl");
+  public static String XslWithHttpRequest = readResource("xsl/test-http.xsl");
 
   public static InputStream WellFormedXslWithInitialTemplateStream() {
     return resourceStream("xsl/test-initial-template.xsl");
