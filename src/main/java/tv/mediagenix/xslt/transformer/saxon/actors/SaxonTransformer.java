@@ -8,6 +8,7 @@ import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 import javax.xml.transform.Source;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -62,6 +63,9 @@ public class SaxonTransformer extends SaxonActor {
   private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
     Processor p = getProcessor();
     XsltCompiler c = p.newXsltCompiler();
+    logger.warn("Protocol restrictor test for https://www.google.com: {}",
+    p.getUnderlyingConfiguration().getProtocolRestrictor().test(URI.create("https://www.google.com"))
+);
     c.setErrorList(this.getErrorList());
     try {
       XsltExecutable e = c.compile(stylesheet);

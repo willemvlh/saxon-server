@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ServerOptionsTest {
-
   SaxonActor actor = new SaxonTransformerBuilder().build();
 
   private File configFile(String location) {

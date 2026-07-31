@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.ProtocolRestrictor;
 import net.sf.saxon.lib.ResourceRequest;
 import net.sf.saxon.lib.ResourceResolver;
 import net.sf.saxon.lib.UnparsedTextURIResolver;
@@ -28,6 +29,7 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
   private ResourceResolver defaultResourceResolver;
   private UnparsedTextURIResolver defaultUnparsedTextURIResolver;
   private URI baseURI = Paths.get("").toAbsolutePath().toUri();
+  private ProtocolRestrictor protocolRestrictor;
 
   public URI getBaseURI() {
     return baseURI;
@@ -37,18 +39,11 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
     this.baseURI = baseURI;
   }
 
-  public SaxonResourceResolver(Configuration config) {
+  public SaxonResourceResolver(Configuration config, boolean allowExternalResources) {
+    this.allowExternalResources = allowExternalResources;
     this.defaultResourceResolver = config.getResourceResolver();
     this.defaultUnparsedTextURIResolver = config.getUnparsedTextURIResolver();
-    this.allowExternalResources = false;
-  }
-
-  public boolean allowExternalResources() {
-    return allowExternalResources;
-  }
-
-  public void setAllowExternalResources(boolean allowExternalResources) {
-    this.allowExternalResources = allowExternalResources;
+    this.protocolRestrictor = config.getProtocolRestrictor();
   }
 
   public Map<String, InputStream> getFiles() {
@@ -67,10 +62,11 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
       logger.debug("Resource found in files map: {}", request.relativeUri);
       return new StreamSource(files.get(request.relativeUri));
     }
-    if (!allowExternalResources()) {
-      throw new XPathException("External resource access is not allowed: " + request.relativeUri);
+    if (allowExternalResources && protocolRestrictor.test(URI.create(request.uri))) {
+      logger.debug("Resource not found in files map, delegating to default resource resolver");
+      return defaultResourceResolver.resolve(request);
     }
-    return defaultResourceResolver.resolve(request);
+    throw new XPathException("External resource access is not allowed: " + request.relativeUri);
   }
 
   @Override
@@ -80,7 +76,8 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
     /*
      * Unfortunately, we only get an absolute URI, which makes it hard to tell how
      * to resolve the request against any files supplied in the HTTP request.
-     * To work around this, we subtract the base URI set by the application from the absoluteURI parameter.
+     * To work around this, we subtract the base URI set by the application from the
+     * absoluteURI parameter.
      */
 
     var relativeURI = baseURI.relativize(absoluteURI);
@@ -92,7 +89,8 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
         throw new XPathException("Unsupported encoding: " + encoding, e);
       }
     }
-    if (allowExternalResources()) {
+    if (allowExternalResources && protocolRestrictor.test(absoluteURI)) {
+      logger.debug("Resource not found in files map, delegating to default resource resolver");
       return defaultUnparsedTextURIResolver.resolve(absoluteURI, encoding, config);
     } else {
       throw new XPathException("External resource access is not allowed: " + absoluteURI);
