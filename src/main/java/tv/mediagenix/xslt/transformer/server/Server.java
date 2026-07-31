@@ -40,7 +40,7 @@ public class Server {
     try {
       options = ServerOptions.fromArgs(args);
       setUp();
-    } catch (ParseException e) {
+    } catch (ParseException | InvalidOptionException e) {
       System.err.println(e.getMessage());
       System.exit(-1);
     }

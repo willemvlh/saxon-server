@@ -10,6 +10,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+import tv.mediagenix.xslt.transformer.server.InvalidOptionException;
 import tv.mediagenix.xslt.transformer.server.ServerOptions;
 
 import javax.xml.transform.stream.StreamSource;
@@ -89,7 +90,7 @@ public class ServerOptionsTest {
   }
 
   @Test
-  public void LoggingTestCase() throws ParseException {
+  public void LoggingTestCase() throws ParseException, InvalidOptionException {
     ServerOptions opts = ServerOptions.fromArgs(new String[] { "-debug" });
     assertTrue(opts.isDebuggingEnabled());
     opts = ServerOptions.fromArgs(new String[] { "-d" });
@@ -97,12 +98,12 @@ public class ServerOptionsTest {
   }
 
   @Test
-  public void SetOptionsFromArgumentsTest() throws ParseException, URISyntaxException {
+  public void SetOptionsFromArgumentsTest() throws ParseException, InvalidOptionException , URISyntaxException {
     String configFilePath = configFile("saxon-config/saxon-config.xml").getPath();
     String[] args = { "-port", "3000", "-config", configFilePath };
     ServerOptions opts = ServerOptions.fromArgs(args);
     assertEquals(3000, (int) opts.getPort());
-    Assertions.assertThrows(RuntimeException.class,
+    Assertions.assertThrows(InvalidOptionException.class,
         () -> ServerOptions.fromArgs(new String[] { "-config", configFilePath, "-insecure" }));
     assertTrue(ServerOptions.fromArgs(new String[] { "-insecure" }).isInsecure());
     assertEquals(configFilePath, opts.getConfigFile().getPath());
