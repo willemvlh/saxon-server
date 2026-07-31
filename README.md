@@ -18,15 +18,15 @@ Otherwise, start the server by running `java -jar saxon-1.15.jar`.
 
 Following command-line options are available:
 
-* `-c`, `--config`: Location to Saxon configuration XML file
+* `-b`, `--base-uri <arg>`      Base URI for resolving relative URIs
+* `-c`, `--config <arg>`: Location to Saxon configuration XML file
 * `-d`, `--debug`: Enable debug logging statements
+* `-df`, `--disable-frontend`: Disable the frontend HTML interface 
 * `-h`, `--help`: Display help
 * `-i`, `--insecure`: Run with default (insecure) configuration
-* `-o`, `--output <arg>`: Write console output to the specified file
 * `-p`, `--port <arg>`: Port on which the server runs
 * `-t`, `--timeout <arg>`: The maximum time a transformation is allowed to run in milliseconds. Defaults to 2 minutes.
 * `-v`, `--version`: Display Saxon version info
-* `-df`, `--disable-frontend`: Disable the frontend HTML interface 
 
 Transformations can then be invoked by sending an HTTP POST call to the server at the `/transform` or `/query` endpoint,
 depending on whether you want to use XSLT or XQuery. The default port is `5000`, but this can be configured (see above).
@@ -47,6 +47,10 @@ the output parameters of the stylesheet, which defaults to UTF-8. The value of t
 controlled by setting the `media-type` output parameter.
 
 Additionally, an HTML interface is available at the root endpoint (`/`) which allows you to perform transformations directly from your browser for testing purposes. This interface can be disabled by passing the `--disable-frontend` command line parameter.
+
+## Attaching files
+
+Additional files can be attached to the request. These files are then available to the transformation using functions such as `unparsed-text()` or `doc()`. The files must be attached as form items and contain a filename. The filename is then used as the URI to access the file in the transformation. For example, if you attach a file named `myfile.xml`, it can be accessed in the transformation using `doc('myfile.xml')`.
 
 ## JSON
 
@@ -77,6 +81,7 @@ is recommended to place a reverse proxy server in front of this application to t
 
 The amount of time that a transformation is allowed to run is 2 minutes by default. This can be configured with
 the `--timeout` parameter, which takes a number in milliseconds. Use `-1` to disable timeouts. Be aware of denial-of-service attacks.
+
 ## Compression
 
 The input can be gzip encoded in order to avoid having to send large files over the network. In this case, you must set
@@ -138,7 +143,3 @@ stylesheet where the error was encountered is passed along. The response code in
 
 Note that `xsl:message` elements without the `terminate=yes` attribute are ignored.
 
-## Performance
-
-Throughput and latency depend on the size of the payload and the complexity of the stylesheet. With small, relatively
-simple stylesheets, the application can easily handle hundreds of requests per second.
