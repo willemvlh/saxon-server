@@ -63,9 +63,6 @@ public class SaxonTransformer extends SaxonActor {
   private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
     Processor p = getProcessor();
     XsltCompiler c = p.newXsltCompiler();
-    logger.warn("Protocol restrictor test for https://www.google.com: {}",
-    p.getUnderlyingConfiguration().getProtocolRestrictor().test(URI.create("https://www.google.com"))
-);
     c.setErrorList(this.getErrorList());
     try {
       XsltExecutable e = c.compile(stylesheet);
