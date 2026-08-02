@@ -41,7 +41,7 @@ public class ServerOptionsTest {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     actor.act(TestHelpers.WellFormedXmlStream(), TestHelpers.SystemPropertyInvokingXslStream(), os);
     Assertions.assertNotEquals(os.size(), 0);
-  }
+ }
 
   @Test
   public void NoOptionsParseTest() throws TransformationException {
