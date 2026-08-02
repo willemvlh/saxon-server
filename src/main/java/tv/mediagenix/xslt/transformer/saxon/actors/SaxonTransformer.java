@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
+import net.sf.saxon.Configuration;
 import net.sf.saxon.serialize.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
@@ -62,12 +63,12 @@ public class SaxonTransformer extends SaxonActor {
 
   private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
     Processor p = getProcessor();
+    p.getUnderlyingConfiguration().setResourceResolver(this.getResourceResolver());
     XsltCompiler c = p.newXsltCompiler();
     c.setErrorList(this.getErrorList());
     try {
       XsltExecutable e = c.compile(stylesheet);
       Xslt30Transformer xf = e.load30();
-      xf.setResourceResolver(this.getResourceResolver());
       xf.setUnparsedTextResolver(this.getResourceResolver());
       xf.setMessageHandler(newMessageHandler());
       return xf;
