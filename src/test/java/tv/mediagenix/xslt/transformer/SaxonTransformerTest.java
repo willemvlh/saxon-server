@@ -141,6 +141,26 @@ public class SaxonTransformerTest {
         new ByteArrayOutputStream()));
   }
 
+  @Test
+  public void testIncludeSecure() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder()
+      .setInsecure(false)
+      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/test-1.xsl")))
+      .build();
+    assertThrows(TransformationException.class, () -> actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
+  }
+
+  @Test
+  public void testIncludeInsecure() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder()
+      .setInsecure(true)
+      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/test-1.xsl")))
+      .build();
+    var output = new ByteArrayOutputStream();
+    actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), output);
+    assertEquals("Hello, World!", output.toString());
+  }
+
   private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
