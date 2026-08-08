@@ -21,177 +21,166 @@ import java.io.*;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public abstract class SaxonActor {
 
-    protected SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
-    protected SAXSourceFactory saxSourceFactory = new SecureSAXSourceFactory();
-    private Processor processor = null;
-    private Map<String, String> serializationParameters = new HashMap<>();
-    private Map<QName, XdmValue> parameters = new HashMap<>();
-    private long timeout = 10000;
-    protected Logger logger = LoggerFactory.getLogger(this.getClass());
-    private URI baseURI = null;
-    private SaxonResourceResolver resourceResolver = new SaxonResourceResolver(newConfiguration(), false);
+  protected SaxonConfigurationFactory configurationFactory = new SaxonSecureConfigurationFactory();
+  protected SAXSourceFactory saxSourceFactory = new SecureSAXSourceFactory();
+  private Processor processor = null;
+  private Map<String, String> serializationParameters = new HashMap<>();
+  private Map<QName, XdmValue> parameters = new HashMap<>();
+  private long timeout = 10000;
+  protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public SaxonResourceResolver getResourceResolver() {
-      return resourceResolver;
+  protected SaxonActor() {
+  }
+
+  private Configuration newConfiguration() {
+    return this.configurationFactory.newConfiguration();
+  }
+
+  public void setConfiguration(Configuration config) {
+    this.configurationFactory = new SaxonFixedConfigurationFactory(config);
+  }
+
+  private String inputStreamToString(InputStream input) throws TransformationException {
+    StringBuilder builder = new StringBuilder();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    try {
+      int c;
+      while ((c = reader.read()) != -1) {
+        builder.append((char) c);
+      }
+      return builder.toString();
+    } catch (IOException e) {
+      throw new TransformationException(e);
     }
+  }
 
-    public void setResourceResolver(SaxonResourceResolver resourceResolver) {
-      this.resourceResolver = resourceResolver;
+  public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output)
+      throws TransformationException {
+    XdmItem context;
+    try {
+      if (isJsonStream(input)) {
+        logger.debug("Detected JSON input");
+        JsonToXmlTransformer xf = new JsonToXmlTransformer();
+        context = xf.transform(inputStreamToString(input), getProcessor());
+      } else {
+        DocumentBuilder b = getProcessor().newDocumentBuilder();
+        context = b.build(saxSourceFactory.newSAXSource(input));
+      }
+      return actWithTimeout(context, stylesheet, output);
+    } catch (SaxonApiException e) {
+      throw new TransformationException(e);
     }
+  }
 
-    protected SaxonActor() {
+  public SerializationProps act(InputStream stylesheet, OutputStream os) throws TransformationException {
+    return actWithTimeout(XdmEmptySequence.getInstance(), stylesheet, os);
+  }
+
+  protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output)
+      throws TransformationException;
+
+  protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output)
+      throws TransformationException {
+    ExecutorService service = new ForkJoinPool();
+    try {
+      FutureTask<SerializationProps> task = new FutureTask<>(() -> act(input, stylesheet, output));
+      service.submit(task);
+      return task.get(this.timeout, TimeUnit.MILLISECONDS);
+    } catch (TimeoutException | InterruptedException e) {
+      logger.debug("Timeout limit ({} ms)was reached", timeout);
+      throw new TransformationException(e);
+    } catch (ExecutionException e) {
+      throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
+    } finally {
+      service.shutdown();
     }
+  }
 
-    private Configuration newConfiguration(){
-        return this.configurationFactory.newConfiguration();
+  private boolean isJsonStream(InputStream stream) throws TransformationException {
+    char c;
+    try {
+      c = (char) stream.read();
+      if (c == '\uFFFF') {
+        // eof
+        return false;
+      }
+      while (Character.isWhitespace(c)) {
+        c = (char) stream.read();
+      }
+      stream.reset();
+      return c != '<';
+    } catch (IOException e) {
+      throw new TransformationException(e);
     }
+  }
 
-    public void setConfiguration(Configuration config){
-       this.configurationFactory = new SaxonFixedConfigurationFactory(config);
+  protected Serializer newSerializer(OutputStream os) {
+    Serializer serializer = this.getProcessor().newSerializer(os);
+    SerializationProperties props = new SerializationProperties();
+    for (String s : this.getSerializationParameters().keySet()) {
+      props.setProperty(s, this.getSerializationParameters().get(s));
     }
+    serializer.setOutputProperties(props);
+    return serializer;
+  }
 
-    private String inputStreamToString(InputStream input) throws TransformationException {
-        StringBuilder builder = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        try {
-            int c;
-            while ((c = reader.read()) != -1) {
-                builder.append((char) c);
-            }
-            return builder.toString();
-        } catch (IOException e) {
-            throw new TransformationException(e);
-        }
+  Processor getProcessor() {
+    if (processor == null) {
+      processor = new Processor(newConfiguration());
     }
+    return processor;
+  }
 
-    public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        XdmItem context;
-        try {
-            if (isJsonStream(input)) {
-                logger.debug("Detected JSON input");
-                JsonToXmlTransformer xf = new JsonToXmlTransformer();
-                context = xf.transform(inputStreamToString(input), getProcessor());
-            } else {
-                DocumentBuilder b = getProcessor().newDocumentBuilder();
-                context = b.build(saxSourceFactory.newSAXSource(input));
-            }
-            return actWithTimeout(context, stylesheet, output);
-        } catch (SaxonApiException e) {
-            throw new TransformationException(e);
-        }
+  protected SerializationProps getSerializationProperties(Serializer s) {
+    return new SerializationProps(s.getOutputProperty(Serializer.Property.MEDIA_TYPE),
+        s.getOutputProperty(Serializer.Property.ENCODING));
+  }
+
+  protected Map<String, String> getSerializationParameters() {
+    return serializationParameters;
+  }
+
+  protected Map<QName, XdmValue> getParameters() {
+    return parameters;
+  }
+
+  public void setSerializationParameters(Map<String, String> serializationParameters) {
+    this.serializationParameters = serializationParameters;
+  }
+
+  public void setInsecure(boolean insecure) {
+    if (insecure) {
+      this.configurationFactory = new SaxonDefaultConfigurationFactory();
+      this.saxSourceFactory = new DefaultSAXSourceFactory();
+    } else {
+      this.configurationFactory = new SaxonSecureConfigurationFactory();
+      this.saxSourceFactory = new SecureSAXSourceFactory();
     }
+    this.setProcessor(new Processor(newConfiguration()));
+  }
 
-    public SerializationProps act(InputStream stylesheet, OutputStream os) throws TransformationException {
-        return actWithTimeout(XdmEmptySequence.getInstance(), stylesheet, os);
-    }
+  public void setProcessor(Processor processor) {
+    this.processor = processor;
+  }
 
-    protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException;
+  public void setTimeout(long milliseconds) {
+    this.timeout = milliseconds;
+  }
 
-    protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output) throws TransformationException {
-        ExecutorService service = new ForkJoinPool();
-        try {
-            FutureTask<SerializationProps> task = new FutureTask<>(() -> act(input, stylesheet, output));
-            service.submit(task);
-            return task.get(this.timeout, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException | InterruptedException e) {
-            logger.debug("Timeout limit ({} ms)was reached", timeout);
-            throw new TransformationException(e);
-        } catch (ExecutionException e) {
-            throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
-        } finally {
-            service.shutdown();
-        }
-    }
+  public void setParameters(Map<QName, XdmValue> parameters) {
+    this.parameters = parameters;
+  }
 
-    private boolean isJsonStream(InputStream stream) throws TransformationException {
-        char c;
-        try {
-            c = (char) stream.read();
-            if (c == '\uFFFF') {
-                //eof
-                return false;
-            }
-            while (Character.isWhitespace(c)) {
-                c = (char) stream.read();
-            }
-            stream.reset();
-            return c != '<';
-        } catch (IOException e) {
-            throw new TransformationException(e);
-        }
-    }
+  public URI getBaseURI() {
+    return this.configurationFactory.getBaseURI();
+  }
 
-    protected Serializer newSerializer(OutputStream os) {
-        Serializer serializer = this.getProcessor().newSerializer(os);
-        SerializationProperties props = new SerializationProperties();
-        for (String s : this.getSerializationParameters().keySet()) {
-            props.setProperty(s, this.getSerializationParameters().get(s));
-        }
-        serializer.setOutputProperties(props);
-        return serializer;
-    }
-
-    Processor getProcessor() {
-        if(processor == null){
-            processor = new Processor(newConfiguration());
-        }
-        return processor;
-    }
-
-    protected SerializationProps getSerializationProperties(Serializer s) {
-        return new SerializationProps(s.getOutputProperty(Serializer.Property.MEDIA_TYPE), s.getOutputProperty(Serializer.Property.ENCODING));
-    }
-
-    protected Map<String, String> getSerializationParameters() {
-        return serializationParameters;
-    }
-
-    protected Map<QName, XdmValue> getParameters() {
-        return parameters;
-    }
-
-    public void setSerializationParameters(Map<String, String> serializationParameters) {
-        this.serializationParameters = serializationParameters;
-    }
-
-    public void setInsecure(boolean insecure) {
-        if (insecure) {
-            this.configurationFactory = new SaxonDefaultConfigurationFactory();
-            this.saxSourceFactory = new DefaultSAXSourceFactory();
-            this.setResourceResolver(new SaxonResourceResolver(newConfiguration(), true));
-        } else {
-            this.configurationFactory = new SaxonSecureConfigurationFactory();
-            this.saxSourceFactory = new SecureSAXSourceFactory();
-            this.setResourceResolver(new SaxonResourceResolver(newConfiguration(), false));
-        }
-        this.setProcessor(new Processor(newConfiguration()));
-    }
-
-
-    public void setProcessor(Processor processor) {
-        this.processor = processor;
-    }
-
-    public void setTimeout(long milliseconds) {
-        this.timeout = milliseconds;
-    }
-
-    public void setParameters(Map<QName, XdmValue> parameters) {
-        this.parameters = parameters;
-    }
-
-    public URI getBaseURI() {
-        return baseURI;
-    }
-
-    public void setBaseURI(URI baseURI) {
-        this.baseURI = baseURI;
-        if(baseURI != null) {
-          this.resourceResolver.setBaseURI(baseURI);
-        }
-    }
+  public void setBaseURI(URI baseURI) {
+    this.configurationFactory.setBaseURI(Objects.requireNonNull(baseURI));
+  }
 }

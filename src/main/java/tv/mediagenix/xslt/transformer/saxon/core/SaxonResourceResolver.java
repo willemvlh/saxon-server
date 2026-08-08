@@ -28,7 +28,7 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
   private Logger logger = LoggerFactory.getLogger(this.getClass());
   private ResourceResolver defaultResourceResolver;
   private UnparsedTextURIResolver defaultUnparsedTextURIResolver;
-  private URI baseURI = Paths.get("").toAbsolutePath().toUri();
+  private URI baseURI = null;
   private ProtocolRestrictor protocolRestrictor;
 
   public URI getBaseURI() {
@@ -39,11 +39,12 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
     this.baseURI = baseURI;
   }
 
-  public SaxonResourceResolver(Configuration config, boolean allowExternalResources) {
+  public SaxonResourceResolver(boolean allowExternalResources, ResourceResolver defaultResourceResolver,
+      UnparsedTextURIResolver unparsedTextURIResolver, ProtocolRestrictor protocolRestrictor) {
     this.allowExternalResources = allowExternalResources;
-    this.defaultResourceResolver = config.getResourceResolver();
-    this.defaultUnparsedTextURIResolver = config.getUnparsedTextURIResolver();
-    this.protocolRestrictor = config.getProtocolRestrictor();
+    this.defaultResourceResolver = defaultResourceResolver;
+    this.defaultUnparsedTextURIResolver = unparsedTextURIResolver;
+    this.protocolRestrictor = protocolRestrictor;
   }
 
   public Map<String, InputStream> getFiles() {

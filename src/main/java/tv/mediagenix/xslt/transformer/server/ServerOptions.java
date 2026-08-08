@@ -6,6 +6,7 @@ import tv.mediagenix.xslt.transformer.Version;
 import org.apache.commons.cli.*;
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Paths;
 
 public class ServerOptions {
   private Integer port = 5000;
@@ -14,7 +15,7 @@ public class ServerOptions {
   private long transformationTimeoutMs = 2 * 60 * 1000;
   private boolean debug = false;
   private boolean disableFrontend = false;
-  private URI baseURI = null;
+  private URI baseURI = Paths.get("").toAbsolutePath().toUri();
 
   public URI getBaseURI() {
     return baseURI;

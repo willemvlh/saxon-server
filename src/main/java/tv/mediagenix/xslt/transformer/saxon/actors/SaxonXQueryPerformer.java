@@ -7,20 +7,15 @@ import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.nio.file.Paths;
 
 public class SaxonXQueryPerformer extends SaxonActor {
   private XQueryExecutable executable;
 
   private XQueryEvaluator newEvaluator(InputStream query) throws SaxonApiException {
     var compiler = this.getProcessor().newXQueryCompiler();
-    URI baseUri = getBaseURI() == null ? Paths.get("").toAbsolutePath().toUri(): getBaseURI();
-    compiler.getUnderlyingStaticContext().setBaseURI(baseUri.toString());
+    compiler.getUnderlyingStaticContext().setBaseURI(this.getBaseURI().toString());
     this.executable = compiler.compile(query);
     XQueryEvaluator evaluator = this.executable.load();
-    evaluator.setResourceResolver(this.getResourceResolver());
-    evaluator.setUnparsedTextResolver(this.getResourceResolver());
     this.getParameters().forEach(evaluator::setExternalVariable);
     return evaluator;
   }

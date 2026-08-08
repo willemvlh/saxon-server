@@ -63,13 +63,11 @@ public class SaxonTransformer extends SaxonActor {
 
   private Xslt30Transformer newTransformer(Source stylesheet) throws TransformationException {
     Processor p = getProcessor();
-    p.getUnderlyingConfiguration().setResourceResolver(this.getResourceResolver());
     XsltCompiler c = p.newXsltCompiler();
     c.setErrorList(this.getErrorList());
     try {
       XsltExecutable e = c.compile(stylesheet);
       Xslt30Transformer xf = e.load30();
-      xf.setUnparsedTextResolver(this.getResourceResolver());
       xf.setMessageHandler(newMessageHandler());
       return xf;
     } catch (SaxonApiException e) {

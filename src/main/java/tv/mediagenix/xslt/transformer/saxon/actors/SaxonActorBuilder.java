@@ -73,7 +73,7 @@ public abstract class SaxonActorBuilder {
   }
 
   public SaxonActorBuilder setFiles(Map<String, InputStream> files) {
-    instance.getResourceResolver().setFiles(files);
+    instance.configurationFactory.setFiles(files);
     return this;
   }
 
