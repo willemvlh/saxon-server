@@ -18,6 +18,7 @@ Otherwise, start the server by running `java -jar saxon-1.15.jar`.
 
 Following command-line options are available:
 
+<<<<<<< HEAD
 * `-b`, `--base-uri <arg>`      Base URI for resolving relative URIs
 * `-c`, `--config <arg>`: Location to Saxon configuration XML file
 * `-d`, `--debug`: Enable debug logging statements
@@ -69,7 +70,7 @@ function and set as the global context item.
 
 ## Security
 
-By default, Saxon assumes all input is untrusted. This means following functionalities are disabled:
+By default, all input is untrusted. This means following functionalities are disabled:
 
 * External function calls
 * Retrieval of system properties and environment variables
