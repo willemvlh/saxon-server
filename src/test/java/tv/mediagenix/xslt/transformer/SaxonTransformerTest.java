@@ -12,6 +12,7 @@ import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
@@ -142,23 +143,32 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void testIncludeSecure() throws TransformationException {
+  public void testIncludeSecure() throws URISyntaxException {
     SaxonActor actor = new SaxonTransformerBuilder()
       .setInsecure(false)
-      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/test-1.xsl")))
+            .setBaseURI(this.getClass().getResource("xsl").toURI())
       .build();
     assertThrows(TransformationException.class, () -> actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
   }
 
   @Test
-  public void testIncludeInsecure() throws TransformationException {
+  public void testIncludeInsecure() throws URISyntaxException, TransformationException {
     SaxonActor actor = new SaxonTransformerBuilder()
-      .setInsecure(true)
-      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/test-1.xsl")))
+            .setInsecure(true)
+            .setTimeout(3600*1000)
+            .setBaseURI(this.getClass().getResource("xsl/").toURI())
+            .build();
+    actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream());
+  }
+
+  @Test
+  public void testIncludeFromAttachedFile() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder()
+      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/included.xsl")))
       .build();
     var output = new ByteArrayOutputStream();
     actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), output);
-    assertEquals("Hello, World!", output.toString());
+    assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>Hello, world!", output.toString());
   }
 
   private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {

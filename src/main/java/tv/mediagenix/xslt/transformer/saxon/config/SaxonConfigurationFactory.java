@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.saxon.Configuration;
+import tv.mediagenix.xslt.transformer.saxon.core.SaxonResourceResolver;
 
 public abstract class SaxonConfigurationFactory {
 
@@ -33,5 +34,24 @@ public abstract class SaxonConfigurationFactory {
     this.baseURI = baseUri;
   }
 
-  public abstract Configuration newConfiguration();
+  protected abstract boolean allowExternalResources();
+
+  public Configuration newConfiguration() {
+
+    var config = new Configuration();
+    var resolver = newResourceResolver(config);
+    config.setResourceResolver(resolver);
+    config.setUnparsedTextURIResolver(resolver);
+    return config;
+  }
+
+  protected SaxonResourceResolver newResourceResolver(Configuration config){
+
+    var resolver = new SaxonResourceResolver(allowExternalResources(), config.getResourceResolver(),
+        config.getUnparsedTextURIResolver(), config.getProtocolRestrictor());
+    resolver.setBaseURI(this.getBaseURI());
+    resolver.setFiles(this.getFiles());
+    return resolver;
+  }
+
 }

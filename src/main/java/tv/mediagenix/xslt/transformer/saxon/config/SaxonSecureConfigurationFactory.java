@@ -1,5 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.config;
 
+import org.slf4j.LoggerFactory;
+
 import net.sf.saxon.Configuration;
 import net.sf.saxon.lib.Feature;
 import net.sf.saxon.trans.XPathException;
@@ -7,7 +9,7 @@ import tv.mediagenix.xslt.transformer.saxon.core.SaxonResourceResolver;
 
 public class SaxonSecureConfigurationFactory extends SaxonConfigurationFactory {
   public Configuration newConfiguration() {
-    Configuration config = new Configuration();
+    Configuration config = super.newConfiguration();
     config.setCollectionFinder((context, collectionURI) -> {
       throw new XPathException("Collection access is not allowed.");
     });
@@ -16,12 +18,11 @@ public class SaxonSecureConfigurationFactory extends SaxonConfigurationFactory {
      */
     config.setConfigurationProperty(Feature.ALLOWED_PROTOCOLS, "file");
     config.setConfigurationProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS, false);
-    var resolver = new SaxonResourceResolver(false, config.getResourceResolver(),
-        config.getUnparsedTextURIResolver(), config.getProtocolRestrictor());
-    resolver.setBaseURI(this.getBaseURI());
-    resolver.setFiles(this.getFiles());
-    config.setResourceResolver(resolver);
-
     return config;
+  }
+
+  @Override
+  protected boolean allowExternalResources() {
+    return false;
   }
 }

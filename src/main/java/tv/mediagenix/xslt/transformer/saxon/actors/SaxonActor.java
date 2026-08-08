@@ -161,7 +161,7 @@ public abstract class SaxonActor {
       this.configurationFactory = new SaxonSecureConfigurationFactory();
       this.saxSourceFactory = new SecureSAXSourceFactory();
     }
-    this.setProcessor(new Processor(newConfiguration()));
+    this.processor = null; //make sure a new one is made when needed
   }
 
   public void setProcessor(Processor processor) {

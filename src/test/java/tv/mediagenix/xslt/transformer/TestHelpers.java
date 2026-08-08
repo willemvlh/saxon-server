@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 public class TestHelpers {
   public static String WellFormedXml = readResource("xml/dummy.xml");
@@ -90,15 +94,26 @@ public class TestHelpers {
     }, args);
   }
 
-  public static <T> T runServer(Action<T> fn, String... args) {
+  public static <T> T runServerDebug(Callable<T> fn, String... args) {
+    var argsWithDebug = Arrays.copyOf(args, args.length + 1);
+    argsWithDebug[args.length] = "--debug";
+    return runServer(fn, argsWithDebug);
+  }
+
+  public static <T> T runServer(Callable<T> fn, String... args) {
     Server.main(args);
     Spark.awaitInitialization();
     LoggerFactory.getLogger(TestHelpers.class).debug("Started server.");
-    T result = fn.run();
-    Spark.stop();
-    Spark.awaitStop();
-    LoggerFactory.getLogger(TestHelpers.class).debug("Stopped server.");
-    return result;
+    try {
+      T result = fn.call();
+      Spark.stop();
+      Spark.awaitStop();
+      LoggerFactory.getLogger(TestHelpers.class).debug("Stopped server.");
+      return result;
+    } catch (Exception e) {
+      LoggerFactory.getLogger(TestHelpers.class).error("Error occurred during server execution, e");
+      return null;
+    }
   }
 
   public static Response request(String xml, String xsl) {

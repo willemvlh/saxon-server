@@ -21,6 +21,9 @@ import net.sf.saxon.lib.ResourceResolver;
 import net.sf.saxon.lib.UnparsedTextURIResolver;
 import net.sf.saxon.trans.XPathException;
 
+/*
+ * Allows accessing files sent as multipart form-data
+ */
 public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIResolver {
 
   private Map<String, InputStream> files = Map.of();

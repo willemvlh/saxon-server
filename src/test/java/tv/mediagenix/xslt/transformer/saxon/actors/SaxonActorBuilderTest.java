@@ -13,7 +13,8 @@ class SaxonActorBuilderTest {
         b.setInsecure(true);
         SaxonActor tf = b.build();
         assertEquals(true, tf.getProcessor().getConfigurationProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS));
-
+        
+        b = new SaxonTransformerBuilder();
         b.setInsecure(false);
         tf = b.build();
         assertEquals(false, tf.getProcessor().getConfigurationProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS));

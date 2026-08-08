@@ -182,7 +182,7 @@ public class ServerTests {
     req.addPart(MultipartBody.Part.createFormData("file", "test.json",
         RequestBody.create("{\"key\": \"value\"}", MediaType.get("application/json"))));
     req.addXML(WellFormedXml).addXSL(XslWithJsonDocFn);
-    var res = runServer(req::execute);
+    var res = runServerDebug(req::execute);
     logger.info(res.body().string());
     assertEquals(200, res.code());
   }
