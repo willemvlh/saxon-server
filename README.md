@@ -18,7 +18,7 @@ Otherwise, start the server by running `java -jar saxon-1.15.jar`.
 
 Following command-line options are available:
 
-* `-b`, `--base-uri <arg>`      Base URI for resolving relative URIs
+* `-b`, `--base-uri <arg>`: Base URI for resolving relative URIs
 * `-c`, `--config <arg>`: Location to Saxon configuration XML file
 * `-d`, `--debug`: Enable debug logging statements
 * `-df`, `--disable-frontend`: Disable the frontend HTML interface 
