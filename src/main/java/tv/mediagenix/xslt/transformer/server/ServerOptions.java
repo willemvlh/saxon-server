@@ -1,6 +1,5 @@
 package tv.mediagenix.xslt.transformer.server;
 
-import net.sf.saxon.s9api.Processor;
 import tv.mediagenix.xslt.transformer.Version;
 
 import org.apache.commons.cli.*;
@@ -138,10 +137,12 @@ public class ServerOptions {
   }
 
   private static void printInformation() {
-    Processor p = new Processor(false);
-    String version = p.getSaxonProductVersion();
-    String edition = p.getSaxonEdition();
-    System.out.printf("Saxon %s %s%n", edition, version);
+    ServerInfo info = ServerInfo.getInstance().load();
+    System.out.printf("Saxon Server version: %s%n", info.getSaxonServerVersion());
+    System.out.printf("Saxon version:        %s%n", info.getSaxonVersion());
+    System.out.printf("Git commit:           %s%n", info.getGitCommitHash());
+    System.out.printf("JDK compiler version: %s%n", info.getJdkCompilerVersion());
+    System.out.printf("Build timestamp:      %s%n", info.getBuildTimestamp());
   }
 
   public boolean isDebuggingEnabled() {
