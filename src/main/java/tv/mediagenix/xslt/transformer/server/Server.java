@@ -169,7 +169,10 @@ public class Server {
             } catch (IOException e) {
               throw new InvalidRequestException(e);
             }
-          }, (existing, incoming) -> existing));
+          }, (existing, incoming) -> {
+            logger.warn("Duplicate file name found: {}. Using the first one.", existing);
+            return existing;
+          }));
     } catch (ServletException | IOException e) {
       throw new InvalidRequestException(e);
     }
