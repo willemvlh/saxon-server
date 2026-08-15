@@ -135,7 +135,7 @@ public class Server {
 
   private static void handleRequest(Request req, Response res, SaxonActorBuilder builder) throws Exception {
     long startTime = System.currentTimeMillis();
-    req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/tmp/"));
+    req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/xxx/"));
     logParts(req);
     Optional<InputStream> input = getStreamFromRequestByKey(req, "xml");
     try (InputStream stylesheet = getStreamFromRequestByKey(req, "xsl")
@@ -169,7 +169,7 @@ public class Server {
             } catch (IOException e) {
               throw new InvalidRequestException(e);
             }
-          }));
+          }, (existing, incoming) -> existing));
     } catch (ServletException | IOException e) {
       throw new InvalidRequestException(e);
     }

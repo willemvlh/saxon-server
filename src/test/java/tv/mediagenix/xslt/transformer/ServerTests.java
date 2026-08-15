@@ -155,6 +155,17 @@ public class ServerTests {
   }
 
   @Test
+  public void filesDuplicate() throws IOException {
+    TestRequest req = new TestRequest();
+    var part1 = MultipartBody.Part.createFormData("file", "duplicate_key", RequestBody.create(new byte[]{1,2,3}));
+    var part2 = MultipartBody.Part.createFormData("file", "duplicate_key", RequestBody.create(new byte[]{1,2,3}));
+    req.addPart(part1).addPart(part2);
+    req.addXML(WellFormedXml).addXSL(WellFormedXsl);
+    var res = runServer(req::execute);
+    assertEquals(200, res.code());
+  }
+
+  @Test
   public void filesUnparsedText() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.txt",
