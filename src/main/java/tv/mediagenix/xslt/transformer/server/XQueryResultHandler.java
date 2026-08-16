@@ -2,18 +2,18 @@ package tv.mediagenix.xslt.transformer.server;
 
 import spark.Request;
 import spark.Response;
-
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
-import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 
-public class XSLTRequestHandler extends RequestHandler {
+public class XQueryResultHandler extends RequestHandler {
 
-  public XSLTRequestHandler(Request req, Response res) {
+  public XQueryResultHandler(Request req, Response res) {
     super(req, res);
   }
 
   @Override
   protected SaxonActorBuilder newBuilder() {
-    return new SaxonTransformerBuilder();
+    return new SaxonXQueryPerformerBuilder();
   }
+
 }

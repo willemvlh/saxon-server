@@ -28,17 +28,9 @@ import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 
 public abstract class RequestHandler {
   protected Logger logger = LoggerFactory.getLogger(this.getClass());
+  protected ServerOptions options = Server.getOptions();
   private Request request;
   private Response response;
-  private ServerOptions options;
-
-  public ServerOptions getOptions() {
-    return options;
-  }
-
-  public void setOptions(ServerOptions options) {
-    this.options = options;
-  }
 
   public Request getRequest() {
     return request;
@@ -98,7 +90,7 @@ public abstract class RequestHandler {
     }
   }
 
-  public void handle() throws InvalidRequestException, IOException, TransformationException {
+  public Void handle() throws InvalidRequestException, IOException, TransformationException {
     long startTime = System.currentTimeMillis();
     logParts();
     Optional<InputStream> input = getStream("xml");
@@ -113,6 +105,7 @@ public abstract class RequestHandler {
       var outputStream = response.raw().getOutputStream();
       writeStream.writeTo(outputStream);
       outputStream.close();
+      return null;
     } finally {
       logger.info("Finished request {} in {} milliseconds", request.session().id(),
           System.currentTimeMillis() - startTime);
@@ -157,28 +150,30 @@ public abstract class RequestHandler {
       try {
         InputStream s = p.getInputStream();
         return new ParameterParser().parseStream(s, (int) p.getSize());
-      } catch (IOException | IllegalArgumentException e) {
-        logger.error("Could not read parameters.", e);
+      } catch (IllegalArgumentException e) {
+        logger.error("Could not parse parameters.", e);
         throw new InvalidRequestException(e.getMessage());
+      } catch (IOException e) {
+        logger.error("Could not read parameters due to IO error.", e);
+        throw new UncheckedIOException(e);
       }
     }).orElseGet(() -> new HashMap<>());
   }
 
   private Optional<InputStream> getStream(String key) {
-    try {
-      Optional<Part> part = getPart(key);
-      return part.map(p -> getStreamFromPart(p));
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    Optional<Part> part = getPart(key);
+    return part.map(p -> getStreamFromPart(p));
   }
 
-  private Optional<Part> getPart(String key) throws IOException {
+  private Optional<Part> getPart(String key) {
     try {
-      return Optional.of(request.raw().getPart(key));
+      return Optional.ofNullable(request.raw().getPart(key));
     } catch (ServletException e) {
       // request does not contain multipart data
       return Optional.empty();
+    } catch (IOException e) {
+      logger.error("Error retrieving part {}: {}", key, e.getMessage());
+      throw new UncheckedIOException(e);
     }
   }
 
