@@ -116,7 +116,7 @@ public class Server {
 
   private static void configureRoutes() {
     port(options.getPort());
-    post("/transform", Server::handleXsltRequest);
+    post("/transform", (req,res) -> new XSLTRequestHandler(req,res).handle());
     post("/query", Server::handleXQueryRequest);
     get("/info", (Request req, Response res) -> {
       return ServerInfo.getInstance().load();
