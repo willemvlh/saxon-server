@@ -16,6 +16,7 @@ import tv.mediagenix.xslt.transformer.saxon.config.sax.SAXSourceFactory;
 import tv.mediagenix.xslt.transformer.saxon.config.sax.SecureSAXSourceFactory;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
 import java.io.*;
 import java.net.URI;
@@ -59,26 +60,26 @@ public abstract class SaxonActor {
     }
   }
 
-  public SerializationProps act(InputStream input, InputStream stylesheet, OutputStream output)
+  public SerializationProps act(TypedInputStream input, TypedInputStream stylesheet, OutputStream output)
       throws TransformationException {
-    XdmItem context;
+    XdmValue context;
     try {
-      if (isJsonStream(input)) {
+      if (input != null)
+        logger.debug(input.getMediaType());
+      if (input == null) {
+        context = XdmEmptySequence.getInstance();
+      } else if (input.isApplicationJson()) {
         logger.debug("Detected JSON input");
         JsonToXmlTransformer xf = new JsonToXmlTransformer();
-        context = xf.transform(inputStreamToString(input), getProcessor());
+        context = xf.transform(inputStreamToString(input.getInputStream()), getProcessor());
       } else {
         DocumentBuilder b = getProcessor().newDocumentBuilder();
-        context = b.build(saxSourceFactory.newSAXSource(input));
+        context = b.build(saxSourceFactory.newSAXSource(input.getInputStream()));
       }
-      return actWithTimeout(context, stylesheet, output);
+      return actWithTimeout(context, stylesheet.getInputStream(), output);
     } catch (SaxonApiException e) {
       throw new TransformationException(e);
     }
-  }
-
-  public SerializationProps act(InputStream stylesheet, OutputStream os) throws TransformationException {
-    return actWithTimeout(XdmEmptySequence.getInstance(), stylesheet, os);
   }
 
   protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output)
@@ -98,24 +99,6 @@ public abstract class SaxonActor {
       throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);
     } finally {
       service.shutdown();
-    }
-  }
-
-  private boolean isJsonStream(InputStream stream) throws TransformationException {
-    char c;
-    try {
-      c = (char) stream.read();
-      if (c == '\uFFFF') {
-        // eof
-        return false;
-      }
-      while (Character.isWhitespace(c)) {
-        c = (char) stream.read();
-      }
-      stream.reset();
-      return c != '<';
-    } catch (IOException e) {
-      throw new TransformationException(e);
     }
   }
 
@@ -161,7 +144,7 @@ public abstract class SaxonActor {
       this.configurationFactory = new SaxonSecureConfigurationFactory();
       this.saxSourceFactory = new SecureSAXSourceFactory();
     }
-    this.processor = null; //make sure a new one is made when needed
+    this.processor = null; // make sure a new one is made when needed
   }
 
   public void setProcessor(Processor processor) {

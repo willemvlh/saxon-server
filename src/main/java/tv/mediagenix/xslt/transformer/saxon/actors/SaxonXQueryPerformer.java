@@ -24,7 +24,7 @@ public class SaxonXQueryPerformer extends SaxonActor {
   public SerializationProps act(XdmValue input, InputStream query, OutputStream output) throws TransformationException {
     try {
       XQueryEvaluator e = newEvaluator(query);
-      if (!input.isEmpty()) {
+      if (!input.isEmptySequence()) {
         e.setContextItem(input.itemAt(0));
       }
       return evaluate(e, output);

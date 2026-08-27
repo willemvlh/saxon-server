@@ -124,12 +124,12 @@ public class ServerTests {
     TestRequest req = new TestRequest();
     req.addOutput("method=text;media-type=application/json");
     req.setPath("query");
-    req.addXML("{\"a\": \"b\"}");
+    req.addXML("{\"a\": \"b\"}", "application/json");
     req.addXSL("xml-to-json(.)");
-    var res = runServer(req::execute);
+    var res = runServerDebug(req::execute);
+    assertEquals("{\"a\":\"b\"}", res.body().string());
     assertEquals(200, res.code());
     assertEquals("application/json;charset=utf-8", res.header("Content-Type").toLowerCase());
-    assertEquals("{\"a\":\"b\"}", res.body().string());
   }
 
   @Test
