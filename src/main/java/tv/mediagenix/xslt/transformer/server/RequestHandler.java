@@ -1,5 +1,6 @@
 package tv.mediagenix.xslt.transformer.server;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActorBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
 public abstract class RequestHandler {
   protected Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -61,7 +63,7 @@ public abstract class RequestHandler {
         logger.debug("Part: type={}, name={}, filename={}, size={}", part.getContentType(), part.getName(),
             part.getSubmittedFileName(), part.getSize());
         try {
-          var buffer = getStreamFromPart(part).readAllBytes();
+          var buffer = getTypedInputStream(part).getInputStream().readAllBytes();
           logger.debug("Contents: {}", new String(buffer));
         } catch (IOException e) {
           logger.debug("Could not read part {}: {}", part.getName(), e.getMessage());
@@ -74,33 +76,69 @@ public abstract class RequestHandler {
 
   /* Return a Part's input, wrapping it in a GZIPInputStream if required */
 
-  private InputStream getStreamFromPart(Part part) {
-    String contentType = part.getContentType();
+  private TypedInputStream getTypedInputStream(Part part) {
+    final String DEFAULT_MEDIA_TYPE = "application/xml";
+    String contentEncoding = part.getHeader("Content-Encoding");
+    String mediaType = DEFAULT_MEDIA_TYPE;
+    if (part.getHeader("Content-Type") != null) {
+      mediaType = extractMediaType(part.getHeader("Content-Type"));
+    }
+    InputStream stream;
     try {
-      if ("application/gzip".equalsIgnoreCase(contentType)) {
-        logger.debug("Payload is zipped");
-        return new GZIPInputStream(part.getInputStream());
+      InputStream partStream = part.getInputStream();
+      boolean isGzip = "gzip".equalsIgnoreCase(contentEncoding)
+          || "application/gzip".equalsIgnoreCase(mediaType)
+          || (part.getSubmittedFileName() != null && part.getSubmittedFileName().toLowerCase().endsWith(".gz"))
+          || checkGzipMagicNumber(partStream);
+      if (isGzip) {
+        stream = new GZIPInputStream(part.getInputStream());
+      } else {
+        stream = part.getInputStream();
       }
-      return part.getInputStream();
     } catch (ZipException e) {
       logger.error("Could not unzip payload: {}", e.getMessage());
       throw new InvalidRequestException("Could not unzip payload: " + e.getMessage());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+    if (mediaType == null || mediaType.isEmpty() || mediaType.equals("application/gzip")) {
+      mediaType = DEFAULT_MEDIA_TYPE;
+    }
+    return new TypedInputStream(stream, mediaType);
+  }
+
+  private String extractMediaType(String contentType) {
+    return contentType.split(";")[0].trim();
+  }
+
+  private boolean checkGzipMagicNumber(InputStream partStream) {
+    var buffered = new BufferedInputStream(partStream);
+    if (buffered.markSupported()) {
+      try {
+        buffered.mark(2);
+        int magic = buffered.read() | (buffered.read() << 8);
+        buffered.reset();
+        return magic == GZIPInputStream.GZIP_MAGIC;
+      } catch (IOException e) {
+        logger.error("Could not read part stream to check for gzip magic number: {}", e.getMessage());
+        return false;
+      }
+    } else {
+      logger.warn("Part stream does not support mark/reset, cannot check for gzip magic number.");
+      return false;
+    }
   }
 
   public Void handle() throws InvalidRequestException, IOException, TransformationException {
     long startTime = System.currentTimeMillis();
     logParts();
-    Optional<InputStream> input = getStream("xml");
-    try (InputStream stylesheet = getStream("xsl")
-        .orElseThrow(() -> new InvalidRequestException("No XSL attachment found"))) {
+    TypedInputStream input = getStream("xml").orElse(null);
+    try {
+      TypedInputStream stylesheet = getStream("xsl")
+          .orElseThrow(() -> new InvalidRequestException("No XSL attachment found"));
       SaxonActor actor = this.newActor();
       ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
-      SerializationProps props = input.isPresent()
-          ? actor.act(input.get(), stylesheet, writeStream)
-          : actor.act(stylesheet, writeStream);
+      SerializationProps props = actor.act(input, stylesheet, writeStream);
       response.header("Content-Type", props.getContentType());
       var outputStream = response.raw().getOutputStream();
       writeStream.writeTo(outputStream);
@@ -134,7 +172,7 @@ public abstract class RequestHandler {
       return this.getParts().stream()
           .filter(part -> part.getSubmittedFileName() != null && !part.getSubmittedFileName().isEmpty())
           .collect(Collectors.toMap(part -> part.getSubmittedFileName(), part -> {
-            return getStreamFromPart(part);
+            return getTypedInputStream(part).getInputStream();
           }, (existing, incoming) -> {
             logger.warn("Duplicate file name found: {}. Using the first one.", existing);
             return existing;
@@ -160,9 +198,9 @@ public abstract class RequestHandler {
     }).orElseGet(() -> new HashMap<>());
   }
 
-  private Optional<InputStream> getStream(String key) {
+  private Optional<TypedInputStream> getStream(String key) {
     Optional<Part> part = getPart(key);
-    return part.map(p -> getStreamFromPart(p));
+    return part.map(p -> getTypedInputStream(p));
   }
 
   private Optional<Part> getPart(String key) {

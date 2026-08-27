@@ -2,11 +2,10 @@ package tv.mediagenix.xslt.transformer;
 
 import okhttp3.*;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.Level;
 import spark.Spark;
+import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 import tv.mediagenix.xslt.transformer.server.Server;
 
 import java.io.ByteArrayInputStream;
@@ -14,9 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 public class TestHelpers {
@@ -33,57 +30,57 @@ public class TestHelpers {
   public static String XslWithJsonDocFn = readResource("xsl/test-json-doc-fn.xsl");
   public static String XslWithHttpRequest = readResource("xsl/test-http.xsl");
 
-  public static InputStream WellFormedXslWithInitialTemplateStream() {
+  public static TypedInputStream WellFormedXslWithInitialTemplateStream() {
     return resourceStream("xsl/test-initial-template.xsl");
   }
 
-  public static InputStream WellFormedXmlStream() {
+  public static TypedInputStream WellFormedXmlStream() {
     return resourceStream("xml/dummy.xml");
   }
 
-  public static InputStream WellFormedXslStream() {
+  public static TypedInputStream WellFormedXslStream() {
     return resourceStream("xsl/test-1.xsl");
   }
 
-  public static InputStream WellFormedXQueryStream() {
+  public static TypedInputStream WellFormedXQueryStream() {
     return resourceStream("xq/abc.xquery");
   }
 
-  public static InputStream XQueryStreamApplicationJsonMime() {
+  public static TypedInputStream XQueryStreamApplicationJsonMime() {
     return resourceStream("xq/hof.xquery");
   }
 
-  public static InputStream IncorrectXQueryStream() {
+  public static TypedInputStream IncorrectXQueryStream() {
     return resourceStream("xq/syntax-error.xquery");
   }
 
-  public static InputStream SystemPropertyInvokingXslStream() {
+  public static TypedInputStream SystemPropertyInvokingXslStream() {
     return resourceStream("xsl/test-system-properties.xsl");
   }
 
-  public static InputStream resourceStream(String name) {
+  public static TypedInputStream resourceStream(String name) {
     try (InputStream is = TestHelpers.class.getResourceAsStream(name)) {
-      return new ByteArrayInputStream(is.readAllBytes());
+      return new TypedInputStream(new ByteArrayInputStream(is.readAllBytes()));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   private static String readResource(String name) {
-    try (InputStream is = resourceStream(name)) {
+    try (InputStream is = resourceStream(name).getInputStream()) {
       return new String(is.readAllBytes(), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static InputStream XslWithDocFunctionStream() {
+  public static TypedInputStream XslWithDocFunctionStream() {
     URL url = TestHelpers.class.getResource("xml/dummy.xml");
     String xsl = readResource("xsl/test-doc-fn.xsl").replace("{URI}", url.toString());
-    return new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8));
+    return new TypedInputStream(new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8)));
   }
 
-  public static InputStream xslWithParameters() {
+  public static TypedInputStream xslWithParameters() {
     return resourceStream("xsl/test-parameters.xsl");
   }
 

@@ -7,6 +7,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonXQueryPerformerBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,7 +33,7 @@ class SaxonXQueryPerformerTest {
   void actWithoutInput() throws TransformationException, UnsupportedEncodingException {
     SaxonXQueryPerformer p = new SaxonXQueryPerformer();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    p.act(TestHelpers.WellFormedXQueryStream(), os);
+    p.act(null, TestHelpers.WellFormedXQueryStream(), os);
     assertEquals("abc", os.toString("utf-8"));
 
   }
@@ -60,7 +61,7 @@ class SaxonXQueryPerformerTest {
         .setSerializationProperties(Collections.singletonMap("method", "text"))
         .setParameters(Collections.singletonMap("myParam", "value")).build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    p.act(getStream("declare variable $myParam external; $myParam"), os);
+    p.act(null, getStream("declare variable $myParam external; $myParam"), os);
     assertEquals("value", os.toString("UTF-8"));
   }
 
@@ -68,7 +69,7 @@ class SaxonXQueryPerformerTest {
   void outputProperty() throws TransformationException, UnsupportedEncodingException {
     SaxonXQueryPerformer p = new SaxonXQueryPerformer();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    p.act(new ByteArrayInputStream("declare option saxon:output 'method=json'; map{}".getBytes()), os);
+    p.act(null, getStream("declare option saxon:output 'method=json'; map{}"), os);
     assertTrue(os.toString("utf-8").startsWith("{"));
   }
 
@@ -77,22 +78,22 @@ class SaxonXQueryPerformerTest {
     SaxonXQueryPerformer p = new SaxonXQueryPerformer();
     p.setBaseURI(URI.create("file:///tmp/"));
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    p.act(getStream("resolve-uri('test.xml')"), os);
+    p.act(null, getStream("resolve-uri('test.xml')"), os);
     assertTrue(os.toString("UTF-8").contains("/tmp/test.xml"));
   }
 
   @Test
   void files() throws TransformationException {
     SaxonXQueryPerformer p = (SaxonXQueryPerformer) new SaxonXQueryPerformerBuilder()
-        .setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>"))).build();
+        .setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>").getInputStream())).build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     p.setSerializationParameters(Collections.singletonMap("method", "text"));
-    p.act(getStream("doc('test.xml')/abc"), os);
+    p.act(null, getStream("doc('test.xml')/abc"), os);
     assertEquals("Expected value", os.toString(StandardCharsets.UTF_8));
   }
 
-  private InputStream getStream(String s) {
-    return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+  private TypedInputStream getStream(String s) {
+    return new TypedInputStream(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)), "text/query");
   }
 
 }

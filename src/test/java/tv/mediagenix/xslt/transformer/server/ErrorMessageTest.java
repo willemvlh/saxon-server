@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import tv.mediagenix.xslt.transformer.TestHelpers;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,10 +21,12 @@ public class ErrorMessageTest {
 
     @Test
     public void malformedXmlErrorPayload() throws Exception {
+      var input = new ByteArrayInputStream(TestHelpers.MalformedXml.getBytes(StandardCharsets.UTF_8));
+      var malformedStream = new TypedInputStream(input, "application/json");
       //Assert that error message structure doesn't change
         try {
             new SaxonTransformerBuilder().build().act(
-                new ByteArrayInputStream(TestHelpers.MalformedXml.getBytes(StandardCharsets.UTF_8)),
+                malformedStream,
                 TestHelpers.WellFormedXslStream(),
                 new ByteArrayOutputStream()
             );

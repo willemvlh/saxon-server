@@ -17,6 +17,12 @@ public class TestRequest {
     return this;
   }
 
+  public TestRequest addXML(String payload, String contentType) {
+    var body = RequestBody.create(payload, MediaType.parse(contentType));
+    parts.add(MultipartBody.Part.createFormData("xml", "input", body));
+    return this;
+  }
+
   public TestRequest addXSL(String payload) {
     parts.add(MultipartBody.Part.createFormData("xsl", payload));
     return this;

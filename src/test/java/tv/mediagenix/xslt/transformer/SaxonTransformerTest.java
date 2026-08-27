@@ -9,6 +9,7 @@ import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
+import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
 import java.io.*;
 import java.net.URI;
@@ -39,7 +40,7 @@ public class SaxonTransformerTest {
   @Test
   public void transformWithoutInputTest() throws TransformationException {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    tf.act(TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
+    tf.act(null, TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
     assertEquals("hello", os.toString());
   }
 
@@ -103,13 +104,13 @@ public class SaxonTransformerTest {
         "<xsl:value-of select=\"resolve-uri('test.xml') || '_' || static-base-uri()\"/>" +
         "</xsl:template>" +
         "</xsl:stylesheet>";
-    actor.act(getStream(xsl), os);
+    actor.act(null, getStream(xsl), os);
     assertEquals("http://www.google.com/test.xml_http://www.google.com", os.toString());
   }
 
   @Test
   public void files() throws TransformationException {
-    SaxonActor actor = new SaxonTransformerBuilder().setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>")))
+    SaxonActor actor = new SaxonTransformerBuilder().setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>").getInputStream()))
         .build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
@@ -119,7 +120,7 @@ public class SaxonTransformerTest {
         "<xsl:value-of select=\"$doc/abc\"/>" +
         "</xsl:template>" +
         "</xsl:stylesheet>";
-    actor.act(getStream(xsl), os);
+    actor.act(null, getStream(xsl), os);
     assertEquals("Expected value", os.toString());
   }
 
@@ -148,7 +149,7 @@ public class SaxonTransformerTest {
       .setInsecure(false)
             .setBaseURI(this.getClass().getResource("xsl").toURI())
       .build();
-    assertThrows(TransformationException.class, () -> actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
+    assertThrows(TransformationException.class, () -> actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
   }
 
   @Test
@@ -158,28 +159,26 @@ public class SaxonTransformerTest {
             .setTimeout(3600*1000)
             .setBaseURI(this.getClass().getResource("xsl/").toURI())
             .build();
-    actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream());
+    actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream());
   }
 
   @Test
   public void testIncludeFromAttachedFile() throws TransformationException {
     SaxonActor actor = new SaxonTransformerBuilder()
-      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/included.xsl")))
+      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/included.xsl").getInputStream()))
       .build();
     var output = new ByteArrayOutputStream();
-    actor.act(TestHelpers.resourceStream("xsl/test-include.xsl"), output);
+    actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), output);
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>Hello, world!", output.toString());
   }
 
   private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-    InputStream xslStr = new ByteArrayInputStream(xsl.getBytes(StandardCharsets.UTF_8));
-    tf.act(input, xslStr, output);
+    tf.act(getStream(xml), getStream(xsl), output);
     return output;
   }
 
-  private InputStream getStream(String s) {
-    return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+  private TypedInputStream getStream(String s) {
+    return new TypedInputStream(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
   }
 }
