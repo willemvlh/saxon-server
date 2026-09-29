@@ -29,6 +29,8 @@ import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
 public abstract class RequestHandler {
+  private static final String CONTENT_TYPE_HEADER = "Content-Type";
+
   protected Logger logger = LoggerFactory.getLogger(this.getClass());
   protected ServerOptions options = Server.getOptions();
   private Request request;
@@ -44,7 +46,7 @@ public abstract class RequestHandler {
 
   protected abstract SaxonActorBuilder newBuilder();
 
-  public RequestHandler(Request req, Response res) {
+  protected RequestHandler(Request req, Response res) {
     this.request = req;
     this.response = res;
     setMultipartConfig();
@@ -80,8 +82,8 @@ public abstract class RequestHandler {
     final String DEFAULT_MEDIA_TYPE = "application/xml";
     String contentEncoding = part.getHeader("Content-Encoding");
     String mediaType = DEFAULT_MEDIA_TYPE;
-    if (part.getHeader("Content-Type") != null) {
-      mediaType = extractMediaType(part.getHeader("Content-Type"));
+    if (part.getHeader(CONTENT_TYPE_HEADER) != null) {
+      mediaType = extractMediaType(part.getHeader(CONTENT_TYPE_HEADER));
     }
     InputStream stream;
     try {
@@ -139,14 +141,16 @@ public abstract class RequestHandler {
       SaxonActor actor = this.newActor();
       ByteArrayOutputStream writeStream = new ByteArrayOutputStream();
       SerializationProps props = actor.act(input, stylesheet, writeStream);
-      response.header("Content-Type", props.getContentType());
+      response.header(CONTENT_TYPE_HEADER, props.getContentType());
       var outputStream = response.raw().getOutputStream();
       writeStream.writeTo(outputStream);
       outputStream.close();
       return null;
     } finally {
-      logger.info("Finished request {} in {} milliseconds", request.session().id(),
-          System.currentTimeMillis() - startTime);
+      if (logger.isInfoEnabled()) {
+        logger.info("Finished request {} in {} milliseconds", request.session().id(),
+            System.currentTimeMillis() - startTime);
+      }
     }
   }
 

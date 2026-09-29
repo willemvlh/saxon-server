@@ -44,7 +44,7 @@ public class Server {
   }
 
   private static void configureLogger() {
-    Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    Logger rootLogger = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
     rootLogger.setLevel(Level.INFO); // avoid verbose Jetty messages
     Logger ourLogger = (Logger) LoggerFactory.getLogger("tv.mediagenix");
     ourLogger.setLevel(options.isDebuggingEnabled() ? Level.DEBUG : Level.INFO);
@@ -74,9 +74,11 @@ public class Server {
   }
 
   private static void logInvalidRequest(Request req) {
-    logger.debug("Invalid request:");
-    logger.debug("IP: {}", req.ip());
-    logger.debug("Content-Type: {}", req.contentType());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Invalid request:");
+      logger.debug("IP: {}", req.ip());
+      logger.debug("Content-Type: {}", req.contentType());
+    }
   }
 
   private static void configureRoutes() {

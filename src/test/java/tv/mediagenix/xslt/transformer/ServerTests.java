@@ -2,39 +2,32 @@ package tv.mediagenix.xslt.transformer;
 
 import okhttp3.*;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static tv.mediagenix.xslt.transformer.TestHelpers.*;
 
-public class ServerTests {
+class ServerTests {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(ServerTests.class);
 
   @Test
-  public void transformation() {
-    runServer(() -> {
+  void transformation() {
+    runServer(() -> assertDoesNotThrow(() -> {
       var res = request(WellFormedXml, WellFormedXsl);
-      try {
-        var body = res.body().string();
-        assertEquals("hello", body);
-        assertEquals(200, res.code());
-      } catch (IOException e) {
-        fail();
-      }
-    });
+      var body = res.body().string();
+      assertEquals("hello", body);
+      assertEquals(200, res.code());
+    }));
   }
 
   @Test
-  public void largeFile() {
+  void largeFile() {
     StringBuilder sb = new StringBuilder();
     sb.append("<root>\n");
     sb.append("<child arg=\"value\"></child>\n".repeat(1000000));
@@ -46,7 +39,7 @@ public class ServerTests {
   }
 
   @Test
-  public void gzip() throws IOException {
+  void gzip() throws IOException {
     var byteStream = new ByteArrayOutputStream();
     GZIPOutputStream out = new GZIPOutputStream(byteStream);
     out.write(WellformedXslWithInitialTemplate.getBytes(StandardCharsets.UTF_8));
@@ -58,18 +51,14 @@ public class ServerTests {
         RequestBody.create(MediaType.get("application/gzip"), byteStream.toByteArray()));
     builder.addPart(part);
     var request = new Request.Builder().url("http://localhost:5000/transform").post(builder.build()).build();
-    runServer(() -> {
-      try {
-        Response response = client.newCall(request).execute();
-        assertEquals(200, response.code());
-      } catch (IOException e) {
-        fail();
-      }
-    });
+    runServer(() -> assertDoesNotThrow(() -> {
+      Response response = client.newCall(request).execute();
+      assertEquals(200, response.code());
+    }));
   }
 
   @Test
-  public void badGzip() throws IOException {
+  void badGzip() throws IOException {
     var byteStream = new ByteArrayOutputStream();
     byteStream.write("some unzipped content".getBytes(StandardCharsets.UTF_8));
     OkHttpClient client = new OkHttpClient();
@@ -79,18 +68,14 @@ public class ServerTests {
         RequestBody.create(byteStream.toByteArray(), MediaType.get("application/gzip")));
     builder.addPart(part);
     var request = new Request.Builder().url("http://localhost:5000/transform").post(builder.build()).build();
-    runServer(() -> {
-      try {
-        Response response = client.newCall(request).execute();
-        assertEquals(400, response.code());
-      } catch (IOException e) {
-        fail();
-      }
-    });
+    runServer(() -> assertDoesNotThrow(() -> {
+      Response response = client.newCall(request).execute();
+      assertEquals(400, response.code());
+    }));
   }
 
   @Test
-  public void query() throws IOException {
+  void query() throws IOException {
     TestRequest req = new TestRequest();
     req.setPath("query");
     req.addXSL("declare option saxon:output \"omit-xml-declaration=true\";" +
@@ -103,7 +88,7 @@ public class ServerTests {
   }
 
   @Test
-  public void noXML() throws IOException {
+  void noXML() throws IOException {
     TestRequest req = new TestRequest();
     req.addXSL(WellformedXslWithInitialTemplate);
     Response res = runServer(req::execute);
@@ -112,7 +97,7 @@ public class ServerTests {
   }
 
   @Test
-  public void noXSL() {
+  void noXSL() {
     TestRequest req = new TestRequest();
     req.addXML("<abc/>");
     Response res = runServer(req::execute);
@@ -120,7 +105,7 @@ public class ServerTests {
   }
 
   @Test
-  public void outputParameters() throws IOException {
+  void outputParameters() throws IOException {
     TestRequest req = new TestRequest();
     req.addOutput("method=text;media-type=application/json");
     req.setPath("query");
@@ -133,7 +118,7 @@ public class ServerTests {
   }
 
   @Test
-  public void parameters() throws IOException {
+  void parameters() throws IOException {
     TestRequest req = new TestRequest();
     req.addParameters("myParam=myValue");
     req.addXML(WellFormedXml);
@@ -144,7 +129,7 @@ public class ServerTests {
   }
 
   @Test
-  public void files() throws IOException {
+  void files() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.xml",
         RequestBody.create("<abc>test</abc>", MediaType.get("application/xml"))));
@@ -155,7 +140,7 @@ public class ServerTests {
   }
 
   @Test
-  public void filesDuplicate() throws IOException {
+  void filesDuplicate() {
     TestRequest req = new TestRequest();
     var part1 = MultipartBody.Part.createFormData("file", "duplicate_key", RequestBody.create(new byte[]{1,2,3}));
     var part2 = MultipartBody.Part.createFormData("file", "duplicate_key", RequestBody.create(new byte[]{1,2,3}));
@@ -166,7 +151,7 @@ public class ServerTests {
   }
 
   @Test
-  public void filesUnparsedText() throws IOException {
+  void filesUnparsedText() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.txt",
         RequestBody.create("test", MediaType.get("application/text"))));
@@ -177,7 +162,7 @@ public class ServerTests {
   }
 
   @Test
-  public void filesUnparsedTextWithModifiedBaseUri() throws IOException {
+  void filesUnparsedTextWithModifiedBaseUri() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.txt",
         RequestBody.create("test", MediaType.get("application/text"))));
@@ -188,7 +173,7 @@ public class ServerTests {
   }
 
   @Test
-  public void filesJsonDoc() throws IOException {
+  void filesJsonDoc() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "test.json",
         RequestBody.create("{\"key\": \"value\"}", MediaType.get("application/json"))));
@@ -199,7 +184,7 @@ public class ServerTests {
   }
 
   @Test
-  public void filesGzipped() throws IOException {
+  void filesGzipped() throws IOException {
     var byteStream = new ByteArrayOutputStream();
     GZIPOutputStream out = new GZIPOutputStream(byteStream);
     out.write("<abc>test</abc>".getBytes(StandardCharsets.UTF_8));
@@ -214,7 +199,7 @@ public class ServerTests {
   }
 
   @Test
-  public void wronglyNamedFile() throws IOException {
+  void wronglyNamedFile() throws IOException {
     TestRequest req = new TestRequest();
     req.addPart(MultipartBody.Part.createFormData("file", "wrong_name_whatever.xml",
         RequestBody.create("<abc>test</abc>", MediaType.get("application/xml"))));
@@ -225,7 +210,7 @@ public class ServerTests {
   }
 
   @Test
-  public void invalidParameters() {
+  void invalidParameters() {
     var res = runServer(() -> new TestRequest()
         .addXSL(WellFormedXsl)
         .addParameters("eh?").execute());
@@ -233,7 +218,7 @@ public class ServerTests {
   }
 
   @Test
-  public void notFound() {
+  void notFound() {
     TestRequest req = new TestRequest();
     req.setPath("unknown");
     var res = runServer(req::execute);
@@ -241,7 +226,7 @@ public class ServerTests {
   }
 
   @Test
-  public void getInfo() throws IOException {
+  void getInfo() {
     TestRequest req = new TestRequest();
     req.setPath("info");
     req.setIsGetRequest();
@@ -250,7 +235,7 @@ public class ServerTests {
   }
 
   @Test
-  public void getWebPage() throws IOException {
+  void getWebPage() throws IOException {
     TestRequest req = new TestRequest();
     req.setPath("/");
     req.setIsGetRequest();
@@ -261,7 +246,7 @@ public class ServerTests {
   }
 
   @Test
-  public void getWebPageWhenDisabled() throws IOException {
+  void getWebPageWhenDisabled() {
     TestRequest req = new TestRequest();
     req.setPath("/");
     req.setIsGetRequest();
@@ -270,7 +255,7 @@ public class ServerTests {
   }
 
   @Test
-  public void httpRequestInsecure() throws IOException {
+  void httpRequestInsecure() {
     TestRequest req = new TestRequest();
     req.addXSL(XslWithHttpRequest)
       .addXML("<abc/>");
@@ -279,7 +264,7 @@ public class ServerTests {
   }
 
   @Test
-  public void httpRequestSecure() throws IOException {
+  void httpRequestSecure() {
     TestRequest req = new TestRequest();
     req.addXSL(XslWithHttpRequest)
       .addXML("<abc/>");
