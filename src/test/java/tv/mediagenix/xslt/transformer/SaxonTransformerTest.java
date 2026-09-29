@@ -19,17 +19,17 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SaxonTransformerTest {
+class SaxonTransformerTest {
   SaxonActor tf = new SaxonTransformerBuilder().setTimeout(5000).build();
 
   @Test
-  public void transformTest() throws UnsupportedEncodingException, TransformationException {
+  void transformTest() throws UnsupportedEncodingException, TransformationException {
     ByteArrayOutputStream output = transformWithStrings(TestHelpers.WellFormedXml, TestHelpers.WellFormedXsl);
-    assertEquals(output.toString("utf-8"), "hello", "The output should be 'hello'");
+    assertEquals("hello", output.toString("utf-8"), "The output should be 'hello'");
   }
 
   @Test
-  public void parameters() throws TransformationException, UnsupportedEncodingException {
+  void parameters() throws TransformationException, UnsupportedEncodingException {
     SaxonActor actor = new SaxonTransformerBuilder().setParameters(Collections.singletonMap("myParam", "value"))
         .build();
     ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -38,14 +38,14 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void transformWithoutInputTest() throws TransformationException {
+  void transformWithoutInputTest() throws TransformationException {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     tf.act(null, TestHelpers.WellFormedXslWithInitialTemplateStream(), os);
     assertEquals("hello", os.toString());
   }
 
   @Test
-  public void messageNoTerminate() throws TransformationException {
+  void messageNoTerminate() throws TransformationException {
     var logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(SaxonTransformer.class);
     var appender = new ListAppender<ILoggingEvent>();
     appender.start();
@@ -56,14 +56,14 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void malformedXslTest() {
+  void malformedXslTest() {
     assertThrows(TransformationException.class,
         () -> transformWithStrings(TestHelpers.MalformedXml, TestHelpers.WellFormedXsl),
         "Malformed input should trigger an exception");
   }
 
   @Test
-  public void errorMsgTest() {
+  void errorMsgTest() {
     try {
       transformWithStrings("bad xml", "bad xsl");
     } catch (TransformationException e) {
@@ -72,30 +72,21 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void messageTest() {
-    try {
-      transformWithStrings("<x/>", TestHelpers.MessageInvokingXsl);
-      fail("should have thrown");
-    } catch (TransformationException e) {
-      assertEquals(TestHelpers.message, e.getMessage());
-    }
-
+  void messageTest() {
+    var e = assertThrows(TransformationException.class,
+        () -> transformWithStrings("<x/>", TestHelpers.MessageInvokingXsl));
+    assertEquals(TestHelpers.message, e.getMessage());
   }
 
   @Test
-  public void testWithCompilationError() {
-    try {
-      transformWithStrings("<abc/>", "<xsl:template xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"/>");
-      fail();
-    } catch (TransformationException e) {
-      System.out.println(e.getMessage());
-      ;
-    }
-    ;
+  void testWithCompilationError() {
+    var e = assertThrows(TransformationException.class,
+        () -> transformWithStrings("<abc/>", "<xsl:template xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"/>"));
+    System.out.println(e.getMessage());
   }
 
   @Test
-  public void setBaseURI() throws TransformationException {
+  void setBaseURI() throws TransformationException {
     SaxonActor actor = new SaxonTransformerBuilder().setBaseURI(URI.create("http://www.google.com")).build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
@@ -109,7 +100,7 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void files() throws TransformationException {
+  void files() throws TransformationException {
     SaxonActor actor = new SaxonTransformerBuilder().setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>").getInputStream()))
         .build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -125,7 +116,7 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void insecureTest() {
+  void insecureTest() {
     SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
     xf.setInsecure(true);
     assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-dtd.xsl"),
@@ -133,7 +124,7 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void collectionTest(){
+  void collectionTest(){
     SaxonTransformer xf = new SaxonTransformer();
     xf.setInsecure(false);
     assertThrows(TransformationException.class, () -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
@@ -144,7 +135,7 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void testIncludeSecure() throws URISyntaxException {
+  void testIncludeSecure() throws URISyntaxException {
     SaxonActor actor = new SaxonTransformerBuilder()
       .setInsecure(false)
             .setBaseURI(this.getClass().getResource("xsl").toURI())
@@ -153,17 +144,17 @@ public class SaxonTransformerTest {
   }
 
   @Test
-  public void testIncludeInsecure() throws URISyntaxException, TransformationException {
+  void testIncludeInsecure() throws URISyntaxException {
     SaxonActor actor = new SaxonTransformerBuilder()
             .setInsecure(true)
             .setTimeout(3600*1000)
             .setBaseURI(this.getClass().getResource("xsl/").toURI())
             .build();
-    actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream());
+    assertDoesNotThrow(() -> actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
   }
 
   @Test
-  public void testIncludeFromAttachedFile() throws TransformationException {
+  void testIncludeFromAttachedFile() throws TransformationException {
     SaxonActor actor = new SaxonTransformerBuilder()
       .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/included.xsl").getInputStream()))
       .build();

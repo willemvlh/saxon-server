@@ -1,6 +1,5 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
-import tv.mediagenix.xslt.transformer.saxon.core.SaxonResourceResolver;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.serialize.SerializationProperties;
