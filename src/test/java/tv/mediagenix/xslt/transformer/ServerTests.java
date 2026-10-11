@@ -39,7 +39,7 @@ class ServerTests {
   }
 
   @Test
-  void gzip() throws IOException {
+  void gzippedXslInput() throws IOException {
     var byteStream = new ByteArrayOutputStream();
     GZIPOutputStream out = new GZIPOutputStream(byteStream);
     out.write(WellformedXslWithInitialTemplate.getBytes(StandardCharsets.UTF_8));
@@ -58,7 +58,27 @@ class ServerTests {
   }
 
   @Test
-  void badGzip() throws IOException {
+  void gzippedXmlInput() throws IOException {
+    var byteStream = new ByteArrayOutputStream();
+    GZIPOutputStream out = new GZIPOutputStream(byteStream);
+    out.write(WellFormedXml.getBytes(StandardCharsets.UTF_8));
+    out.close();
+    OkHttpClient client = new OkHttpClient();
+    MultipartBody.Builder builder = new MultipartBody.Builder();
+    builder.setType(MultipartBody.FORM);
+    builder.addPart(MultipartBody.Part.createFormData("xml", "input.xml.gz",
+        RequestBody.create(MediaType.get("application/gzip"), byteStream.toByteArray())));
+    builder.addPart(MultipartBody.Part.createFormData("xsl", WellFormedXsl));
+    var request = new Request.Builder().url("http://localhost:5000/transform").post(builder.build()).build();
+    runServer(() -> assertDoesNotThrow(() -> {
+      Response response = client.newCall(request).execute();
+      assertEquals(200, response.code());
+      assertEquals("hello", response.body().string());
+    }));
+  }
+
+  @Test
+  void GzipContainingInvalidXslContents() throws IOException {
     var byteStream = new ByteArrayOutputStream();
     byteStream.write("some unzipped content".getBytes(StandardCharsets.UTF_8));
     OkHttpClient client = new OkHttpClient();
