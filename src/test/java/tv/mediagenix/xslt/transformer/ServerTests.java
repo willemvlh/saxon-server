@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static tv.mediagenix.xslt.transformer.TestHelpers.*;
 
 class ServerTests {
@@ -238,6 +240,48 @@ class ServerTests {
   }
 
   @Test
+  void invalidParameterName() {
+    var res = runServer(() -> new TestRequest()
+        .addXML(WellFormedXml)
+        .addXSL(WellFormedXsl)
+        .addParameters("{bad name=1").execute());
+    assertEquals(400, res.code());
+  }
+
+  @Test
+  void unknownOutputParameter() {
+    var res = runServer(() -> new TestRequest()
+        .addXML(WellFormedXml)
+        .addXSL(WellFormedXsl)
+        .addOutput("indnet=yes").execute());
+    assertEquals(400, res.code());
+  }
+
+  @Test
+  void mediaTypeWithNewlineIsNotReflectedInHeader() {
+    var res = runServer(() -> new TestRequest()
+        .addXML(WellFormedXml)
+        .addXSL(WellFormedXsl)
+        .addOutput("media-type=text/plain\nX-Injected: 1").execute());
+    var contentType = res.header("Content-Type");
+    assertFalse(contentType != null && contentType.contains("X-Injected"),
+        "Content-Type was: " + contentType);
+  }
+
+  @Test
+  void errorDoesNotLeakServerPath() throws IOException {
+    var xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
+        "<xsl:template name=\"xsl:initial-template\">" +
+        "<xsl:value-of select=\"unparsed-text('missing.txt')\"/>" +
+        "</xsl:template></xsl:stylesheet>";
+    var res = runServer(() -> new TestRequest().addXSL(xsl).execute());
+    assertEquals(400, res.code());
+    var serverDir = Paths.get("").toAbsolutePath().toString();
+    var body = res.body().string();
+    assertFalse(body.contains(serverDir), "Response leaks server path: " + body);
+  }
+
+  @Test
   void notFound() {
     TestRequest req = new TestRequest();
     req.setPath("unknown");
@@ -252,6 +296,15 @@ class ServerTests {
     req.setIsGetRequest();
     var res = runServer(req::execute);
     assertEquals(200, res.code());
+  }
+
+  @Test
+  void getInfoContentType() {
+    TestRequest req = new TestRequest();
+    req.setPath("info");
+    req.setIsGetRequest();
+    var res = runServer(req::execute);
+    assertEquals("application/json", res.header("Content-Type").toLowerCase().split(";")[0]);
   }
 
   @Test

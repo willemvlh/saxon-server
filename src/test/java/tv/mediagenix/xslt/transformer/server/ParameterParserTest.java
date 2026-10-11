@@ -48,6 +48,21 @@ class ParameterParserTest {
     }
 
     @Test
+    public void testParseEscapedBackslashBeforeSeparator() {
+        ParameterParser p = new ParameterParser();
+        Map<String, String> result = p.parseString("a=C:\\temp\\\\;b=2");
+        assertEquals(2, result.size());
+        assertEquals("C:\\temp\\", result.get("a"));
+        assertEquals("2", result.get("b"));
+    }
+
+    @Test
+    public void emptyParameterName() {
+        ParameterParser p = new ParameterParser();
+        assertThrows(IllegalArgumentException.class, () -> p.parseString("=1"));
+    }
+
+    @Test
     public void testStream() throws IOException {
         ParameterParser p = new ParameterParser();
         String s = "koe=kalf;varken=big";

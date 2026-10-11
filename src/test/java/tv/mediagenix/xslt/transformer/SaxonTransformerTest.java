@@ -116,6 +116,22 @@ class SaxonTransformerTest {
   }
 
   @Test
+  void attachedFileCanBeReadMultipleTimes() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder()
+        .setFiles(Collections.singletonMap("test.txt", getStream("content").getInputStream()))
+        .build();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
+        "<xsl:output method=\"text\"/>" +
+        "<xsl:template name=\"xsl:initial-template\">" +
+        "<xsl:value-of select=\"unparsed-text('test.txt') || '|' || unparsed-text('test.txt')\"/>" +
+        "</xsl:template>" +
+        "</xsl:stylesheet>";
+    actor.act(null, getStream(xsl), os);
+    assertEquals("content|content", os.toString());
+  }
+
+  @Test
   void insecureTest() {
     SaxonTransformer xf = (SaxonTransformer) new SaxonTransformerBuilder().build();
     xf.setInsecure(true);
