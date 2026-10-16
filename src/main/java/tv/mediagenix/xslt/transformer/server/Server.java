@@ -86,6 +86,7 @@ public class Server {
     post("/transform", (req, res) -> new XSLTRequestHandler(req, res).handle());
     post("/query", (req, res) -> new XQueryResultHandler(req, res).handle());
     get("/info", (Request req, Response res) -> {
+      res.header("Content-Type", "application/json;charset=utf-8");
       return ServerInfo.getInstance().load();
     }, new JsonTransformer());
   }
