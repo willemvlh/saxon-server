@@ -13,6 +13,7 @@ import java.util.zip.GZIPOutputStream;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static tv.mediagenix.xslt.transformer.TestHelpers.*;
 
 class ServerTests {
@@ -258,14 +259,13 @@ class ServerTests {
   }
 
   @Test
-  void mediaTypeWithNewlineIsNotReflectedInHeader() {
+  void mediaTypeWithNewline() {
     var res = runServer(() -> new TestRequest()
         .addXML(WellFormedXml)
         .addXSL(WellFormedXsl)
         .addOutput("media-type=text/plain\nX-Injected: 1").execute());
     var contentType = res.header("Content-Type");
-    assertFalse(contentType != null && contentType.contains("X-Injected"),
-        "Content-Type was: " + contentType);
+    assertEquals("text/plain X-Injected: 1;charset=utf-8", contentType);
   }
 
   @Test
