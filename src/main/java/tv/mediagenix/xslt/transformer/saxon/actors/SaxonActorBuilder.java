@@ -3,6 +3,7 @@ package tv.mediagenix.xslt.transformer.saxon.actors;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.om.NameChecker;
 import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.Serializer;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
@@ -26,6 +27,11 @@ public abstract class SaxonActorBuilder {
   protected abstract SaxonActor createNewInstance();
 
   public SaxonActorBuilder setSerializationProperties(Map<String, String> parameters) {
+    parameters.keySet().forEach(k -> {
+      if (Serializer.Property.get(k) == null) {
+        throw new IllegalArgumentException("Unknown serialization parameter: " + k);
+      }
+    });
     instance.setSerializationParameters(parameters);
     return this;
   }
