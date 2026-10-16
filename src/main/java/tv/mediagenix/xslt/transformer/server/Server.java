@@ -12,6 +12,10 @@ import ch.qos.logback.classic.Level;
 
 import static spark.Spark.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.management.ManagementFactory;
+
 public class Server {
 
   private static final Logger logger = (Logger) LoggerFactory.getLogger(Server.class);
@@ -24,11 +28,27 @@ public class Server {
   public static void main(String[] args) {
     try {
       options = ServerOptions.fromArgs(args);
+      logStartupInfo();
       setUp();
     } catch (ParseException | InvalidOptionException e) {
       System.err.println(e.getMessage());
       System.exit(-1);
     }
+  }
+
+  private static void logStartupInfo() {
+    var byteArrayOutputStream = new ByteArrayOutputStream();
+    var printStream = new PrintStream(byteArrayOutputStream);
+    ServerInfo.getInstance().load().print(printStream);
+    logger.info("\n"+byteArrayOutputStream.toString());
+    logger.info("JVM: {} {} ({}), Java {} at {}",
+        System.getProperty("java.vm.name"),
+        System.getProperty("java.vm.version"),
+        System.getProperty("java.vm.vendor"),
+        System.getProperty("java.version"),
+        System.getProperty("java.home"));
+    logger.debug("JVM arguments: {}", ManagementFactory.getRuntimeMXBean().getInputArguments());
+    logger.debug("\nOptions: \n{}", options);
   }
 
   public static void setUp() {
@@ -48,7 +68,7 @@ public class Server {
     rootLogger.setLevel(Level.INFO); // avoid verbose Jetty messages
     Logger ourLogger = (Logger) LoggerFactory.getLogger("tv.mediagenix");
     ourLogger.setLevel(options.isDebuggingEnabled() ? Level.DEBUG : Level.INFO);
-    logger.debug("Options: {}", options);
+
   }
 
   private static void configureFilters() {

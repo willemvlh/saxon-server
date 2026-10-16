@@ -4,6 +4,7 @@ import tv.mediagenix.xslt.transformer.Version;
 
 import org.apache.commons.cli.*;
 import java.io.File;
+import java.io.PrintStream;
 import java.net.URI;
 import java.nio.file.Paths;
 
@@ -75,7 +76,7 @@ public class ServerOptions {
       System.exit(0);
     }
     if (cmd.hasOption("version")) {
-      printInformation();
+      printInformation(System.out);
       System.exit(0);
     }
     if (cmd.hasOption("port")) {
@@ -136,13 +137,9 @@ public class ServerOptions {
     return options;
   }
 
-  private static void printInformation() {
+  private static void printInformation(PrintStream out) {
     ServerInfo info = ServerInfo.getInstance().load();
-    System.out.printf("Saxon Server version: %s%n", info.getSaxonServerVersion());
-    System.out.printf("Saxon version:        %s%n", info.getSaxonVersion());
-    System.out.printf("Git commit:           %s%n", info.getGitCommitHash());
-    System.out.printf("JDK compiler version: %s%n", info.getJdkCompilerVersion());
-    System.out.printf("Build timestamp:      %s%n", info.getBuildTimestamp());
+    info.print(out);
   }
 
   public boolean isDebuggingEnabled() {
@@ -154,9 +151,12 @@ public class ServerOptions {
   }
 
   public String toString() {
-    return String.format("Debug: %s\n", isDebuggingEnabled()) +
+    return String.format("Debug: %s\n", debug) +
         String.format("Port: %s\n", port) +
         String.format("Insecure: %s\n", insecure) +
+        String.format("Transformation timeout (ms): %s\n", transformationTimeoutMs) +
+        String.format("Disable frontend: %s\n", disableFrontend) +
+        String.format("Base URI: %s\n", baseURI) +
         String.format("Config: %s \n", configFile == null ? "none" : configFile.getAbsolutePath());
   }
 }
