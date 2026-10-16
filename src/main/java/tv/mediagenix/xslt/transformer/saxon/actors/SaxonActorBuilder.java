@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.om.NameChecker;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
@@ -66,6 +67,9 @@ public abstract class SaxonActorBuilder {
   public SaxonActorBuilder setParameters(Map<String, String> parameters) {
     Map<QName, XdmValue> qNameParams = new HashMap<>();
     parameters.forEach((k, v) -> {
+      if (!NameChecker.isValidNCName(k)) {
+        throw new IllegalArgumentException("Invalid parameter name: " + k);
+      }
       qNameParams.put(new QName(k), XdmAtomicValue.makeAtomicValue(v));
     });
     instance.setParameters(qNameParams);

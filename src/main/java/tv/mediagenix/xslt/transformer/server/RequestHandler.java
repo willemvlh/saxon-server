@@ -170,6 +170,8 @@ public abstract class RequestHandler {
     } catch (TransformationException e) {
       logger.error("Error during actor construction: ", e);
       throw new InvalidRequestException(e);
+    } catch (IllegalArgumentException e) {
+      throw new InvalidRequestException(e.getMessage());
     }
   }
 
