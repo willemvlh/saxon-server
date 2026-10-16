@@ -35,6 +35,7 @@ public abstract class RequestHandler {
   protected ServerOptions options = Server.getOptions();
   private Request request;
   private Response response;
+  private String requestId = java.util.UUID.randomUUID().toString();
 
   public Request getRequest() {
     return request;
@@ -133,6 +134,7 @@ public abstract class RequestHandler {
 
   public Void handle() throws InvalidRequestException, IOException, TransformationException {
     long startTime = System.currentTimeMillis();
+    logger.info("Handling request {} from {}", requestId, request.ip());
     logParts();
     TypedInputStream input = getStream("xml").orElse(null);
     try {
@@ -148,7 +150,7 @@ public abstract class RequestHandler {
       return null;
     } finally {
       if (logger.isInfoEnabled()) {
-        logger.info("Finished request {} in {} milliseconds", request.session().id(),
+        logger.info("Finished request {} in {} milliseconds", requestId,
             System.currentTimeMillis() - startTime);
       }
     }

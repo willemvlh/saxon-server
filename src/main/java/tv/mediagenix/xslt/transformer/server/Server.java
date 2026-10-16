@@ -53,8 +53,8 @@ public class Server {
 
   private static void configureFilters() {
     before("/*", (req, res) -> {
-      logger.info("Received request from {} (session-id = {}, content-length={})", req.ip(),
-          req.session().id(), req.contentLength());
+      logger.info("Received request from {} (content-length={})", req.ip(),
+          req.contentLength());
       res.raw().setHeader("Server", "/");
     });
   }
