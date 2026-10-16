@@ -8,8 +8,8 @@ import net.sf.saxon.trans.XPathException;
 import tv.mediagenix.xslt.transformer.saxon.core.SaxonResourceResolver;
 
 public class SaxonSecureConfigurationFactory extends SaxonConfigurationFactory {
-  public Configuration newConfiguration() {
-    Configuration config = super.newConfiguration();
+  @Override
+  protected void configure(Configuration config) {
     config.setCollectionFinder((context, collectionURI) -> {
       throw new XPathException("Collection access is not allowed.");
     });
@@ -18,7 +18,6 @@ public class SaxonSecureConfigurationFactory extends SaxonConfigurationFactory {
      */
     config.setConfigurationProperty(Feature.ALLOWED_PROTOCOLS, "file");
     config.setConfigurationProperty(Feature.ALLOW_EXTERNAL_FUNCTIONS, false);
-    return config;
   }
 
   @Override

@@ -1,6 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.config;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.StandardUnparsedTextResolver;
 
 public class SaxonFixedConfigurationFactory extends SaxonConfigurationFactory {
 
@@ -10,7 +11,7 @@ public class SaxonFixedConfigurationFactory extends SaxonConfigurationFactory {
     this.configuration = configuration;
     var resolver = newResourceResolver(this.configuration);
     this.configuration.setResourceResolver(resolver);
-    this.configuration.setUnparsedTextURIResolver(resolver);
+    this.configuration.setUnparsedTextURIResolver(new StandardUnparsedTextResolver());
   }
 
   @Override

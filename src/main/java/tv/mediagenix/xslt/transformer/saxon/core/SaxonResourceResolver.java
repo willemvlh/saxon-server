@@ -1,9 +1,7 @@
 package tv.mediagenix.xslt.transformer.saxon.core;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -14,23 +12,20 @@ import javax.xml.transform.stream.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.sf.saxon.Configuration;
 import net.sf.saxon.lib.ProtocolRestrictor;
 import net.sf.saxon.lib.ResourceRequest;
 import net.sf.saxon.lib.ResourceResolver;
-import net.sf.saxon.lib.UnparsedTextURIResolver;
 import net.sf.saxon.trans.XPathException;
 
 /*
  * Allows accessing files sent as multipart form-data
  */
-public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIResolver {
+public class SaxonResourceResolver implements ResourceResolver {
 
   private Map<String, InputStream> files = Map.of();
   private boolean allowExternalResources;
   private Logger logger = LoggerFactory.getLogger(this.getClass());
   private ResourceResolver defaultResourceResolver;
-  private UnparsedTextURIResolver defaultUnparsedTextURIResolver;
   private URI baseURI = null;
   private ProtocolRestrictor protocolRestrictor;
 
@@ -43,10 +38,9 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
   }
 
   public SaxonResourceResolver(boolean allowExternalResources, ResourceResolver defaultResourceResolver,
-      UnparsedTextURIResolver unparsedTextURIResolver, ProtocolRestrictor protocolRestrictor) {
+      ProtocolRestrictor protocolRestrictor) {
     this.allowExternalResources = allowExternalResources;
     this.defaultResourceResolver = defaultResourceResolver;
-    this.defaultUnparsedTextURIResolver = unparsedTextURIResolver;
     this.protocolRestrictor = protocolRestrictor;
   }
 
@@ -55,49 +49,64 @@ public class SaxonResourceResolver implements ResourceResolver, UnparsedTextURIR
   }
 
   public void setFiles(Map<String, InputStream> files) {
+    for (Map.Entry<String, InputStream> entry : files.entrySet()) {
+      var stream = entry.getValue();
+      if (!stream.markSupported()) {
+        logger.warn(
+            "Input stream for file: {} does not support mark/reset!",
+            entry.getKey());
+      } else {
+        stream.mark(Integer.MAX_VALUE);
+      }
+    }
     this.files = files;
   }
 
+  /*
+   * Handles both XML resources (doc(), xsl:include, ...) and non-XML resources
+   * (unparsed-text(), json-doc(), ...). For the latter, Saxon's default
+   * StandardUnparsedTextResolver delegates to the configuration's ResourceResolver,
+   * but only supplies the absolute URI. In that case we derive the relative URI from
+   * the base URI set by the application.
+   */
   @Override
   public Source resolve(ResourceRequest request) throws XPathException {
     logger.debug("Resolving resource -> Relative URI: {}, Base URI: {}, URI: {}, Nature: {}", request.relativeUri,
         request.baseUri, request.uri, request.nature);
-    if (request.relativeUri != null && files.containsKey(request.relativeUri)) {
-      logger.debug("Resource found in files map: {}", request.relativeUri);
-      return new StreamSource(files.get(request.relativeUri));
+    var key = findFileKey(request);
+    if (key != null) {
+      logger.debug("Resource found in files map: {}", key);
+      var stream = files.get(key);
+      try {
+        stream.reset();
+      } catch (IOException e) {
+        logger.warn("Could not reset stream for resource: {}. Multiple reads may deliver inconsistent results",
+            key, e);
+      }
+      return new StreamSource(stream, request.uri);
     }
-    if (allowExternalResources && protocolRestrictor.test(URI.create(request.uri))) {
+    if (allowExternalResources && request.uri != null && protocolRestrictor.test(URI.create(request.uri))) {
       logger.debug("Resource not found in files map, delegating to default resource resolver");
-      return defaultResourceResolver.resolve(request);
+      return defaultResourceResolver == null ? null : defaultResourceResolver.resolve(request);
     }
-    throw new XPathException("External resource access is not allowed: " + request.relativeUri);
+    throw new XPathException("External resource access is not allowed: " + relativeUri(request));
   }
 
-  @Override
-  public Reader resolve(URI absoluteURI, String encoding, Configuration config) throws XPathException {
-    logger.debug("Resolving unparsed text URI -> Base URI: {}, Absolute URI: {}, Encoding: {}", baseURI, absoluteURI,
-        encoding);
-    /*
-     * Unfortunately, we only get an absolute URI, which makes it hard to tell how
-     * to resolve the request against any files supplied in the HTTP request.
-     * To work around this, we subtract the base URI set by the application from the
-     * absoluteURI parameter.
-     */
+  private String findFileKey(ResourceRequest request) {
+    if (request.relativeUri != null && files.containsKey(request.relativeUri)) {
+      return request.relativeUri;
+    }
+    var relative = relativeUri(request);
+    return relative != null && files.containsKey(relative) ? relative : null;
+  }
 
-    var relativeURI = baseURI.relativize(absoluteURI);
-    if (files.containsKey(relativeURI.toString())) {
-      logger.debug("Resource found in files map: {}", relativeURI);
-      try {
-        return new InputStreamReader(files.get(relativeURI.toString()), encoding != null ? encoding : "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        throw new XPathException("Unsupported encoding: " + encoding, e);
-      }
+  private String relativeUri(ResourceRequest request) {
+    if (request.relativeUri != null) {
+      return request.relativeUri;
     }
-    if (allowExternalResources && protocolRestrictor.test(absoluteURI)) {
-      logger.debug("Resource not found in files map, delegating to default resource resolver");
-      return defaultUnparsedTextURIResolver.resolve(absoluteURI, encoding, config);
-    } else {
-      throw new XPathException("External resource access is not allowed: " + absoluteURI);
+    if (request.uri != null && baseURI != null) {
+      return baseURI.relativize(URI.create(request.uri)).toString();
     }
+    return request.uri;
   }
 }
