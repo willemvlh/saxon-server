@@ -84,6 +84,10 @@ public abstract class SaxonActor {
   protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output)
       throws TransformationException;
 
+/*
+ * Note that even though we impose a timeout, the underlying transformation will still continue to run in the background since a thread in Java cannot be stopped.
+ */
+
   protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output)
       throws TransformationException {
     ExecutorService service = new ForkJoinPool();
