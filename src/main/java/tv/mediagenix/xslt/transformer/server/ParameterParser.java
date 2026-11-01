@@ -33,10 +33,10 @@ public class ParameterParser {
     String paramName = "";
     String paramValue = "";
     int counter = 0;
-    char c;
+    int c;
     while (true) {
       checkParameterLength(++counter);
-      c = (char) reader.read();
+      c =  reader.read();
       switch (c) {
         case '\\':
           buffer.append(readEscapedCharacter(reader));
@@ -45,7 +45,7 @@ public class ParameterParser {
           ensureBufferNotEmpty("Parameter name must not be empty");
           paramName = readAndFlushBuffer();
           break;
-        case 0xffff:
+        case -1:
           if (paramName.length() == 0) {
             if (buffer.length() > 0) {
               throw new IllegalArgumentException("Unexpected EOF");
@@ -87,7 +87,7 @@ public class ParameterParser {
   }
 
   private Object readEscapedCharacter(StringReader reader) throws IOException {
-    char c = (char) reader.read();
+    int c = reader.read();
     if (c == -1) {
       throw new IllegalArgumentException("Expected character after \\");
     }
