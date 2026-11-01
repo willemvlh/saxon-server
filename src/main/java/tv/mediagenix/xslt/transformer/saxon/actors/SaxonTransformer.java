@@ -1,7 +1,6 @@
 package tv.mediagenix.xslt.transformer.saxon.actors;
 
 import net.sf.saxon.s9api.*;
-import net.sf.saxon.Configuration;
 import net.sf.saxon.serialize.SerializationProperties;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
@@ -9,7 +8,6 @@ import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 import javax.xml.transform.Source;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;

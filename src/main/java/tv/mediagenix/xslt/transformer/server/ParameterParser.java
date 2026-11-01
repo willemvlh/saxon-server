@@ -36,7 +36,7 @@ public class ParameterParser {
     int c;
     while (true) {
       checkParameterLength(++counter);
-      c =  reader.read();
+      c = reader.read();
       switch (c) {
         case '\\':
           buffer.append(readEscapedCharacter(reader));
@@ -86,7 +86,7 @@ public class ParameterParser {
     buffer = new StringBuilder();
   }
 
-  private Object readEscapedCharacter(StringReader reader) throws IOException {
+  private char readEscapedCharacter(StringReader reader) throws IOException {
     int c = reader.read();
     if (c == -1) {
       throw new IllegalArgumentException("Expected character after \\");
@@ -94,7 +94,7 @@ public class ParameterParser {
     if (c != ';' && c != '=' && c != '\\') {
       throw new IllegalArgumentException("\\" + c + " is an invalid escape sequence");
     }
-    return c;
+    return (char) c;
   }
 
   public Map<String, String> parseStream(InputStream s, int size) throws IOException {

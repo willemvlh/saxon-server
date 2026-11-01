@@ -95,8 +95,11 @@ public abstract class SaxonActor {
       FutureTask<SerializationProps> task = new FutureTask<>(() -> act(input, stylesheet, output));
       service.submit(task);
       return task.get(this.timeout, TimeUnit.MILLISECONDS);
-    } catch (TimeoutException | InterruptedException e) {
+    } catch (TimeoutException e) {
       logger.debug("Timeout limit ({} ms)was reached", timeout);
+      throw new TransformationException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new TransformationException(e);
     } catch (ExecutionException e) {
       throw new TransformationException((e.getCause() == null ? e : e.getCause()).getMessage(), e);

@@ -12,7 +12,7 @@ public class ServerOptions {
   private Integer port = 5000;
   private File configFile;
   private boolean insecure = false;
-  private long transformationTimeoutMs = 2 * 60 * 1000;
+  private long transformationTimeoutMs = 2L * 60 * 1000;
   private boolean debug = false;
   private boolean disableFrontend = false;
   private URI baseURI = Paths.get("").toAbsolutePath().toUri();

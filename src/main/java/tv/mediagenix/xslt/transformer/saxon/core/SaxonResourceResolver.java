@@ -3,7 +3,6 @@ package tv.mediagenix.xslt.transformer.saxon.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.xml.transform.Source;
@@ -22,12 +21,12 @@ import net.sf.saxon.trans.XPathException;
  */
 public class SaxonResourceResolver implements ResourceResolver {
 
+  private final boolean allowExternalResources;
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final ResourceResolver defaultResourceResolver;
+  private final ProtocolRestrictor protocolRestrictor;
   private Map<String, InputStream> files = Map.of();
-  private boolean allowExternalResources;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
-  private ResourceResolver defaultResourceResolver;
   private URI baseURI = null;
-  private ProtocolRestrictor protocolRestrictor;
 
   public URI getBaseURI() {
     return baseURI;
@@ -65,8 +64,10 @@ public class SaxonResourceResolver implements ResourceResolver {
   /*
    * Handles both XML resources (doc(), xsl:include, ...) and non-XML resources
    * (unparsed-text(), json-doc(), ...). For the latter, Saxon's default
-   * StandardUnparsedTextResolver delegates to the configuration's ResourceResolver,
-   * but only supplies the absolute URI. In that case we derive the relative URI from
+   * StandardUnparsedTextResolver delegates to the configuration's
+   * ResourceResolver,
+   * but only supplies the absolute URI. In that case we derive the relative URI
+   * from
    * the base URI set by the application.
    */
   @Override
