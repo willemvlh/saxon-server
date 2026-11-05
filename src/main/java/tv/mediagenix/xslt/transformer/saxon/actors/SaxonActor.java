@@ -16,6 +16,7 @@ import tv.mediagenix.xslt.transformer.saxon.config.sax.SecureSAXSourceFactory;
 import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
+import tv.mediagenix.xslt.transformer.saxon.core.CancelableOutputStream;
 
 import java.io.*;
 import java.net.URI;
@@ -75,7 +76,7 @@ public abstract class SaxonActor {
         DocumentBuilder b = getProcessor().newDocumentBuilder();
         context = b.build(saxSourceFactory.newSAXSource(input.getInputStream()));
       }
-      return actWithTimeout(context, stylesheet.getInputStream(), output);
+      return actWithTimeout(context, stylesheet.getInputStream(), new CancelableOutputStream(output));
     } catch (SaxonApiException e) {
       throw new TransformationException(e);
     }
@@ -84,11 +85,14 @@ public abstract class SaxonActor {
   protected abstract SerializationProps act(XdmValue input, InputStream stylesheet, OutputStream output)
       throws TransformationException;
 
-/*
- * Note that even though we impose a timeout, the underlying transformation will still continue to run in the background since a thread in Java cannot be stopped.
- */
+  /*
+   * Note that even though we impose a timeout, the underlying transformation will
+   * still continue to run in the background as long as it doesn't try to write
+   * any output,
+   * since a thread in Java cannot be stopped.
+   */
 
-  protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, OutputStream output)
+  protected SerializationProps actWithTimeout(XdmValue input, InputStream stylesheet, CancelableOutputStream output)
       throws TransformationException {
     ExecutorService service = new ForkJoinPool();
     try {
@@ -96,9 +100,16 @@ public abstract class SaxonActor {
       service.submit(task);
       return task.get(this.timeout, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
-      logger.debug("Timeout limit ({} ms)was reached", timeout);
-      throw new TransformationException(e);
+      logger.debug("Timeout limit ({} ms) was reached", timeout);
+
+      // Canceling the output stream ensures the transformation thread throws and
+      // stops as soon as it tries to write
+      // after the timeout is reached.
+      output.cancel();
+
+      throw new TransformationException(String.format("Timeout limit (%d ms) was reached", timeout), e);
     } catch (InterruptedException e) {
+      // Something interrupted the calling thread, e.g. server shutdown
       Thread.currentThread().interrupt();
       throw new TransformationException(e);
     } catch (ExecutionException e) {
