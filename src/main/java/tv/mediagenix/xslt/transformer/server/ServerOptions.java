@@ -15,6 +15,7 @@ public class ServerOptions {
   private long transformationTimeoutMs = 2L * 60 * 1000;
   private boolean debug = false;
   private boolean disableFrontend = false;
+  private boolean disableInfo = false;
   private URI baseURI = Paths.get("").toAbsolutePath().toUri();
 
   public URI getBaseURI() {
@@ -31,6 +32,14 @@ public class ServerOptions {
 
   public void setDisableFrontend(boolean disableFrontend) {
     this.disableFrontend = disableFrontend;
+  }
+
+  public boolean isDisableInfo() {
+    return disableInfo;
+  }
+
+  public void setDisableInfo(boolean disableInfo) {
+    this.disableInfo = disableInfo;
   }
 
   public Integer getPort() {
@@ -111,6 +120,9 @@ public class ServerOptions {
     if (cmd.hasOption("disable-frontend")) {
       serverOptions.setDisableFrontend(true);
     }
+    if (cmd.hasOption("disable-info")) {
+      serverOptions.setDisableInfo(true);
+    }
     if (cmd.hasOption("base-uri")) {
       try {
         URI baseUri = URI.create(cmd.getOptionValue("base-uri"));
@@ -134,6 +146,7 @@ public class ServerOptions {
     options.addOption("d", "debug", false, "Enable debug logging statements");
     options.addOption("b", "base-uri", true, "Base URI for resolving relative URIs");
     options.addOption("df", "disable-frontend", false, "Disable the frontend (HTML) interface");
+    options.addOption("di", "disable-info", false, "Disable the GET /info endpoint");
     return options;
   }
 
@@ -156,6 +169,7 @@ public class ServerOptions {
         String.format("Insecure: %s\n", insecure) +
         String.format("Transformation timeout (ms): %s\n", transformationTimeoutMs) +
         String.format("Disable frontend: %s\n", disableFrontend) +
+        String.format("Disable info: %s\n", disableInfo) +
         String.format("Base URI: %s\n", baseURI) +
         String.format("Config: %s \n", configFile == null ? "none" : configFile.getAbsolutePath());
   }

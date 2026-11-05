@@ -35,4 +35,14 @@ public class ServerInfoTest{
     System.out.println(info.getJdkCompilerVersion());
     assertTrue(info.getJdkCompilerVersion().matches("[\\d\\.]+"));
   }
+
+  @Test
+  public void getOsName() {
+    assertTrue(info.getOsName() != null && !info.getOsName().isBlank());
+  }
+
+  @Test
+  public void getOsVersion() {
+    assertTrue(info.getOsVersion() != null && !info.getOsVersion().isBlank());
+  }
 }

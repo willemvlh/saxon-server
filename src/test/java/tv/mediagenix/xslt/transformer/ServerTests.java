@@ -298,6 +298,15 @@ class ServerTests {
   }
 
   @Test
+  void getInfoWhenDisabled() {
+    TestRequest req = new TestRequest();
+    req.setPath("info");
+    req.setIsGetRequest();
+    var res = runServer(req::execute, "--disable-info");
+    assertEquals(404, res.code());
+  }
+
+  @Test
   void getInfoContentType() {
     TestRequest req = new TestRequest();
     req.setPath("info");

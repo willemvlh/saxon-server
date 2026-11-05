@@ -22,6 +22,7 @@ Following command-line options are available:
 * `-c`, `--config <arg>`: Location to Saxon configuration XML file
 * `-d`, `--debug`: Enable debug logging statements
 * `-df`, `--disable-frontend`: Disable the frontend HTML interface 
+* `-di`, `--disable-info`: Disable the `GET /info` endpoint
 * `-h`, `--help`: Display help
 * `-i`, `--insecure`: Run with default (insecure) configuration
 * `-p`, `--port <arg>`: Port on which the server runs
