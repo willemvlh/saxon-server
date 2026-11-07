@@ -1,3 +1,5 @@
+[![CI](https://github.com/willemvlh/saxon-server/actions/workflows/ci.yml/badge.svg)](https://github.com/willemvlh/saxon-server/actions/workflows/ci.yml)
+
 This application exposes an HTTP API to perform XSLT and XQuery transformations using the Saxon processor.
 
 ## Installing
