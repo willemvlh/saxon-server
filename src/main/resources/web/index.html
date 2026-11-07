@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Saxon server</title>
+    <link rel="stylesheet" href="codemirror/codemirror.min.css" />
     <style>
       :root {
         --accent: #2563eb;
@@ -21,9 +22,7 @@
 
       body {
         margin: 0;
-        padding: 10px;
         display: flex;
-        justify-content: center;
         background: var(--bg);
         font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         color: #111827;
@@ -31,12 +30,8 @@
 
       main {
         background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        padding: 2rem;
+        padding: 1rem;
         width: 100%;
-        max-width: 90%;
         display: flex;
         flex-direction: column;
       }
@@ -50,8 +45,9 @@
 
       .fields {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-auto-rows: minmax(0, 1fr);
+        gap: 1rem;
         flex: 1;
         min-height: 0;
       }
@@ -60,6 +56,7 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
+        min-width: 0;
       }
 
       label {
@@ -80,8 +77,40 @@
         resize: none;
       }
 
-      textarea:focus {
+      .options {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+
+      textarea:focus,
+      input[type="text"]:focus {
         outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+
+      .CodeMirror {
+        flex: 1;
+        height: auto;
+        min-height: 0;
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+
+      .CodeMirror-focused {
         border-color: var(--accent);
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
       }
@@ -104,8 +133,9 @@
       }
 
       @media (max-width: 700px) {
-        .fields {
-          grid-template-columns: 1fr;
+        .fields,
+        .options {
+          grid-template-columns: minmax(0, 1fr);
         }
       }
     </style>
@@ -139,6 +169,16 @@
 </textarea>
           </div>
         </div>
+        <div class="options">
+          <div class="field">
+            <label for="parameters">Stylesheet parameters</label>
+            <input type="text" id="parameters" name="parameters" placeholder="myParam=value;other=value" spellcheck="false">
+          </div>
+          <div class="field">
+            <label for="output">Serialization parameters</label>
+            <input type="text" id="output" name="output" placeholder="method=xml;indent=yes" spellcheck="false">
+          </div>
+        </div>
         <div id="file" style="margin: 10px 0;">
           <label for="fileInput">Additional files</label>  
           <input type="file" id="fileInput" name="fileInput" multiple>  
@@ -146,5 +186,28 @@
         <button type="submit">Transform</button>
       </form>
     </main>
+    <script src="codemirror/codemirror.min.js"></script>
+    <script src="codemirror/xml.min.js"></script>
+    <script>
+      for (const id of ["xml", "xsl"]) {
+        CodeMirror.fromTextArea(document.getElementById(id), {
+          mode: "xml",
+          lineNumbers: true,
+        });
+      }
+
+      // The server rejects an empty "parameters" or "output" part, so leave
+      // those fields out of the request when they are blank.
+      document.getElementById("transformForm").addEventListener("formdata", (e) => {
+        for (const name of ["parameters", "output"]) {
+          const value = (e.formData.get(name) || "").trim();
+          if (value) {
+            e.formData.set(name, value);
+          } else {
+            e.formData.delete(name);
+          }
+        }
+      });
+    </script>
   </body>
 </html>
