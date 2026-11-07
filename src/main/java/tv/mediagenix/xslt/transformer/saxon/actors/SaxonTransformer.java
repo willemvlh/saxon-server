@@ -55,7 +55,7 @@ public class SaxonTransformer extends SaxonActor {
     Serializer s = transformer.newSerializer(os);
     SerializationProperties props = new SerializationProperties();
     getSerializationParameters().forEach(props::setProperty);
-    s.setOutputProperties(s.getSerializationProperties().combineWith(props));
+    s.setOutputProperties(props.combineWith(s.getSerializationProperties()));
     return s;
   }
 

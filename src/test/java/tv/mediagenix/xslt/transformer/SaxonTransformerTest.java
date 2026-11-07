@@ -8,6 +8,7 @@ import ch.qos.logback.core.read.ListAppender;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonActor;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformer;
 import tv.mediagenix.xslt.transformer.saxon.actors.SaxonTransformerBuilder;
+import tv.mediagenix.xslt.transformer.saxon.core.SerializationProps;
 import tv.mediagenix.xslt.transformer.saxon.core.TransformationException;
 import tv.mediagenix.xslt.transformer.saxon.core.TypedInputStream;
 
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,7 +103,8 @@ class SaxonTransformerTest {
 
   @Test
   void files() throws TransformationException {
-    SaxonActor actor = new SaxonTransformerBuilder().setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>").getInputStream()))
+    SaxonActor actor = new SaxonTransformerBuilder()
+        .setFiles(Collections.singletonMap("test.xml", getStream("<abc>Expected value</abc>").getInputStream()))
         .build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     String xsl = "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"3.0\">" +
@@ -140,43 +143,59 @@ class SaxonTransformerTest {
   }
 
   @Test
-  void collectionTest(){
+  void collectionTest() {
     SaxonTransformer xf = new SaxonTransformer();
     xf.setInsecure(false);
-    assertThrows(TransformationException.class, () -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
-        new ByteArrayOutputStream()));
+    assertThrows(TransformationException.class,
+        () -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
+            new ByteArrayOutputStream()));
     xf.setInsecure(true);
-    assertDoesNotThrow(() -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
-        new ByteArrayOutputStream()));
+    assertDoesNotThrow(
+        () -> xf.act(TestHelpers.WellFormedXmlStream(), TestHelpers.resourceStream("xsl/test-collection.xsl"),
+            new ByteArrayOutputStream()));
   }
 
   @Test
   void testIncludeSecure() throws URISyntaxException {
     SaxonActor actor = new SaxonTransformerBuilder()
-      .setInsecure(false)
-            .setBaseURI(this.getClass().getResource("xsl").toURI())
-      .build();
-    assertThrows(TransformationException.class, () -> actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
+        .setInsecure(false)
+        .setBaseURI(this.getClass().getResource("xsl").toURI())
+        .build();
+    assertThrows(TransformationException.class,
+        () -> actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
   }
 
   @Test
   void testIncludeInsecure() throws URISyntaxException {
     SaxonActor actor = new SaxonTransformerBuilder()
-            .setInsecure(true)
-            .setTimeout(3600*1000)
-            .setBaseURI(this.getClass().getResource("xsl/").toURI())
-            .build();
-    assertDoesNotThrow(() -> actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
+        .setInsecure(true)
+        .setTimeout(3600 * 1000)
+        .setBaseURI(this.getClass().getResource("xsl/").toURI())
+        .build();
+    assertDoesNotThrow(
+        () -> actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), new ByteArrayOutputStream()));
   }
 
   @Test
   void testIncludeFromAttachedFile() throws TransformationException {
     SaxonActor actor = new SaxonTransformerBuilder()
-      .setFiles(Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/included.xsl").getInputStream()))
-      .build();
+        .setFiles(
+            Collections.singletonMap("included.xsl", TestHelpers.resourceStream("xsl/included.xsl").getInputStream()))
+        .build();
     var output = new ByteArrayOutputStream();
     actor.act(null, TestHelpers.resourceStream("xsl/test-include.xsl"), output);
     assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>Hello, world!", output.toString());
+  }
+
+  @Test
+  void serializationPropsFromParametersTakePriority() throws TransformationException {
+    SaxonActor actor = new SaxonTransformerBuilder()
+        .setSerializationProperties(Map.of("method", "json"))
+        .build();
+    var output = new ByteArrayOutputStream();
+    actor.act(TestHelpers.resourceStream("xml/dummy.xml"), TestHelpers.resourceStream("xsl/test-method-text-output-map.xsl"),
+        output);
+    assertEquals("{}", output.toString());
   }
 
   private ByteArrayOutputStream transformWithStrings(String xml, String xsl) throws TransformationException {
